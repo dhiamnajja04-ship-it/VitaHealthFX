@@ -34,6 +34,15 @@ public class ServiceVitaHealth {
         userDAO.ajouter(medecin);
     }
 
+    public void inscrireAdmin(User admin) throws SQLException {
+        if (userDAO.findByEmail(admin.getEmail()) != null) {
+            throw new SQLException("Email déjà utilisé");
+        }
+        admin.setRole("admin");
+        admin.setVerified(true);
+        userDAO.ajouter(admin);
+    }
+
     public User login(String email, String password) throws SQLException {
         User user = userDAO.findByEmail(email);
         if (user != null && password.equals(user.getPassword())) {
@@ -57,6 +66,24 @@ public class ServiceVitaHealth {
 
     public List<User> getAllMedecins() throws SQLException {
         return userDAO.getAllMedecins();
+    }
+
+    // ========== RECHERCHE ==========
+
+    public List<User> rechercherUtilisateursParNom(String nom) throws SQLException {
+        return userDAO.rechercherParNom(nom);
+    }
+
+    public List<User> rechercherUtilisateursParEmail(String email) throws SQLException {
+        return userDAO.rechercherParEmail(email);
+    }
+
+    public List<User> rechercherUtilisateursParRole(String role) throws SQLException {
+        return userDAO.rechercherParRole(role);
+    }
+
+    public List<User> rechercherMedecinsParSpecialite(String specialite) throws SQLException {
+        return userDAO.rechercherParSpecialite(specialite);
     }
 
     // UPDATE - User

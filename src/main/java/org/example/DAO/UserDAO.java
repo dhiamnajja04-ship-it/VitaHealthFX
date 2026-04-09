@@ -92,6 +92,61 @@ public class UserDAO {
         return findByRole("medecin");
     }
 
+    // ==================== RECHERCHE ====================
+
+    public List<User> rechercherParNom(String nom) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM user WHERE first_name LIKE ? OR last_name LIKE ?";
+        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, "%" + nom + "%");
+            pstmt.setString(2, "%" + nom + "%");
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                users.add(mapResultSet(rs));
+            }
+        }
+        return users;
+    }
+
+    public List<User> rechercherParEmail(String email) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM user WHERE email LIKE ?";
+        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, "%" + email + "%");
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                users.add(mapResultSet(rs));
+            }
+        }
+        return users;
+    }
+
+    public List<User> rechercherParRole(String role) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM user WHERE role = ?";
+        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, role);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                users.add(mapResultSet(rs));
+            }
+        }
+        return users;
+    }
+
+    public List<User> rechercherParSpecialite(String specialite) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM user WHERE specialite LIKE ? AND role = 'medecin'";
+        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, "%" + specialite + "%");
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                users.add(mapResultSet(rs));
+            }
+        }
+        return users;
+    }
+
     // ==================== UPDATE ====================
     public void update(User user) throws SQLException {
         String sql = "UPDATE user SET email=?, password=?, first_name=?, last_name=?, role=?, " +
