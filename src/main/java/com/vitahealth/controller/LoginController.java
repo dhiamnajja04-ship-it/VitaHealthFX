@@ -1,182 +1,150 @@
 package com.vitahealth.controller;
 
-import com.vitahealth.dao.UserDAO;
-import com.vitahealth.model.User;
-import com.vitahealth.util.SessionManager;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.animation.PauseTransition;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
+import com.vitahealth.service.ServiceVitaHealth;
+import com.vitahealth.entity.User;
+import com.vitahealth.entity.Role;
+import com.vitahealth.App;
+import com.vitahealth.util.SessionManager;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.stage.Stage;
-import java.util.regex.Pattern;
+
+import java.sql.SQLException;
 
 public class LoginController {
 
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
-    @FXML private Button registerButton;
-    @FXML private Label errorLabel;
+    private final ServiceVitaHealth service = new ServiceVitaHealth();
+    private TextField emailField;
+    private PasswordField passwordField;
+    private Label messageLabel;
 
-    private UserDAO userDAO;
-    private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+    public Scene getScene() {
+        StackPane root = new StackPane();
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #1a1a2e, #16213e);");
 
-    @FXML
-    public void initialize() {
-        System.out.println("=== LoginController initialisé ===");
-        userDAO = new UserDAO();
+        VBox card = new VBox(20);
+        card.setAlignment(Pos.CENTER);
+        card.setMaxWidth(400);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 40;");
 
-        loginButton.setOnAction(e -> handleLogin());
-        registerButton.setOnAction(e -> openRegister());
+        Text title = new Text("🌟 VITAHEALTH");
+        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e66;");
+
+        emailField = new TextField();
+        emailField.setPromptText("📧 Email");
+        emailField.setStyle("-fx-padding: 12; -fx-background-radius: 10;");
+
+        passwordField = new PasswordField();
+        passwordField.setPromptText("🔒 Mot de passe");
+        passwordField.setStyle("-fx-padding: 12; -fx-background-radius: 10;");
+
+        messageLabel = new Label();
+        messageLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 12px;");
+
+        Button loginBtn = new Button("SE CONNECTER");
+        loginBtn.setStyle("-fx-background-color: #2c3e66; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-padding: 12; -fx-background-radius: 25; -fx-cursor: hand;");
+        loginBtn.setMaxWidth(Double.MAX_VALUE);
+        loginBtn.setOnAction(e -> handleLogin());
+
+        Hyperlink registerLink = new Hyperlink("📝 Pas encore de compte ? S'inscrire");
+        registerLink.setStyle("-fx-text-fill: #2c3e66; -fx-font-size: 12px;");
+        registerLink.setOnAction(e -> openRegister());
+
         passwordField.setOnAction(e -> handleLogin());
 
-        // Validation en temps réel
-        emailField.textProperty().addListener((obs, old, val) -> validateEmail());
-        passwordField.textProperty().addListener((obs, old, val) -> validatePassword());
+        card.getChildren().addAll(title, emailField, passwordField, messageLabel, loginBtn, registerLink);
+        root.getChildren().add(card);
 
-        // Styles CSS
-        loginButton.getStyleClass().add("btn-primary");
-        registerButton.getStyleClass().add("btn-outline");
-    }
-
-    private void validateEmail() {
-        String email = emailField.getText().trim();
-        if (!email.isEmpty() && !EMAIL_PATTERN.matcher(email).matches()) {
-            emailField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
-        } else {
-            emailField.setStyle("");
-        }
-    }
-
-    private void validatePassword() {
-        String password = passwordField.getText();
-        if (!password.isEmpty() && password.length() < 6) {
-            passwordField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
-        } else {
-            passwordField.setStyle("");
-        }
-    }
-
-    private boolean isFormValid() {
-        String email = emailField.getText().trim();
-        String password = passwordField.getText();
-
-        if (email.isEmpty()) {
-            errorLabel.setText("Veuillez saisir votre email");
-            return false;
-        }
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
-            errorLabel.setText("Email invalide");
-            return false;
-        }
-        if (password.isEmpty()) {
-            errorLabel.setText("Veuillez saisir votre mot de passe");
-            return false;
-        }
-        if (password.length() < 6) {
-            errorLabel.setText("Le mot de passe doit contenir au moins 6 caractères");
-            return false;
-        }
-        return true;
+        Scene scene = new Scene(root, 1200, 800);
+        scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+        return scene;
     }
 
     private void handleLogin() {
-        errorLabel.setText("");
-
-        if (!isFormValid()) {
-            errorLabel.setStyle("-fx-text-fill: #e74c3c;");
-            return;
-        }
-
         String email = emailField.getText().trim();
         String password = passwordField.getText();
 
-        // Désactiver le bouton pendant l'authentification
-        loginButton.setDisable(true);
-        loginButton.setText("Connexion en cours...");
+        if (email.isEmpty() || password.isEmpty()) {
+            showError("❌ Veuillez remplir tous les champs");
+            return;
+        }
 
-        User user = userDAO.authenticate(email, password);
+        try {
+            User user = service.login(email, password);
+            if (user != null) {
+                SessionManager.getInstance().setCurrentUser(user);
 
-        if (user != null) {
-            SessionManager.getInstance().setCurrentUser(user);
-            errorLabel.setText("✅ Connexion réussie !");
-            errorLabel.setStyle("-fx-text-fill: #27ae60;");
+                messageLabel.setStyle("-fx-text-fill: #28a745;");
+                messageLabel.setText("✅ Connexion réussie ! Redirection...");
 
-            new Thread(() -> {
-                try {
-                    Thread.sleep(1000);
-                    javafx.application.Platform.runLater(() -> redirectToDashboard(user));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        } else {
-            loginButton.setDisable(false);
-            loginButton.setText("SE CONNECTER");
-            errorLabel.setText("❌ Email ou mot de passe incorrect");
-            errorLabel.setStyle("-fx-text-fill: #e74c3c;");
+                PauseTransition delay = new PauseTransition(Duration.seconds(1));
+                delay.setOnFinished(e -> redirectByRole(user));
+                delay.play();
+            } else {
+                showError("❌ Email ou mot de passe incorrect");
+            }
+        } catch (SQLException e) {
+            showError("❌ Erreur de connexion : " + e.getMessage());
         }
     }
 
-    private void redirectToDashboard(User user) {
+    private void redirectByRole(User user) {
         try {
-            String fxmlFile;
-            int width, height;
-            String role = user.getRole().toUpperCase();
-
-            switch (role) {
-                case "ADMIN":
-                    fxmlFile = "/fxml/AdminDashboard.fxml";
-                    width = 1200;
-                    height = 700;
+            switch (user.getRole()) {
+                case Role.ADMIN:
+                    App.changeScene(new AdminDashboardController(user).getScene());
                     break;
-                case "DOCTOR":
-                    fxmlFile = "/fxml/DoctorDashboard.fxml";
-                    width = 1100;
-                    height = 700;
+                case Role.MEDECIN:
+                    // Charger la vue médecin (FXML)
+                    Parent medecinRoot = FXMLLoader.load(getClass().getResource("/fxml/MedecinView.fxml"));
+                    Scene medecinScene = new Scene(medecinRoot, 1200, 800);
+                    medecinScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                    Stage medecinStage = (Stage) emailField.getScene().getWindow();
+                    medecinStage.setScene(medecinScene);
+                    medecinStage.setTitle("VitaHealthFX - Espace Médecin");
                     break;
-                case "PATIENT":
-                    fxmlFile = "/fxml/PatientDashboard.fxml";
-                    width = 1000;
-                    height = 700;
+                case Role.PATIENT:
+                    Parent patientRoot = FXMLLoader.load(getClass().getResource("/fxml/PatientDashboard.fxml"));
+                    Scene patientScene = new Scene(patientRoot, 1200, 800);
+                    patientScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                    Stage patientStage = (Stage) emailField.getScene().getWindow();
+                    patientStage.setScene(patientScene);
+                    patientStage.setTitle("VitaHealthFX - Espace Patient");
                     break;
                 default:
-                    fxmlFile = "/fxml/HomeView.fxml";
-                    width = 1200;
-                    height = 700;
+                    showError("Rôle inconnu : " + user.getRole());
             }
-
-            Parent dashboard = FXMLLoader.load(getClass().getResource(fxmlFile));
-            Scene scene = new Scene(dashboard, width, height);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.setTitle("VitaHealthFX - " + role);
-            stage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
-            errorLabel.setText("Erreur technique: " + e.getMessage());
-            errorLabel.setStyle("-fx-text-fill: #e74c3c;");
-            loginButton.setDisable(false);
-            loginButton.setText("SE CONNECTER");
+            showError("Erreur lors de la redirection : " + e.getMessage());
         }
     }
 
     private void openRegister() {
         try {
-            Parent registerView = FXMLLoader.load(getClass().getResource("/fxml/RegisterView.fxml"));
-            Scene scene = new Scene(registerView, 500, 700);
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/RegisterView.fxml"));
+            Scene scene = new Scene(root, 1200, 800);
             scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            Stage stage = (Stage) registerButton.getScene().getWindow();
+            Stage stage = (Stage) emailField.getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("VitaHealthFX - Inscription");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
+            showError("❌ Impossible d'ouvrir la page d'inscription");
         }
+    }
+
+    private void showError(String message) {
+        messageLabel.setStyle("-fx-text-fill: #dc3545;");
+        messageLabel.setText(message);
     }
 }

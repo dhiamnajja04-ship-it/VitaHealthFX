@@ -1,9 +1,9 @@
-package com.vitahealth.controller.admin;
+package com.vitahealth.controller;
 
 import com.vitahealth.dao.AppointmentDAO;
 import com.vitahealth.dao.UserDAO;
-import com.vitahealth.model.Appointment;
-import com.vitahealth.model.User;
+import com.vitahealth.entity.User;
+import com.vitahealth.entity.Appointment;
 import com.vitahealth.util.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -134,7 +135,6 @@ public class AdminController {
         appColReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         appColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // ✅ CORRECTION ICI : setCellFactory pour la date
         appColDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         appColDate.setCellFactory(column -> new TableCell<Appointment, LocalDateTime>() {
             @Override
@@ -148,7 +148,6 @@ public class AdminController {
             }
         });
 
-        // Style des statuts
         appColStatus.setCellFactory(column -> new TableCell<Appointment, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -171,7 +170,8 @@ public class AdminController {
                         case "CANCELLED":
                             setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
                             break;
-                        default: setStyle("");
+                        default:
+                            setStyle("");
                     }
                 }
             }
@@ -196,38 +196,50 @@ public class AdminController {
     }
 
     private void loadDashboardStats() {
-        List<User> allUsers = userDAO.getAllUsers();
-        totalUsersLabel.setText(String.valueOf(allUsers.size()));
+        try {
+            List<User> allUsers = userDAO.findAll();
+            totalUsersLabel.setText(String.valueOf(allUsers.size()));
 
-        long patientsCount = allUsers.stream().filter(u -> "PATIENT".equals(u.getRole())).count();
-        long doctorsCount = allUsers.stream().filter(u -> "DOCTOR".equals(u.getRole())).count();
+            long patientsCount = allUsers.stream().filter(u -> "PATIENT".equals(u.getRole())).count();
+            long doctorsCount = allUsers.stream().filter(u -> "DOCTOR".equals(u.getRole())).count();
 
-        totalPatientsLabel.setText(String.valueOf(patientsCount));
-        totalDoctorsLabel.setText(String.valueOf(doctorsCount));
+            totalPatientsLabel.setText(String.valueOf(patientsCount));
+            totalDoctorsLabel.setText(String.valueOf(doctorsCount));
 
-        List<Appointment> allAppointments = appointmentDAO.getAllAppointments();
-        totalAppointmentsLabel.setText(String.valueOf(allAppointments.size()));
+            List<Appointment> allAppointments = appointmentDAO.getAllAppointments();
+            totalAppointmentsLabel.setText(String.valueOf(allAppointments.size()));
 
-        long newUsers = allUsers.stream().filter(u -> u.getId() > (allUsers.size() - 10)).count();
-        newUsersLabel.setText(String.valueOf(newUsers));
+            long newUsers = allUsers.stream().filter(u -> u.getId() > (allUsers.size() - 10)).count();
+            newUsersLabel.setText(String.valueOf(newUsers));
 
-        long monthApps = allAppointments.stream().filter(a -> {
-            if (a.getDate() == null) return false;
-            return a.getDate().getMonthValue() == LocalDateTime.now().getMonthValue();
-        }).count();
-        monthAppointmentsLabel.setText(String.valueOf(monthApps));
+            long monthApps = allAppointments.stream().filter(a -> {
+                if (a.getDate() == null) return false;
+                return a.getDate().getMonthValue() == LocalDateTime.now().getMonthValue();
+            }).count();
+            monthAppointmentsLabel.setText(String.valueOf(monthApps));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger les statistiques : " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     private void loadAllUsers() {
-        usersList = FXCollections.observableArrayList(userDAO.getAllUsers());
-        userTable.setItems(usersList);
-        double avgId = usersList.stream().mapToInt(User::getId).average().orElse(0);
-        avgAgeLabel.setText(String.format("%.1f", avgId));
+        try {
+            usersList = FXCollections.observableArrayList(userDAO.findAll());
+            userTable.setItems(usersList);
+            double avgId = usersList.stream().mapToInt(User::getId).average().orElse(0);
+            avgAgeLabel.setText(String.format("%.1f", avgId));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger les utilisateurs : " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     private void loadAllAppointments() {
-        appointmentsList = FXCollections.observableArrayList(appointmentDAO.getAllAppointments());
-        appointmentTable.setItems(appointmentsList);
+
+            appointmentsList = FXCollections.observableArrayList(appointmentDAO.getAllAppointments());
+            appointmentTable.setItems(appointmentsList);
+
     }
 
     private void searchUsers() {
@@ -258,11 +270,11 @@ public class AdminController {
     }
 
     private void openAddUserDialog() {
-        showAlert("Information", "Fonctionnalite a implementer", Alert.AlertType.INFORMATION);
+        showAlert("Information", "Fonctionnalité à implémenter", Alert.AlertType.INFORMATION);
     }
 
     private void openEditUserDialog(User user) {
-        showAlert("Information", "Fonctionnalite a implementer", Alert.AlertType.INFORMATION);
+        showAlert("Information", "Fonctionnalité à implémenter", Alert.AlertType.INFORMATION);
     }
 
     private void deleteUser(User user) {
@@ -271,9 +283,15 @@ public class AdminController {
         confirm.setHeaderText("Supprimer l'utilisateur ?");
         confirm.setContentText("Voulez-vous vraiment supprimer " + user.getFullName() + " ?");
         confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK && userDAO.deleteUser(user.getId())) {
-                showAlert("Succes", "Utilisateur supprime", Alert.AlertType.INFORMATION);
-                refreshAll();
+            if (response == ButtonType.OK) {
+                try {
+                    userDAO.delete(user.getId());
+                    showAlert("Succès", "Utilisateur supprimé", Alert.AlertType.INFORMATION);
+                    refreshAll();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Erreur", "Suppression impossible : " + e.getMessage(), Alert.AlertType.ERROR);
+                }
             }
         });
     }
@@ -284,8 +302,9 @@ public class AdminController {
         confirm.setHeaderText("Annuler le rendez-vous ?");
         confirm.setContentText("Voulez-vous vraiment annuler ce rendez-vous ?");
         confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK && appointmentDAO.cancelAppointment(appointment.getId())) {
-                showAlert("Succes", "Rendez-vous annule", Alert.AlertType.INFORMATION);
+            if (response == ButtonType.OK) {
+                appointmentDAO.cancelAppointment(appointment.getId());
+                showAlert("Succès", "Rendez-vous annulé", Alert.AlertType.INFORMATION);
                 refreshAll();
             }
         });

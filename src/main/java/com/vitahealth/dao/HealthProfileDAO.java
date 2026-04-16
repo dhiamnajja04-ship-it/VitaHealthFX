@@ -1,6 +1,6 @@
 package com.vitahealth.dao;
 
-import com.vitahealth.model.HealthProfile;
+import com.vitahealth.entity.HealthProfile;
 import java.sql.*;
 
 public class HealthProfileDAO {

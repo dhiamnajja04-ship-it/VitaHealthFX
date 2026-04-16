@@ -1,23 +1,24 @@
-package org.example.service;
+package com.vitahealth.service;
 
-import org.example.entity.User;
-import org.example.dao.UserDAO;
+import com.vitahealth.entity.User;
+import com.vitahealth.dao.UserDAO;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.SQLException;
 import java.util.List;
 
 public class ServiceVitaHealth {
     private UserDAO userDAO = new UserDAO();
 
-    // ========== AUTHENTIFICATION ==========
+    // ✅ Connexion avec vérification BCrypt
     public User login(String email, String password) throws SQLException {
         User user = userDAO.findByEmail(email);
-        if (user != null && password.equals(user.getPassword())) {
+        if (user != null && BCrypt.checkpw(password, user.getPassword())) {
             return user;
         }
         return null;
     }
 
-    // ========== READ ==========
     public User getUserById(int id) throws SQLException {
         return userDAO.findById(id);
     }
@@ -30,17 +31,14 @@ public class ServiceVitaHealth {
         return userDAO.getAllMedecins();
     }
 
-    // ========== UPDATE ==========
     public void updateUser(User user) throws SQLException {
         userDAO.update(user);
     }
 
-    // ========== DELETE ==========
     public void deleteUser(int id) throws SQLException {
         userDAO.delete(id);
     }
 
-    // ========== RECHERCHE SQL ==========
     public List<User> rechercherUtilisateursParNom(String nom) throws SQLException {
         return userDAO.rechercherParNom(nom);
     }
@@ -53,20 +51,19 @@ public class ServiceVitaHealth {
         return userDAO.rechercherParRole(role);
     }
 
-    // ========== RECHERCHE STREAM ==========
+    // ✅ Méthodes Stream corrigées (appellent les bonnes méthodes)
     public List<User> rechercherUtilisateursParNomStream(String nom) throws SQLException {
-        return userDAO.rechercherParNomStream(nom);
+        return userDAO.rechercherParNom(nom);
     }
 
     public List<User> rechercherUtilisateursParEmailStream(String email) throws SQLException {
-        return userDAO.rechercherParEmailStream(email);
+        return userDAO.rechercherParEmail(email);  // retourne List, pas User
     }
 
     public List<User> rechercherUtilisateursParRoleStream(String role) throws SQLException {
-        return userDAO.rechercherParRoleStream(role);
+        return userDAO.findByRole(role);
     }
 
-    // ========== STATISTIQUES ==========
     public long compterUtilisateursParRole(String role) throws SQLException {
         return userDAO.compterParRole(role);
     }

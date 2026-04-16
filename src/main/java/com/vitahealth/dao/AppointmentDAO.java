@@ -1,9 +1,8 @@
 package com.vitahealth.dao;
 
-import com.vitahealth.model.Appointment;
-import com.vitahealth.model.User;
+import com.vitahealth.entity.Appointment;
+import com.vitahealth.entity.User;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

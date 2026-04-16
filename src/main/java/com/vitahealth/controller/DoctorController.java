@@ -1,10 +1,16 @@
-package com.vitahealth.controller.doctor;
+package com.vitahealth.controller;
 
 import com.vitahealth.dao.AppointmentDAO;
 import com.vitahealth.dao.UserDAO;
-import com.vitahealth.model.Appointment;
-import com.vitahealth.model.User;
+import com.vitahealth.dao.ParaMedicalDAO;
+import com.vitahealth.dao.PrescriptionDAO;
+import com.vitahealth.entity.Appointment;
+import com.vitahealth.entity.User;
+import com.vitahealth.entity.ParaMedical;
+import com.vitahealth.entity.Prescription;
 import com.vitahealth.util.SessionManager;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,6 +30,7 @@ import java.util.stream.Collectors;
 
 public class DoctorController {
 
+    // ========== COMPOSANTS EXISTANTS ==========
     @FXML private Label userLabel;
     @FXML private Button logoutBtn;
 
@@ -44,11 +51,48 @@ public class DoctorController {
     @FXML private TableColumn<User, String> patColLastAppointment;
     @FXML private TableColumn<User, Void> patColActions;
 
+    // ========== NOUVEAUX COMPOSANTS POUR PRESCRIPTIONS ==========
+    @FXML private ComboBox<User> patientPrescCombo;
+    @FXML private Button loadPatientPrescBtn;
+    @FXML private Button refreshPrescListBtn;
+    @FXML private TextArea medicamentsArea;
+    @FXML private TextField dureeField;
+    @FXML private TextArea instructionsArea;
+    @FXML private TableView<Prescription> prescriptionTable;
+    @FXML private TableColumn<Prescription, LocalDateTime> colPrescDate;
+    @FXML private TableColumn<Prescription, String> colMedicaments;
+    @FXML private TableColumn<Prescription, String> colDuree;
+    @FXML private TableColumn<Prescription, String> colInstructions;
+    @FXML private Button ajouterPrescriptionBtn;
+    @FXML private Button modifierPrescriptionBtn;
+    @FXML private Button supprimerPrescriptionBtn;
+    @FXML private Button viderPrescChampsBtn;
+
+    // ========== NOUVEAUX COMPOSANTS POUR PARAMÈTRES MÉDICAUX ==========
+    @FXML private ComboBox<User> patientParamCombo;
+    @FXML private Button loadPatientParamBtn;
+    @FXML private Button refreshParamListBtn;
+    @FXML private TableView<ParaMedical> parametreTable;
+    @FXML private TableColumn<ParaMedical, LocalDateTime> colParamDate;
+    @FXML private TableColumn<ParaMedical, Double> colPoids;
+    @FXML private TableColumn<ParaMedical, Double> colTaille;
+    @FXML private TableColumn<ParaMedical, Double> colGlycemie;
+    @FXML private TableColumn<ParaMedical, String> colTension;
+    @FXML private TableColumn<ParaMedical, Double> colImc;
+    @FXML private TableColumn<ParaMedical, String> colInterpretation;
+
+    // ========== DAOs ==========
     private AppointmentDAO appointmentDAO;
     private UserDAO userDAO;
+    private ParaMedicalDAO paraMedicalDAO;
+    private PrescriptionDAO prescriptionDAO;
+
     private User currentUser;
     private ObservableList<Appointment> appointmentsList;
     private ObservableList<User> patientsList;
+    private ObservableList<Prescription> prescriptionsList;
+    private ObservableList<ParaMedical> parametresList;
+
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -56,47 +100,63 @@ public class DoctorController {
     public void initialize() {
         appointmentDAO = new AppointmentDAO();
         userDAO = new UserDAO();
-        currentUser = SessionManager.getInstance().getCurrentUser();
+        paraMedicalDAO = new ParaMedicalDAO();
+        prescriptionDAO = new PrescriptionDAO();
 
+        currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser != null) {
             userLabel.setText("👨‍⚕️ Dr. " + currentUser.getFullName());
         }
 
+        // Configuration des composants existants
         setupAppointmentsTable();
         setupPatientsTable();
 
+        // Configuration des nouveaux composants
+        setupPrescriptions();
+        setupParametres();
+
+        // Chargement des données
         loadAppointments();
         loadPatients();
+        loadPatientsForCombos();
 
+        // Écouteurs existants
         dateFilter.setOnAction(e -> filterAppointmentsByDate());
         clearFilterBtn.setOnAction(e -> clearFilter());
         refreshBtn.setOnAction(e -> refreshAll());
         searchPatientField.textProperty().addListener((obs, old, val) -> searchPatients());
         logoutBtn.setOnAction(e -> logout());
+
+        // Écouteurs nouveaux
+        loadPatientPrescBtn.setOnAction(e -> loadPrescriptionsForPatient());
+        refreshPrescListBtn.setOnAction(e -> loadPrescriptionsForPatient());
+        ajouterPrescriptionBtn.setOnAction(e -> ajouterPrescription());
+        modifierPrescriptionBtn.setOnAction(e -> modifierPrescription());
+        supprimerPrescriptionBtn.setOnAction(e -> supprimerPrescription());
+        viderPrescChampsBtn.setOnAction(e -> viderChampsPrescription());
+
+        loadPatientParamBtn.setOnAction(e -> loadParametresForPatient());
+        refreshParamListBtn.setOnAction(e -> loadParametresForPatient());
     }
 
+    // ========== CONFIGURATIONS ==========
     private void setupAppointmentsTable() {
         colTime.setCellValueFactory(new PropertyValueFactory<>("date"));
         colTime.setCellFactory(column -> new TableCell<Appointment, LocalDateTime>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
+            @Override protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.format(timeFormatter));
             }
         });
-
         colPatient.setCellValueFactory(new PropertyValueFactory<>("patientName"));
         colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-
         colStatus.setCellFactory(column -> new TableCell<Appointment, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
+            @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
+                if (empty || item == null) setText(null);
+                else {
                     setText(item);
                     switch (item.toUpperCase()) {
                         case "SCHEDULED": setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;"); break;
@@ -108,12 +168,10 @@ public class DoctorController {
                 }
             }
         });
-
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button confirmBtn = new Button("✓ Confirmer");
             private final Button cancelBtn = new Button("✗ Annuler");
             private final HBox buttons = new HBox(8, confirmBtn, cancelBtn);
-
             {
                 confirmBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12;");
                 cancelBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12;");
@@ -126,19 +184,12 @@ public class DoctorController {
                     updateAppointmentStatus(app, "CANCELLED");
                 });
             }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
+            @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
+                if (empty) setGraphic(null);
+                else {
                     Appointment app = getTableView().getItems().get(getIndex());
-                    if ("SCHEDULED".equals(app.getStatus())) {
-                        setGraphic(buttons);
-                    } else {
-                        setGraphic(null);
-                    }
+                    setGraphic("SCHEDULED".equals(app.getStatus()) ? buttons : null);
                 }
             }
         });
@@ -148,7 +199,6 @@ public class DoctorController {
         patColName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         patColEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         patColLastAppointment.setCellValueFactory(new PropertyValueFactory<>("lastAppointment"));
-
         patColActions.setCellFactory(param -> new TableCell<>() {
             private final Button historyBtn = new Button("📋 Historique");
             {
@@ -158,31 +208,54 @@ public class DoctorController {
                     showPatientHistory(patient);
                 });
             }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
+            @Override protected void updateItem(Void item, boolean empty) {
                 setGraphic(empty ? null : historyBtn);
             }
         });
     }
 
+    private void setupPrescriptions() {
+        colPrescDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        colMedicaments.setCellValueFactory(new PropertyValueFactory<>("medicationList"));
+        colDuree.setCellValueFactory(new PropertyValueFactory<>("duration"));
+        colInstructions.setCellValueFactory(new PropertyValueFactory<>("instructions"));
+        colPrescDate.setCellFactory(column -> new TableCell<Prescription, LocalDateTime>() {
+            @Override protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.format(dateFormatter));
+            }
+        });
+    }
+
+    private void setupParametres() {
+        colParamDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        colPoids.setCellValueFactory(new PropertyValueFactory<>("poids"));
+        colTaille.setCellValueFactory(new PropertyValueFactory<>("taille"));
+        colGlycemie.setCellValueFactory(new PropertyValueFactory<>("glycemie"));
+        colTension.setCellValueFactory(new PropertyValueFactory<>("tensionSystolique"));
+        colImc.setCellValueFactory(cellData -> {
+            Double imc = cellData.getValue().getImc();
+            return new SimpleObjectProperty<>(imc != null ? imc : 0.0);
+        });
+        colInterpretation.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getImcInterpretation()));
+        colParamDate.setCellFactory(column -> new TableCell<ParaMedical, LocalDateTime>() {
+            @Override protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.format(dateFormatter));
+            }
+        });
+        colImc.setCellFactory(column -> new TableCell<ParaMedical, Double>() {
+            @Override protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%.2f", item));
+            }
+        });
+    }
+
+    // ========== CHARGEMENT DES DONNÉES ==========
     private void loadAppointments() {
         appointmentsList = FXCollections.observableArrayList(appointmentDAO.getAppointmentsByDoctor(currentUser.getId()));
-        appointmentsTable.setItems(appointmentsList);
-    }
-
-    private void filterAppointmentsByDate() {
-        LocalDate date = dateFilter.getValue();
-        if (date != null) {
-            List<Appointment> filtered = appointmentsList.stream()
-                    .filter(a -> a.getDate() != null && a.getDate().toLocalDate().equals(date))
-                    .collect(Collectors.toList());
-            appointmentsTable.setItems(FXCollections.observableArrayList(filtered));
-        }
-    }
-
-    private void clearFilter() {
-        dateFilter.setValue(null);
         appointmentsTable.setItems(appointmentsList);
     }
 
@@ -205,16 +278,117 @@ public class DoctorController {
         patientsTable.setItems(patientsList);
     }
 
-    private void searchPatients() {
-        String keyword = searchPatientField.getText().toLowerCase();
-        if (keyword.isEmpty()) {
-            patientsTable.setItems(patientsList);
-        } else {
-            List<User> filtered = patientsList.stream()
-                    .filter(p -> p.getFullName().toLowerCase().contains(keyword))
-                    .collect(Collectors.toList());
-            patientsTable.setItems(FXCollections.observableArrayList(filtered));
+    private void loadPatientsForCombos() {
+        try {
+            List<User> allPatients = userDAO.findByRole("PATIENT");
+            ObservableList<User> patientOptions = FXCollections.observableArrayList(allPatients);
+            patientPrescCombo.setItems(patientOptions);
+            patientParamCombo.setItems(patientOptions);
+            // Configurer les converters pour afficher le nom complet
+            patientPrescCombo.setConverter(new javafx.util.StringConverter<User>() {
+                @Override public String toString(User u) { return u != null ? u.getFullName() : ""; }
+                @Override public User fromString(String s) { return null; }
+            });
+            patientParamCombo.setConverter(new javafx.util.StringConverter<User>() {
+                @Override public String toString(User u) { return u != null ? u.getFullName() : ""; }
+                @Override public User fromString(String s) { return null; }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private void loadPrescriptionsForPatient() {
+        User patient = patientPrescCombo.getValue();
+        if (patient == null) {
+            showAlert("Info", "Sélectionnez un patient", Alert.AlertType.INFORMATION);
+            return;
+        }
+        List<Prescription> prescriptions = prescriptionDAO.getByPatientId(patient.getId());
+        prescriptionsList = FXCollections.observableArrayList(prescriptions);
+        prescriptionTable.setItems(prescriptionsList);
+    }
+
+    private void loadParametresForPatient() {
+        User patient = patientParamCombo.getValue();
+        if (patient == null) {
+            showAlert("Info", "Sélectionnez un patient", Alert.AlertType.INFORMATION);
+            return;
+        }
+        List<ParaMedical> parametres = paraMedicalDAO.getByUserId(patient.getId());
+        parametresList = FXCollections.observableArrayList(parametres);
+        parametreTable.setItems(parametresList);
+    }
+
+    // ========== GESTION PRESCRIPTIONS ==========
+    private void ajouterPrescription() {
+        User patient = patientPrescCombo.getValue();
+        if (patient == null) {
+            showAlert("Erreur", "Choisissez un patient", Alert.AlertType.ERROR);
+            return;
+        }
+        Prescription p = new Prescription();
+        p.setMedicationList(medicamentsArea.getText());
+        p.setInstructions(instructionsArea.getText());
+        p.setDuration(dureeField.getText());
+        if (prescriptionDAO.ajouter(patient.getId(), currentUser.getId(), p)) {
+            showAlert("Succès", "Prescription ajoutée", Alert.AlertType.INFORMATION);
+            loadPrescriptionsForPatient();
+            viderChampsPrescription();
+        } else {
+            showAlert("Erreur", "Échec de l'ajout", Alert.AlertType.ERROR);
+        }
+    }
+
+    private void modifierPrescription() {
+        Prescription selected = prescriptionTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Info", "Sélectionnez une prescription", Alert.AlertType.WARNING);
+            return;
+        }
+        selected.setMedicationList(medicamentsArea.getText());
+        selected.setInstructions(instructionsArea.getText());
+        selected.setDuration(dureeField.getText());
+        if (prescriptionDAO.modifier(selected)) {
+            showAlert("Succès", "Prescription modifiée", Alert.AlertType.INFORMATION);
+            loadPrescriptionsForPatient();
+        } else {
+            showAlert("Erreur", "Modification impossible", Alert.AlertType.ERROR);
+        }
+    }
+
+    private void supprimerPrescription() {
+        Prescription selected = prescriptionTable.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cette prescription ?", ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES && prescriptionDAO.supprimer(selected.getId())) {
+                showAlert("Succès", "Prescription supprimée", Alert.AlertType.INFORMATION);
+                loadPrescriptionsForPatient();
+            }
+        });
+    }
+
+    private void viderChampsPrescription() {
+        medicamentsArea.clear();
+        dureeField.clear();
+        instructionsArea.clear();
+    }
+
+    // ========== GESTION RENDEZ-VOUS ==========
+    private void filterAppointmentsByDate() {
+        LocalDate date = dateFilter.getValue();
+        if (date != null) {
+            List<Appointment> filtered = appointmentsList.stream()
+                    .filter(a -> a.getDate() != null && a.getDate().toLocalDate().equals(date))
+                    .collect(Collectors.toList());
+            appointmentsTable.setItems(FXCollections.observableArrayList(filtered));
+        }
+    }
+
+    private void clearFilter() {
+        dateFilter.setValue(null);
+        appointmentsTable.setItems(appointmentsList);
     }
 
     private void updateAppointmentStatus(Appointment appointment, String status) {
@@ -232,7 +406,6 @@ public class DoctorController {
                     .append(" : ").append(app.getReason())
                     .append(" (").append(app.getStatus()).append(")\n");
         }
-
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Historique du patient");
         alert.setHeaderText("Historique des rendez-vous de " + patient.getFullName());
@@ -240,13 +413,28 @@ public class DoctorController {
         alert.showAndWait();
     }
 
+    private void searchPatients() {
+        String keyword = searchPatientField.getText().toLowerCase();
+        if (keyword.isEmpty()) {
+            patientsTable.setItems(patientsList);
+        } else {
+            List<User> filtered = patientsList.stream()
+                    .filter(p -> p.getFullName().toLowerCase().contains(keyword))
+                    .collect(Collectors.toList());
+            patientsTable.setItems(FXCollections.observableArrayList(filtered));
+        }
+    }
+
     private void refreshAll() {
         loadAppointments();
         loadPatients();
         dateFilter.setValue(null);
         searchPatientField.clear();
+        if (patientPrescCombo.getValue() != null) loadPrescriptionsForPatient();
+        if (patientParamCombo.getValue() != null) loadParametresForPatient();
     }
 
+    // ========== DÉCONNEXION ==========
     private void logout() {
         SessionManager.getInstance().logout();
         try {

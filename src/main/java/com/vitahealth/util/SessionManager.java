@@ -1,6 +1,7 @@
 package com.vitahealth.util;
 
-import com.vitahealth.model.User;
+import com.vitahealth.entity.User;
+import com.vitahealth.entity.User;
 
 public class SessionManager {
     private static SessionManager instance;

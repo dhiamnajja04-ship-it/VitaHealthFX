@@ -1,4 +1,4 @@
-package com.vitahealth.model;
+package com.vitahealth.entity;
 
 public class HealthProfile {
     private int id;

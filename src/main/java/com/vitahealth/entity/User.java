@@ -1,4 +1,4 @@
-package org.example.entity;
+package com.vitahealth.entity;
 
 public class User {
     private int id;
@@ -52,4 +52,14 @@ public class User {
     public void setGlycemie(Double glycemie) { this.glycemie = glycemie; }
     public void setTension(String tension) { this.tension = tension; }
     public void setMaladie(String maladie) { this.maladie = maladie; }
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    @Override
+    public String toString() {
+        return getFullName();
+    }
+
+
 }
