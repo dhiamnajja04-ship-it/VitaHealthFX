@@ -119,10 +119,10 @@
                         </GridPane>
 
                         <HBox spacing="15.0">
-                            <Button fx:id="ajouterParametreBtn" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="➕ Ajouter" />
-                            <Button fx:id="modifierParametreBtn" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="✏️ Modifier" />
-                            <Button fx:id="supprimerParametreBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="🗑️ Supprimer" />
-                            <Button fx:id="rafraichirParametresBtn" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="🔄 Rafraîchir" />
+                            <Button fx:id="ajouterParametreBtn" text=" Ajouter" />
+                            <Button fx:id="modifierParametreBtn" text=" Modifier" />
+                            <Button fx:id="supprimerParametreBtn"  text="Supprimer" />
+                            <Button fx:id="rafraichirParametresBtn"  text=" Rafraîchir" />
                         </HBox>
 
                         <TableView fx:id="parametreTable" prefHeight="350">
@@ -146,10 +146,10 @@
 
                         <TableView fx:id="prescriptionTable" prefHeight="550">
                             <columns>
-                                <TableColumn fx:id="colPrescDate" text="Date" prefWidth="150" />
-                                <TableColumn fx:id="colMedicaments" text="Médicaments" prefWidth="280" />
-                                <TableColumn fx:id="colDuree" text="Durée" prefWidth="120" />
-                                <TableColumn fx:id="colInstructions" text="Instructions" prefWidth="350" />
+                                <TableColumn fx:id="colPrescDate" style="-fx-background-color: #ececec; -fx-border-color: #aaa; -fx-text-fill: black;" text="Date" prefWidth="150" />
+                                <TableColumn fx:id="colMedicaments" style="-fx-background-color: #ececec; -fx-border-color: #aaa; -fx-text-fill: black;" text="Médicaments" prefWidth="280" />
+                                <TableColumn fx:id="colDuree" style="-fx-background-color: #ececec; -fx-border-color: #aaa; -fx-text-fill: black;" text="Durée" prefWidth="120" />
+                                <TableColumn fx:id="colInstructions" style="-fx-background-color: #ececec; -fx-border-color: #aaa; -fx-text-fill: black;"  text="Instructions" prefWidth="350" />
                             </columns>
                         </TableView>
                     </VBox>

@@ -425,3 +425,8 @@
 .dialog-pane .content {
     -fx-font-size: 14px;
 }
+#ajouterParametreBtn, #modifierParametreBtn, #supprimerParametreBtn, #rafraichirParametresBtn {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #cccccc;
+    -fx-text-fill: #333;
+}
