@@ -9,18 +9,19 @@ import com.vitahealth.entity.User;
 import com.vitahealth.entity.ParaMedical;
 import com.vitahealth.entity.Prescription;
 import com.vitahealth.util.SessionManager;
+import javafx.animation.ScaleTransition;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class DoctorController {
 
-    // ========== COMPOSANTS EXISTANTS ==========
+    // ========== COMPOSANTS ==========
     @FXML private Label userLabel;
     @FXML private Button logoutBtn;
 
@@ -51,7 +52,6 @@ public class DoctorController {
     @FXML private TableColumn<User, String> patColLastAppointment;
     @FXML private TableColumn<User, Void> patColActions;
 
-    // ========== NOUVEAUX COMPOSANTS POUR PRESCRIPTIONS ==========
     @FXML private ComboBox<User> patientPrescCombo;
     @FXML private Button loadPatientPrescBtn;
     @FXML private Button refreshPrescListBtn;
@@ -68,7 +68,6 @@ public class DoctorController {
     @FXML private Button supprimerPrescriptionBtn;
     @FXML private Button viderPrescChampsBtn;
 
-    // ========== NOUVEAUX COMPOSANTS POUR PARAMÈTRES MÉDICAUX ==========
     @FXML private ComboBox<User> patientParamCombo;
     @FXML private Button loadPatientParamBtn;
     @FXML private Button refreshParamListBtn;
@@ -81,7 +80,6 @@ public class DoctorController {
     @FXML private TableColumn<ParaMedical, Double> colImc;
     @FXML private TableColumn<ParaMedical, String> colInterpretation;
 
-    // ========== DAOs ==========
     private AppointmentDAO appointmentDAO;
     private UserDAO userDAO;
     private ParaMedicalDAO paraMedicalDAO;
@@ -108,27 +106,22 @@ public class DoctorController {
             userLabel.setText("👨‍⚕️ Dr. " + currentUser.getFullName());
         }
 
-        // Configuration des composants existants
         setupAppointmentsTable();
         setupPatientsTable();
-
-        // Configuration des nouveaux composants
         setupPrescriptions();
         setupParametres();
 
-        // Chargement des données
         loadAppointments();
         loadPatients();
         loadPatientsForCombos();
 
-        // Écouteurs existants
         dateFilter.setOnAction(e -> filterAppointmentsByDate());
         clearFilterBtn.setOnAction(e -> clearFilter());
         refreshBtn.setOnAction(e -> refreshAll());
         searchPatientField.textProperty().addListener((obs, old, val) -> searchPatients());
-        logoutBtn.setOnAction(e -> logout());
 
-        // Écouteurs nouveaux
+        applyButtonStyles();
+
         loadPatientPrescBtn.setOnAction(e -> loadPrescriptionsForPatient());
         refreshPrescListBtn.setOnAction(e -> loadPrescriptionsForPatient());
         ajouterPrescriptionBtn.setOnAction(e -> ajouterPrescription());
@@ -138,9 +131,45 @@ public class DoctorController {
 
         loadPatientParamBtn.setOnAction(e -> loadParametresForPatient());
         refreshParamListBtn.setOnAction(e -> loadParametresForPatient());
+
+        logoutBtn.setOnAction(e -> logout());
     }
 
-    // ========== CONFIGURATIONS ==========
+    private void applyButtonStyles() {
+        refreshBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        clearFilterBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        loadPatientPrescBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        refreshPrescListBtn.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        loadPatientParamBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        refreshParamListBtn.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        ajouterPrescriptionBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        modifierPrescriptionBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        supprimerPrescriptionBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        viderPrescChampsBtn.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+
+        addHoverAnimation(refreshBtn);
+        addHoverAnimation(clearFilterBtn);
+        addHoverAnimation(loadPatientPrescBtn);
+        addHoverAnimation(ajouterPrescriptionBtn);
+        addHoverAnimation(modifierPrescriptionBtn);
+        addHoverAnimation(supprimerPrescriptionBtn);
+    }
+
+    private void addHoverAnimation(Button btn) {
+        btn.setOnMouseEntered(e -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), btn);
+            st.setToX(1.05);
+            st.setToY(1.05);
+            st.play();
+        });
+        btn.setOnMouseExited(e -> {
+            ScaleTransition st = new ScaleTransition(Duration.millis(200), btn);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+        });
+    }
+
     private void setupAppointmentsTable() {
         colTime.setCellValueFactory(new PropertyValueFactory<>("date"));
         colTime.setCellFactory(column -> new TableCell<Appointment, LocalDateTime>() {
@@ -173,8 +202,10 @@ public class DoctorController {
             private final Button cancelBtn = new Button("✗ Annuler");
             private final HBox buttons = new HBox(8, confirmBtn, cancelBtn);
             {
-                confirmBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12;");
-                cancelBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12;");
+                confirmBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12; -fx-cursor: hand;");
+                cancelBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12; -fx-cursor: hand;");
+                addHoverAnimation(confirmBtn);
+                addHoverAnimation(cancelBtn);
                 confirmBtn.setOnAction(e -> {
                     Appointment app = getTableView().getItems().get(getIndex());
                     updateAppointmentStatus(app, "CONFIRMED");
@@ -202,7 +233,8 @@ public class DoctorController {
         patColActions.setCellFactory(param -> new TableCell<>() {
             private final Button historyBtn = new Button("📋 Historique");
             {
-                historyBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12;");
+                historyBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 12; -fx-cursor: hand;");
+                addHoverAnimation(historyBtn);
                 historyBtn.setOnAction(e -> {
                     User patient = getTableView().getItems().get(getIndex());
                     showPatientHistory(patient);
@@ -253,7 +285,6 @@ public class DoctorController {
         });
     }
 
-    // ========== CHARGEMENT DES DONNÉES ==========
     private void loadAppointments() {
         appointmentsList = FXCollections.observableArrayList(appointmentDAO.getAppointmentsByDoctor(currentUser.getId()));
         appointmentsTable.setItems(appointmentsList);
@@ -284,7 +315,6 @@ public class DoctorController {
             ObservableList<User> patientOptions = FXCollections.observableArrayList(allPatients);
             patientPrescCombo.setItems(patientOptions);
             patientParamCombo.setItems(patientOptions);
-            // Configurer les converters pour afficher le nom complet
             patientPrescCombo.setConverter(new javafx.util.StringConverter<User>() {
                 @Override public String toString(User u) { return u != null ? u.getFullName() : ""; }
                 @Override public User fromString(String s) { return null; }
@@ -320,7 +350,6 @@ public class DoctorController {
         parametreTable.setItems(parametresList);
     }
 
-    // ========== GESTION PRESCRIPTIONS ==========
     private void ajouterPrescription() {
         User patient = patientPrescCombo.getValue();
         if (patient == null) {
@@ -332,11 +361,11 @@ public class DoctorController {
         p.setInstructions(instructionsArea.getText());
         p.setDuration(dureeField.getText());
         if (prescriptionDAO.ajouter(patient.getId(), currentUser.getId(), p)) {
-            showAlert("Succès", "Prescription ajoutée", Alert.AlertType.INFORMATION);
+            showAlert("✅ Succès", "Prescription ajoutée avec succès !", Alert.AlertType.INFORMATION);
             loadPrescriptionsForPatient();
             viderChampsPrescription();
         } else {
-            showAlert("Erreur", "Échec de l'ajout", Alert.AlertType.ERROR);
+            showAlert("❌ Erreur", "Échec de l'ajout", Alert.AlertType.ERROR);
         }
     }
 
@@ -350,20 +379,23 @@ public class DoctorController {
         selected.setInstructions(instructionsArea.getText());
         selected.setDuration(dureeField.getText());
         if (prescriptionDAO.modifier(selected)) {
-            showAlert("Succès", "Prescription modifiée", Alert.AlertType.INFORMATION);
+            showAlert("✅ Succès", "Prescription modifiée avec succès !", Alert.AlertType.INFORMATION);
             loadPrescriptionsForPatient();
         } else {
-            showAlert("Erreur", "Modification impossible", Alert.AlertType.ERROR);
+            showAlert("❌ Erreur", "Modification impossible", Alert.AlertType.ERROR);
         }
     }
 
     private void supprimerPrescription() {
         Prescription selected = prescriptionTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cette prescription ?", ButtonType.YES, ButtonType.NO);
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "⚠️ Supprimer cette prescription ?\nCette action est irréversible !",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirmation de suppression");
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES && prescriptionDAO.supprimer(selected.getId())) {
-                showAlert("Succès", "Prescription supprimée", Alert.AlertType.INFORMATION);
+                showAlert("✅ Succès", "Prescription supprimée avec succès !", Alert.AlertType.INFORMATION);
                 loadPrescriptionsForPatient();
             }
         });
@@ -375,7 +407,6 @@ public class DoctorController {
         instructionsArea.clear();
     }
 
-    // ========== GESTION RENDEZ-VOUS ==========
     private void filterAppointmentsByDate() {
         LocalDate date = dateFilter.getValue();
         if (date != null) {
@@ -393,7 +424,7 @@ public class DoctorController {
 
     private void updateAppointmentStatus(Appointment appointment, String status) {
         if (appointmentDAO.updateAppointmentStatus(appointment.getId(), status)) {
-            showAlert("Succès", "Rendez-vous " + (status.equals("CONFIRMED") ? "confirmé" : "annulé"), Alert.AlertType.INFORMATION);
+            showAlert("✅ Succès", "Rendez-vous " + (status.equals("CONFIRMED") ? "confirmé" : "annulé"), Alert.AlertType.INFORMATION);
             refreshAll();
         }
     }
@@ -406,10 +437,17 @@ public class DoctorController {
                     .append(" : ").append(app.getReason())
                     .append(" (").append(app.getStatus()).append(")\n");
         }
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Historique du patient");
+        alert.setTitle("📋 Historique du patient");
         alert.setHeaderText("Historique des rendez-vous de " + patient.getFullName());
-        alert.setContentText(history.length() > 0 ? history.toString() : "Aucun rendez-vous");
+
+        TextArea textArea = new TextArea(history.toString());
+        textArea.setEditable(false);
+        textArea.setPrefHeight(300);
+        textArea.setPrefWidth(500);
+
+        alert.getDialogPane().setContent(textArea);
         alert.showAndWait();
     }
 
@@ -434,20 +472,14 @@ public class DoctorController {
         if (patientParamCombo.getValue() != null) loadParametresForPatient();
     }
 
-    // ========== DÉCONNEXION ==========
     private void logout() {
         SessionManager.getInstance().logout();
-        try {
-            Parent loginView = FXMLLoader.load(getClass().getResource("/fxml/LoginView.fxml"));
-            Scene scene = new Scene(loginView, 450, 600);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            Stage stage = (Stage) logoutBtn.getScene().getWindow();
-            stage.setScene(scene);
-            stage.setTitle("VitaHealthFX - Connexion");
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        LoginController loginController = new LoginController();
+        Scene scene = loginController.getScene();
+        Stage stage = (Stage) logoutBtn.getScene().getWindow();
+        stage.setScene(scene);
+        stage.setTitle("VitaHealthFX - Connexion");
+        stage.show();
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {

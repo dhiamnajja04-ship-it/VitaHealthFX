@@ -1,4 +1,4 @@
-package org.example.config;
+package com.vitahealth.config;
 
 import java.sql.*;
 

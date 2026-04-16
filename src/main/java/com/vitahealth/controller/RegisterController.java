@@ -101,7 +101,7 @@ public class RegisterController {
         if (v.isEmpty()) { setFieldError(passwordField, "Mot de passe requis"); return false; }
         if (v.length() < 6) { setFieldError(passwordField, "6 caractères minimum"); return false; }
         if (!PASSWORD_PATTERN.matcher(v).matches()) {
-            setFieldError(passwordField, "1 maj, 1 min, 1 chiffre");
+            setFieldError(passwordField, "1 maj, 1 min, 1 chiffre requis");
             return false;
         }
         clearFieldError(passwordField);
@@ -113,7 +113,7 @@ public class RegisterController {
         String confirm = confirmPasswordField.getText();
         if (confirm.isEmpty()) { setFieldError(confirmPasswordField, "Confirmation requise"); return false; }
         if (!passwordField.getText().equals(confirm)) {
-            setFieldError(confirmPasswordField, "Mots de passe différents");
+            setFieldError(confirmPasswordField, "Les mots de passe ne correspondent pas");
             return false;
         }
         clearFieldError(confirmPasswordField);
@@ -134,7 +134,7 @@ public class RegisterController {
         successLabel.setText("");
 
         if (!isFormValid()) {
-            showError("❌ Corrigez les erreurs");
+            showError("❌ Veuillez corriger les erreurs dans le formulaire");
             return;
         }
 
@@ -149,22 +149,25 @@ public class RegisterController {
         newUser.setVerified(false);
 
         registerButton.setDisable(true);
-        registerButton.setText("Inscription...");
+        registerButton.setText("⏳ Inscription en cours...");
 
         try {
             boolean created = userDAO.ajouter(newUser);
             if (created) {
-                successLabel.setText("✅ Inscription réussie ! Redirection...");
+                successLabel.setText("✅ Inscription réussie ! Redirection vers la connexion...");
+                successLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                errorLabel.setText("");
+
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e -> openLogin());
                 delay.play();
             } else {
-                showError("❌ Email déjà existant");
+                showError("❌ Cet email existe déjà. Veuillez en choisir un autre.");
                 registerButton.setDisable(false);
                 registerButton.setText("S'INSCRIRE");
             }
         } catch (SQLException e) {
-            showError("❌ Erreur : " + e.getMessage());
+            showError("❌ Erreur technique : " + e.getMessage());
             registerButton.setDisable(false);
             registerButton.setText("S'INSCRIRE");
         }
@@ -174,7 +177,7 @@ public class RegisterController {
         try {
             Parent loginView = FXMLLoader.load(getClass().getResource("/fxml/LoginView.fxml"));
             Scene scene = new Scene(loginView, 1200, 800);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/css/style-light.css").toExternalForm());
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("VitaHealthFX - Connexion");
@@ -186,11 +189,12 @@ public class RegisterController {
 
     private void showError(String message) {
         errorLabel.setText(message);
-        errorLabel.setStyle("-fx-text-fill: #e74c3c;");
+        errorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 13px;");
+        successLabel.setText("");
     }
 
     private void setFieldError(Control field, String message) {
-        field.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px; -fx-border-radius: 10px;");
+        field.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px; -fx-border-radius: 12px;");
         showError(message);
     }
 

@@ -2,7 +2,7 @@ package com.vitahealth.dao;
 
 import com.vitahealth.entity.User;
 import com.vitahealth.entity.Role;
-import org.example.config.DatabaseConnection;
+import com.vitahealth.config.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,13 +10,77 @@ import java.util.List;
 
 public class UserDAO {
 
+    // ✅ AUTHENTICATE
+    public User authenticate(String email, String password) {
+        String sql = "SELECT * FROM user WHERE email = ? AND password = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return mapResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ✅ CREATE USER (pour AdminDashboardController)
+    public boolean createUser(User user) {
+        String sql = "INSERT INTO user (email, password, first_name, last_name, role) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, user.getEmail());
+            pstmt.setString(2, user.getPassword());
+            pstmt.setString(3, user.getFirstName());
+            pstmt.setString(4, user.getLastName());
+            pstmt.setString(5, user.getRole());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ✅ UPDATE USER (pour AdminDashboardController)
+    public boolean updateUser(User user) {
+        String sql = "UPDATE user SET first_name=?, last_name=?, email=?, role=? WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, user.getFirstName());
+            pstmt.setString(2, user.getLastName());
+            pstmt.setString(3, user.getEmail());
+            pstmt.setString(4, user.getRole());
+            pstmt.setInt(5, user.getId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ✅ DELETE USER (pour AdminDashboardController)
+    public boolean deleteUser(int id) {
+        String sql = "DELETE FROM user WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean ajouter(User user) throws SQLException {
         String sql = "INSERT INTO user (email, password, first_name, last_name, role, is_verified, " +
                 "specialite, diplome, cin, poids, taille, glycemie, tension, maladie) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection()
-                .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, user.getEmail());
             pstmt.setString(2, user.getPassword());
@@ -47,10 +111,10 @@ public class UserDAO {
         }
     }
 
-    // ✅ Retourne un seul User, pas une List
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM user WHERE email = ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -63,7 +127,8 @@ public class UserDAO {
 
     public User findById(int id) throws SQLException {
         String sql = "SELECT * FROM user WHERE id = ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
@@ -75,11 +140,16 @@ public class UserDAO {
     public List<User> findAll() throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM user ORDER BY id";
-        try (Statement stmt = DatabaseConnection.getConnection().createStatement();
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) users.add(mapResultSet(rs));
         }
         return users;
+    }
+
+    public List<User> getAllUsers() throws SQLException {
+        return findAll();
     }
 
     public List<User> findByRole(String role) throws SQLException {
@@ -93,7 +163,8 @@ public class UserDAO {
     public List<User> rechercherParNom(String nom) throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM user WHERE first_name LIKE ? OR last_name LIKE ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             String pattern = "%" + nom + "%";
             pstmt.setString(1, pattern);
             pstmt.setString(2, pattern);
@@ -107,7 +178,8 @@ public class UserDAO {
     public List<User> rechercherParEmail(String email) throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM user WHERE email LIKE ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, "%" + email + "%");
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) users.add(mapResultSet(rs));
@@ -119,7 +191,8 @@ public class UserDAO {
     public List<User> rechercherParRole(String role) throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM user WHERE role = ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, role);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) users.add(mapResultSet(rs));
@@ -132,7 +205,8 @@ public class UserDAO {
         String sql = "UPDATE user SET email=?, password=?, first_name=?, last_name=?, role=?, " +
                 "is_verified=?, specialite=?, diplome=?, cin=?, poids=?, taille=?, glycemie=?, tension=?, maladie=? " +
                 "WHERE id=?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getEmail());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getFirstName());
@@ -154,7 +228,8 @@ public class UserDAO {
 
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM user WHERE id = ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         }
@@ -162,7 +237,8 @@ public class UserDAO {
 
     public long compterParRole(String role) throws SQLException {
         String sql = "SELECT COUNT(*) FROM user WHERE role = ?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, role);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) return rs.getLong(1);
@@ -173,7 +249,8 @@ public class UserDAO {
 
     public double moyennePoidsPatients() throws SQLException {
         String sql = "SELECT AVG(poids) FROM user WHERE role = ? AND poids IS NOT NULL";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, Role.PATIENT);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) return rs.getDouble(1);

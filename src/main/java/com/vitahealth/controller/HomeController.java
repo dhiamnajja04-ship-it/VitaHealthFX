@@ -34,7 +34,9 @@ public class HomeController {
         try {
             Parent loginView = FXMLLoader.load(getClass().getResource("/fxml/LoginView.fxml"));
             Stage stage = (Stage) loginBtn.getScene().getWindow();
-            stage.setScene(new Scene(loginView, 400, 550));
+            Scene scene = new Scene(loginView, 450, 600);
+            scene.getStylesheets().add(getClass().getResource("/css/style-light.css").toExternalForm());
+            stage.setScene(scene);
             stage.setTitle("VitaHealthFX - Connexion");
             System.out.println("✅ Ouverture de la page de connexion");
         } catch (Exception e) {
@@ -47,7 +49,9 @@ public class HomeController {
         try {
             Parent registerView = FXMLLoader.load(getClass().getResource("/fxml/RegisterView.fxml"));
             Stage stage = (Stage) registerBtn.getScene().getWindow();
-            stage.setScene(new Scene(registerView, 450, 650));
+            Scene scene = new Scene(registerView, 500, 700);
+            scene.getStylesheets().add(getClass().getResource("/css/style-light.css").toExternalForm());
+            stage.setScene(scene);
             stage.setTitle("VitaHealthFX - Inscription");
             System.out.println("✅ Ouverture de la page d'inscription");
         } catch (Exception e) {

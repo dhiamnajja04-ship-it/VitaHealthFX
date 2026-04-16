@@ -3,9 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="750.0" prefWidth="1300.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vitahealth.controller.admin.AdminController">
+<BorderPane prefHeight="750.0" prefWidth="1300.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vitahealth.controller.AdminController">
 
     <!-- TOP BAR -->
     <top>
@@ -18,43 +17,34 @@
                 <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
             </HBox>
 
-            <!-- TAB PANE -->
             <TabPane fx:id="mainTabPane" style="-fx-background-color: white; -fx-tab-min-height: 40; -fx-tab-max-height: 40;">
 
-                <!-- TAB 1: DASHBOARD -->
                 <Tab text="📊 Dashboard" closable="false">
                     <VBox spacing="25.0" style="-fx-padding: 25;">
-
-                        <!-- Statistiques -->
                         <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Tableau de bord" />
 
                         <GridPane hgap="20.0" vgap="20.0">
-                            <!-- Total Users -->
-                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #667eea; -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                 <Label style="-fx-text-fill: white; -fx-font-size: 38px; -fx-font-weight: bold;" fx:id="totalUsersLabel" text="0" />
                                 <Label style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;" text="👥 Total Utilisateurs" />
                             </VBox>
 
-                            <!-- Total Patients -->
-                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #27ae60; -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                 <Label style="-fx-text-fill: white; -fx-font-size: 38px; -fx-font-weight: bold;" fx:id="totalPatientsLabel" text="0" />
                                 <Label style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;" text="👤 Patients" />
                             </VBox>
 
-                            <!-- Total Doctors -->
-                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: linear-gradient(135deg, #3498db 0%, #5dade2 100%); -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #3498db; -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="2" GridPane.rowIndex="0">
                                 <Label style="-fx-text-fill: white; -fx-font-size: 38px; -fx-font-weight: bold;" fx:id="totalDoctorsLabel" text="0" />
                                 <Label style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;" text="👨‍⚕️ Médecins" />
                             </VBox>
 
-                            <!-- Total Appointments -->
-                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                            <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #f39c12; -fx-padding: 25; -fx-background-radius: 15;" GridPane.columnIndex="3" GridPane.rowIndex="0">
                                 <Label style="-fx-text-fill: white; -fx-font-size: 38px; -fx-font-weight: bold;" fx:id="totalAppointmentsLabel" text="0" />
                                 <Label style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;" text="📅 Rendez-vous" />
                             </VBox>
                         </GridPane>
 
-                        <!-- Section récente -->
                         <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #34495e; -fx-padding: 10 0 0 0;" text="📈 Activité récente" />
                         <HBox spacing="20.0">
                             <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
@@ -69,10 +59,8 @@
                     </VBox>
                 </Tab>
 
-                <!-- TAB 2: GESTION DES UTILISATEURS -->
                 <Tab text="👥 Utilisateurs" closable="false">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
-                        <!-- Barre d'outils -->
                         <HBox spacing="15.0">
                             <TextField fx:id="searchField" promptText="🔍 Rechercher par email, nom..." HBox.hgrow="ALWAYS" style="-fx-background-radius: 25; -fx-padding: 10 15;" />
                             <Button fx:id="searchBtn" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="Rechercher" />
@@ -80,7 +68,6 @@
                             <Button fx:id="refreshBtn" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="🔄 Rafraîchir" />
                         </HBox>
 
-                        <!-- Tableau des utilisateurs -->
                         <TableView fx:id="userTable" prefHeight="550.0">
                             <columns>
                                 <TableColumn fx:id="colId" text="ID" prefWidth="60" />
@@ -93,7 +80,6 @@
                             </columns>
                         </TableView>
 
-                        <!-- Footer stats -->
                         <HBox alignment="CENTER_RIGHT" spacing="15.0">
                             <Label style="-fx-text-fill: #7f8c8d;" text="📊 Moyenne des IDs :" />
                             <Label fx:id="avgAgeLabel" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;" text="0" />
@@ -101,17 +87,14 @@
                     </VBox>
                 </Tab>
 
-                <!-- TAB 3: RENDEZ-VOUS -->
                 <Tab text="📅 Rendez-vous" closable="false">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
-                        <!-- Barre d'outils -->
                         <HBox spacing="15.0">
                             <TextField fx:id="appointmentSearchField" promptText="🔍 Rechercher par patient ou médecin..." HBox.hgrow="ALWAYS" style="-fx-background-radius: 25; -fx-padding: 10 15;" />
                             <Button fx:id="searchAppointmentBtn" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="Rechercher" />
                             <Button fx:id="refreshAppointmentBtn" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="🔄 Rafraîchir" />
                         </HBox>
 
-                        <!-- Tableau des rendez-vous -->
                         <TableView fx:id="appointmentTable" prefHeight="550.0">
                             <columns>
                                 <TableColumn fx:id="appColId" text="ID" prefWidth="50" />

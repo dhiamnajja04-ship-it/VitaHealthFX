@@ -7,20 +7,19 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import com.vitahealth.service.ServiceVitaHealth;
+import com.vitahealth.dao.UserDAO;
 import com.vitahealth.entity.User;
-import com.vitahealth.entity.Role;
 import com.vitahealth.App;
 import com.vitahealth.util.SessionManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
+import java.io.IOException;
 
 public class LoginController {
 
-    private final ServiceVitaHealth service = new ServiceVitaHealth();
+    private final UserDAO userDAO = new UserDAO();
     private TextField emailField;
     private PasswordField passwordField;
     private Label messageLabel;
@@ -64,7 +63,8 @@ public class LoginController {
         root.getChildren().add(card);
 
         Scene scene = new Scene(root, 1200, 800);
-        scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+        // ✅ Forcer le light mode
+        scene.getStylesheets().add(getClass().getResource("/css/style-light.css").toExternalForm());
         return scene;
     }
 
@@ -77,54 +77,58 @@ public class LoginController {
             return;
         }
 
-        try {
-            User user = service.login(email, password);
-            if (user != null) {
-                SessionManager.getInstance().setCurrentUser(user);
+        User user = userDAO.authenticate(email, password);
 
-                messageLabel.setStyle("-fx-text-fill: #28a745;");
-                messageLabel.setText("✅ Connexion réussie ! Redirection...");
+        if (user != null) {
+            SessionManager.getInstance().setCurrentUser(user);
 
-                PauseTransition delay = new PauseTransition(Duration.seconds(1));
-                delay.setOnFinished(e -> redirectByRole(user));
-                delay.play();
-            } else {
-                showError("❌ Email ou mot de passe incorrect");
-            }
-        } catch (SQLException e) {
-            showError("❌ Erreur de connexion : " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #28a745;");
+            messageLabel.setText("✅ Connexion réussie ! Redirection...");
+
+            PauseTransition delay = new PauseTransition(Duration.seconds(1));
+            delay.setOnFinished(e -> redirectByRole(user));
+            delay.play();
+        } else {
+            showError("❌ Email ou mot de passe incorrect");
         }
     }
 
     private void redirectByRole(User user) {
         try {
-            switch (user.getRole()) {
-                case Role.ADMIN:
-                    App.changeScene(new AdminDashboardController(user).getScene());
+            String fxmlFile;
+            String title;
+
+            switch (user.getRole().toUpperCase()) {
+                case "ADMIN":
+                    fxmlFile = "/fxml/AdminDashboard.fxml";
+                    title = "VitaHealthFX - Administration";
                     break;
-                case Role.MEDECIN:
-                    // Charger la vue médecin (FXML)
-                    Parent medecinRoot = FXMLLoader.load(getClass().getResource("/fxml/MedecinView.fxml"));
-                    Scene medecinScene = new Scene(medecinRoot, 1200, 800);
-                    medecinScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-                    Stage medecinStage = (Stage) emailField.getScene().getWindow();
-                    medecinStage.setScene(medecinScene);
-                    medecinStage.setTitle("VitaHealthFX - Espace Médecin");
+                case "DOCTOR":
+                    fxmlFile = "/fxml/DoctorDashboard.fxml";
+                    title = "VitaHealthFX - Espace Médecin";
                     break;
-                case Role.PATIENT:
-                    Parent patientRoot = FXMLLoader.load(getClass().getResource("/fxml/PatientDashboard.fxml"));
-                    Scene patientScene = new Scene(patientRoot, 1200, 800);
-                    patientScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-                    Stage patientStage = (Stage) emailField.getScene().getWindow();
-                    patientStage.setScene(patientScene);
-                    patientStage.setTitle("VitaHealthFX - Espace Patient");
+                case "PATIENT":
+                    fxmlFile = "/fxml/PatientDashboard.fxml";
+                    title = "VitaHealthFX - Espace Patient";
                     break;
                 default:
-                    showError("Rôle inconnu : " + user.getRole());
+                    fxmlFile = "/fxml/HomeView.fxml";
+                    title = "VitaHealthFX";
             }
-        } catch (Exception e) {
+
+            Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
+            Scene scene = new Scene(root, 1200, 800);
+            // ✅ Forcer le light mode
+            scene.getStylesheets().add(getClass().getResource("/css/style-light.css").toExternalForm());
+
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle(title);
+            stage.show();
+
+        } catch (IOException e) {
             e.printStackTrace();
-            showError("Erreur lors de la redirection : " + e.getMessage());
+            showError("❌ Erreur lors de la redirection : " + e.getMessage());
         }
     }
 
@@ -132,12 +136,13 @@ public class LoginController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/RegisterView.fxml"));
             Scene scene = new Scene(root, 1200, 800);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            // ✅ Forcer le light mode
+            scene.getStylesheets().add(getClass().getResource("/css/style-light.css").toExternalForm());
             Stage stage = (Stage) emailField.getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("VitaHealthFX - Inscription");
             stage.show();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             showError("❌ Impossible d'ouvrir la page d'inscription");
         }

@@ -5,38 +5,47 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 
-<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.vitahealth.controller.RegisterController"
-           style="-fx-background-color: linear-gradient(to bottom right, #1a1a2e, #16213e);">
+<StackPane prefHeight="700.0" prefWidth="550.0" style="-fx-background-color: linear-gradient(135deg, #667eea, #764ba2);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vitahealth.controller.RegisterController">
 
-    <VBox alignment="CENTER" spacing="15" maxWidth="400"
-          style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 40;">
-        <Text text="📝 Inscription" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e66;" />
+    <VBox alignment="CENTER" spacing="20.0" maxWidth="480.0" style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 30px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0, 0, 10); -fx-padding: 40 35;">
+        <padding>
+            <Insets bottom="40.0" left="35.0" right="35.0" top="40.0" />
+        </padding>
 
-        <TextField fx:id="firstNameField" promptText="Prénom" style="-fx-padding: 12; -fx-background-radius: 10;" />
-        <TextField fx:id="lastNameField" promptText="Nom" style="-fx-padding: 12; -fx-background-radius: 10;" />
-        <TextField fx:id="emailField" promptText="Email" style="-fx-padding: 12; -fx-background-radius: 10;" />
-        <PasswordField fx:id="passwordField" promptText="Mot de passe" style="-fx-padding: 12; -fx-background-radius: 10;" />
-        <PasswordField fx:id="confirmPasswordField" promptText="Confirmer mot de passe" style="-fx-padding: 12; -fx-background-radius: 10;" />
+        <!-- Titre -->
+        <VBox alignment="CENTER" spacing="5.0">
+            <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="📝 Inscription" />
+            <Text style="-fx-font-size: 13px; -fx-fill: #7f8c8d;" text="Créez votre compte en quelques secondes" />
+        </VBox>
 
-        <HBox spacing="20" alignment="CENTER">
-            <RadioButton fx:id="patientRadio" text="Patient" selected="true">
+        <Separator prefWidth="300.0" />
+
+        <!-- Champs du formulaire -->
+        <VBox spacing="15.0">
+            <TextField fx:id="firstNameField" promptText="👤 Prénom" style="-fx-background-color: #f8f9fa; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;" />
+            <TextField fx:id="lastNameField" promptText="👤 Nom" style="-fx-background-color: #f8f9fa; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;" />
+            <TextField fx:id="emailField" promptText="📧 Email" style="-fx-background-color: #f8f9fa; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;" />
+            <PasswordField fx:id="passwordField" promptText="🔒 Mot de passe" style="-fx-background-color: #f8f9fa; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;" />
+            <PasswordField fx:id="confirmPasswordField" promptText="🔒 Confirmer mot de passe" style="-fx-background-color: #f8f9fa; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;" />
+        </VBox>
+
+        <!-- Rôle -->
+        <HBox spacing="30.0" alignment="CENTER">
+            <RadioButton fx:id="patientRadio" text="👤 Patient" selected="true">
                 <toggleGroup>
                     <ToggleGroup fx:id="roleGroup" />
                 </toggleGroup>
             </RadioButton>
-            <RadioButton fx:id="doctorRadio" text="Médecin" toggleGroup="$roleGroup" />
+            <RadioButton fx:id="doctorRadio" text="👨‍⚕️ Médecin" toggleGroup="$roleGroup" />
         </HBox>
 
-        <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
-        <Label fx:id="successLabel" style="-fx-text-fill: #27ae60; -fx-font-size: 12px;" />
+        <!-- Messages -->
+        <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" text="" wrapText="true" />
+        <Label fx:id="successLabel" style="-fx-text-fill: #27ae60; -fx-font-size: 12px;" text="" wrapText="true" />
 
-        <Button fx:id="registerButton" text="S'INSCRIRE"
-                style="-fx-background-color: #2c3e66; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 25;"
-                maxWidth="Infinity" />
+        <!-- Boutons -->
+        <Button fx:id="registerButton" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 12; -fx-cursor: hand;" text="✅ S'INSCRIRE" maxWidth="Infinity" />
 
-        <Button fx:id="loginButton" text="🔑 Déjà un compte ? Se connecter"
-                style="-fx-background-color: transparent; -fx-text-fill: #2c3e66; -fx-underline: true;"
-                maxWidth="Infinity" />
+        <Button fx:id="loginButton" style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-font-size: 13px; -fx-cursor: hand; -fx-underline: true; -fx-font-weight: bold;" text="🔑 Déjà un compte ? Se connecter" maxWidth="Infinity" />
     </VBox>
 </StackPane>

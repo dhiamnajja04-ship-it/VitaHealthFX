@@ -1,7 +1,7 @@
 package com.vitahealth.dao;
 
 import com.vitahealth.entity.Prescription;
-import org.example.config.DatabaseConnection;
+import com.vitahealth.config.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +11,8 @@ public class PrescriptionDAO {
 
     public boolean ajouter(int patientId, int medecinId, Prescription p) {
         String sql = "INSERT INTO prescriptions (patient_id, medecin_id, medication_list, instructions, duration) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, patientId);
             pstmt.setInt(2, medecinId);
             pstmt.setString(3, p.getMedicationList());
@@ -31,7 +32,8 @@ public class PrescriptionDAO {
     public List<Prescription> getByPatientId(int patientId) {
         List<Prescription> list = new ArrayList<>();
         String sql = "SELECT * FROM prescriptions WHERE patient_id = ? ORDER BY created_at DESC";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, patientId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -52,7 +54,8 @@ public class PrescriptionDAO {
     public List<Prescription> getByMedecinId(int medecinId) {
         List<Prescription> list = new ArrayList<>();
         String sql = "SELECT * FROM prescriptions WHERE medecin_id = ? ORDER BY created_at DESC";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, medecinId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -72,7 +75,8 @@ public class PrescriptionDAO {
 
     public boolean modifier(Prescription p) {
         String sql = "UPDATE prescriptions SET medication_list=?, instructions=?, duration=? WHERE id=?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, p.getMedicationList());
             pstmt.setString(2, p.getInstructions());
             pstmt.setString(3, p.getDuration());
@@ -86,7 +90,8 @@ public class PrescriptionDAO {
 
     public boolean supprimer(int id) {
         String sql = "DELETE FROM prescriptions WHERE id=?";
-        try (PreparedStatement pstmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
