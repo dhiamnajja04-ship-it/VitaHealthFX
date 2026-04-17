@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;"
+            stylesheets="@style/dashboard.css"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshopjdbc.Controllers.UserDashboardController">
+    <content>
+        <VBox spacing="25.0" style="-fx-padding: 40;">
+            <children>
+                <VBox style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                    <children>
+                        <Label fx:id="welcomeLabel" text="Hello 👋" textFill="#1e293b">
+                            <font><Font name="System Bold" size="32.0" /></font>
+                        </Label>
+                        <Label text="Here are the health workshops you've joined." textFill="#64748b" />
+                    </children>
+                </VBox>
+
+                <Label text="My Upcoming Events" textFill="#1e293b" style="-fx-font-weight: bold; -fx-font-size: 20;" />
+
+                <FlowPane fx:id="myEventsContainer" hgap="25.0" vgap="25.0" prefWrapLength="1000.0" />
+
+                <VBox fx:id="emptyState" alignment="CENTER" spacing="15" managed="false" visible="false">
+                    <children>
+                        <Label text="You haven't registered for any events yet." textFill="#94a3b8" />
+                        <Button text="Browse Events" onAction="#handleExplore" style="-fx-background-color: #0d9488; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 25; -fx-font-weight: bold;" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

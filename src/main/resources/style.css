@@ -1,0 +1,18 @@
+/* Fix for invisible text in input fields */
+.text-field, .text-area {
+    -fx-text-fill: #1e293b; /* Dark Navy text */
+    -fx-prompt-text-fill: #94a3b8; /* Light gray for placeholders */
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 5;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #38bdf8;
+    -fx-background-color: #ffffff;
+}
+
+/* Fix for the card text color */
+.label {
+    -fx-text-fill: #1e293b;
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.UserEventController">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <children>
+                <Label text="Available Health Events" style="-fx-font-size: 26px; -fx-font-weight: bold;" textFill="#1e293b"/>
+                <Region HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Search events..." style="-fx-pref-width: 300;"/>
+            </children>
+        </HBox>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <FlowPane fx:id="eventFlowPane" hgap="20.0" vgap="20.0" />
+            </content>
+        </ScrollPane>
+    </children>
+</VBox>
