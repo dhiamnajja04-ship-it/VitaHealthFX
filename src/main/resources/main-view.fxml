@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" 
+            fx:controller="controllers.MainController" prefHeight="700.0" prefWidth="1100.0">
+    
+    <!-- Header -->
+    <top>
+        <HBox styleClass="header" alignment="CENTER_LEFT" spacing="20">
+            <Label text="VitalHealth" styleClass="logo-text" />
+            <Region HBox.hgrow="ALWAYS" />
+        </HBox>
+    </top>
+
+    <!-- Sidebar -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="260" spacing="5">
+            <Label text="MENU PRINCIPAL" styleClass="sidebar-category" />
+            <Button text="📅 Rendez-vous" fx:id="btnRdv" onAction="#showRendezVous" styleClass="sidebar-btn, sidebar-btn-active" />
+            
+            <Label text="ESPACE MÉDECIN" styleClass="sidebar-category" />
+            <Button text="👨‍⚕️ Liste des Médecins" fx:id="btnMedecins" onAction="#showMedecins" styleClass="sidebar-btn" />
+            <Button text="💬 Réponses RDV" fx:id="btnReponses" onAction="#showReponses" styleClass="sidebar-btn" />
+            <Button text="🏥 Mon Espace" fx:id="btnEspaceMedecin" onAction="#showEspaceMedecin" styleClass="sidebar-btn" />
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
+    <center>
+        <StackPane fx:id="contentArea" style="-fx-padding: 25;">
+            <!-- Content will be injected here dynamically -->
+        </StackPane>
+    </center>
+
+</BorderPane>

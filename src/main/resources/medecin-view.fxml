@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-padding: 0;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.MedecinController">
+    
+    <VBox styleClass="card" spacing="15" VBox.vgrow="ALWAYS">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="👨‍⚕️ Liste des Médecins" styleClass="card-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox spacing="10">
+                <Button text="+ Nouveau" onAction="#handleNouveau" styleClass="btn-success" />
+                <Button text="Modifier" onAction="#handleEditSelected" styleClass="btn-info" />
+                <Button text="Supprimer" onAction="#handleSupprimer" styleClass="btn-danger" />
+            </HBox>
+        </HBox>
+
+        <TableView fx:id="tableMedecin" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50" />
+                <TableColumn fx:id="colNom" text="Nom" prefWidth="120" />
+                <TableColumn fx:id="colPrenom" text="Prénom" prefWidth="120" />
+                <TableColumn fx:id="colSpecialite" text="Spécialité" prefWidth="150" />
+                <TableColumn fx:id="colTelephone" text="Téléphone" prefWidth="120" />
+                <TableColumn fx:id="colEmail" text="Email" prefWidth="250" />
+            </columns>
+        </TableView>
+
+        <Label fx:id="lblErreur" textFill="#dc3545" style="-fx-font-weight: bold;" />
+    </VBox>
+</VBox>

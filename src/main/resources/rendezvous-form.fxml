@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="0" style="-fx-background-color: #f6f9ff;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.RdvFormController">
+    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+    <VBox styleClass="card" spacing="25" prefWidth="600" style="-fx-max-width: 600;">
+        
+        <VBox spacing="5" alignment="CENTER">
+            <Label text="Nouvelle Demande" styleClass="title-label" style="-fx-font-size: 24px;" />
+            <Label text="Remplissez le formulaire ci-dessous pour solliciter une consultation." textFill="#6c757d" />
+        </VBox>
+
+        <Separator />
+
+        <GridPane hgap="20" vgap="20">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+
+            <!-- Date & Heure -->
+            <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label text="Date souhaitée" style="-fx-font-weight: bold;" />
+                <DatePicker fx:id="dpRdvDate" maxWidth="Infinity" promptText="jj/mm/aaaa" />
+            </VBox>
+            
+            <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label text="Heure préférée" style="-fx-font-weight: bold;" />
+                <TextField fx:id="tfRdvHeure" promptText="ex: 14:30" />
+            </VBox>
+
+            <!-- Médecin -->
+            <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                <Label text="Choisir un médecin" style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="cbRdvMedecin" maxWidth="Infinity" promptText="Sélectionnez un spécialiste..." />
+            </VBox>
+
+            <!-- Priorité -->
+            <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                <Label text="Priorité" style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="cbRdvPriorite" maxWidth="Infinity" promptText="Sélectionnez l'urgence..." />
+            </VBox>
+
+            <!-- Patient Info -->
+            <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                <Label text="Nom Patient" style="-fx-font-weight: bold;" />
+                <TextField fx:id="tfRdvPatientNom" promptText="Nom..." />
+            </VBox>
+
+            <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <Label text="Prénom Patient" style="-fx-font-weight: bold;" />
+                <TextField fx:id="tfRdvPatientPrenom" promptText="Prénom..." />
+            </VBox>
+
+            <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                <Label text="Téléphone Patient" style="-fx-font-weight: bold;" />
+                <TextField fx:id="tfRdvPatientTel" promptText="+216 ..." />
+            </VBox>
+
+            <!-- Motif -->
+            <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2">
+                <Label text="Motif de la consultation" style="-fx-font-weight: bold;" />
+                <TextArea fx:id="taRdvMotif" prefHeight="80" promptText="Décrivez brièvement le motif..." wrapText="true" />
+            </VBox>
+        </GridPane>
+
+        <Label fx:id="lblRdvErreur" textFill="#dc3545" wrapText="true" />
+
+        <HBox spacing="15" alignment="CENTER_RIGHT">
+            <Button text="Annuler" onAction="#handleFermer" styleClass="btn-secondary" />
+            <Button text="Réinitialiser" onAction="#handleRdvVider" styleClass="btn-info" />
+            <Button text="Enregistrer la demande" fx:id="btnAjouter" onAction="#handleRdvAjouter" styleClass="btn-primary" prefHeight="45" style="-fx-font-size: 14px;" />
+            <Button text="Mettre à jour" fx:id="btnModifier" onAction="#handleRdvModifier" styleClass="btn-success" prefHeight="45" style="-fx-font-size: 14px;" />
+        </HBox>
+    </VBox>
+</VBox>

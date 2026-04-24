@@ -1,0 +1,110 @@
+package controllers;
+
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import models.Medecin;
+import services.MedecinService;
+
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
+
+public class MedecinFormController implements Initializable {
+
+    @FXML private TextField tfMedNom, tfMedPrenom, tfMedSpecialite, tfMedTelephone, tfMedEmail;
+    @FXML private Label lblMedErreur;
+    @FXML private Button btnAjouter, btnModifier;
+
+    private MedecinService service;
+    private Medecin medSelectionne = null;
+    private MainController mainController;
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        try {
+            service = new MedecinService();
+        } catch (SQLException e) {
+            System.err.println("Erreur init MedecinService: " + e.getMessage());
+        }
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    public void setMedecin(Medecin m) {
+        if (m != null) {
+            medSelectionne = m;
+            tfMedNom.setText(m.getNom());
+            tfMedPrenom.setText(m.getPrenom());
+            tfMedSpecialite.setText(m.getSpecialite());
+            tfMedTelephone.setText(m.getTelephone());
+            tfMedEmail.setText(m.getEmail());
+            btnAjouter.setVisible(false);
+            btnAjouter.setManaged(false);
+        } else {
+            btnModifier.setVisible(false);
+            btnModifier.setManaged(false);
+        }
+    }
+
+    @FXML
+    private void handleMedAjouter() {
+        try {
+            service.ajouter(construireMedecin());
+            if (mainController != null) mainController.rafraichirListes();
+            handleFermer();
+        } catch (Exception e) {
+            afficherErreur(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleMedModifier() {
+        if (medSelectionne == null) return;
+        try {
+            Medecin m = construireMedecin();
+            m.setId(medSelectionne.getId());
+            service.modifier(m);
+            if (mainController != null) mainController.rafraichirListes();
+            handleFermer();
+        } catch (Exception e) {
+            afficherErreur(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleMedVider() {
+        tfMedNom.clear(); tfMedPrenom.clear(); tfMedSpecialite.clear();
+        tfMedTelephone.clear(); tfMedEmail.clear();
+        lblMedErreur.setText("");
+    }
+
+    @FXML
+    private void handleFermer() {
+        ((Stage) btnAjouter.getScene().getWindow()).close();
+    }
+
+    private Medecin construireMedecin() {
+        Medecin m = new Medecin();
+        m.setNom(tfMedNom.getText().trim());
+        m.setPrenom(tfMedPrenom.getText().trim());
+        m.setSpecialite(tfMedSpecialite.getText().trim());
+        m.setTelephone(tfMedTelephone.getText().trim());
+        m.setEmail(tfMedEmail.getText().trim());
+        
+        if (m.getNom().isEmpty() || m.getPrenom().isEmpty()) {
+            throw new IllegalArgumentException("Le nom et le prénom sont requis.");
+        }
+        return m;
+    }
+
+    private void afficherErreur(String msg) {
+        lblMedErreur.setStyle("-fx-text-fill: red;");
+        lblMedErreur.setText("⚠ " + msg);
+    }
+}

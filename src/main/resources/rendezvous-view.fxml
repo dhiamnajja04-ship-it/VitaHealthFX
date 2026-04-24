@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-padding: 0;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.RendezVousController">
+    
+    <VBox styleClass="card" spacing="15" VBox.vgrow="ALWAYS">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="📅 Gestion des Rendez-vous" styleClass="card-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox spacing="10">
+                <Button text="+ Nouveau RDV" onAction="#handleNouveau" styleClass="btn-success" />
+                <Button text="Modifier" onAction="#handleEditSelected" styleClass="btn-info" />
+                <Button text="Supprimer" onAction="#handleSupprimer" styleClass="btn-danger" />
+            </HBox>
+        </HBox>
+
+        <TableView fx:id="tableRdv" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50" />
+                <TableColumn fx:id="colDate" text="Date" prefWidth="100" />
+                <TableColumn fx:id="colHeure" text="Heure" prefWidth="80" />
+                <TableColumn fx:id="colMotif" text="Motif" prefWidth="250" />
+                <TableColumn fx:id="colPriorite" text="Priorité" prefWidth="100" />
+                <TableColumn fx:id="colMedecinId" text="Med. ID" prefWidth="80" />
+                <TableColumn fx:id="colPatientNom" text="Patient (Nom)" prefWidth="150" />
+            </columns>
+        </TableView>
+
+        <Label fx:id="lblErreur" textFill="#dc3545" style="-fx-font-weight: bold;" />
+    </VBox>
+</VBox>
