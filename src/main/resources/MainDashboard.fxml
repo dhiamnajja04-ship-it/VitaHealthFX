@@ -13,7 +13,7 @@
                 <Region HBox.hgrow="ALWAYS" />
                 <HBox alignment="CENTER" spacing="15.0">
                     <children>
-                        <Button onAction="#showUserDashboard" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-cursor: hand;" text="Home" />
+                        <Button onAction="#showUserDashboard" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-cursor: hand;" text="Dashboard" />
                         <Button onAction="#showUserEventView" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-cursor: hand;" text="Explore Events" />
                         <Separator orientation="VERTICAL" />
                         <Button fx:id="adminPanelBtn" onAction="#toggleAdminMode" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold;" text="Admin Panel" />

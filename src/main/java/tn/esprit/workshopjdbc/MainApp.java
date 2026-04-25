@@ -19,15 +19,15 @@ public class MainApp extends Application {
         godModeUser.setFirstName("admin");
         godModeUser.setLastName("admin");
         List<String> roles = new ArrayList<>();
-        roles.add("ROLE_ADMIN"); // Gives you CRUD powers
+        roles.add("ROLE_ADMIN");
         godModeUser.setRoles(roles);
-        godModeUser.setMaladie("Diabetes"); // Gives you Patient fields
+        godModeUser.setMaladie("Diabetes");
         UserSession.setSession(godModeUser);
         // ------------------------------------
 
         Parent root = FXMLLoader.load(getClass().getResource("/MainDashboard.fxml"));
         primaryStage.setScene(new Scene(root));
-        primaryStage.setTitle("VitaHealth - Event Management (Admin Mode)");
+        primaryStage.setTitle("VitaHealth - Event Management");
         primaryStage.show();
     }
 }
