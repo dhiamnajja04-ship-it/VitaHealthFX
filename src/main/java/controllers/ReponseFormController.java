@@ -146,6 +146,16 @@ public class ReponseFormController implements Initializable {
         return r;
     }
 
+    public void setViewMode() {
+        cbRepRdv.setDisable(true);
+        taRepMessage.setDisable(true);
+        cbRepType.setDisable(true);
+        btnAjouter.setVisible(false);
+        btnAjouter.setManaged(false);
+        btnModifier.setVisible(false);
+        btnModifier.setManaged(false);
+    }
+
     private void afficherErreur(String msg) {
         lblRepErreur.setStyle("-fx-text-fill: red;");
         lblRepErreur.setText("⚠ " + msg);

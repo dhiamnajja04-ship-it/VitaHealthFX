@@ -15,6 +15,7 @@ public class RendezVous {
     private String    patientNom;
     private String    patientPrenom;
     private String    patientTel;
+    private String    patientEmail;
 
     public RendezVous() {
         this.statut = "en_attente";
@@ -23,7 +24,7 @@ public class RendezVous {
 
     public RendezVous(int id, LocalDate date, LocalTime heure,
                       String motif, String statut, String priorite, int medecinId,
-                      String patientNom, String patientPrenom, String patientTel) {
+                      String patientNom, String patientPrenom, String patientTel, String patientEmail) {
         this.id           = id;
         this.date         = date;
         this.heure        = heure;
@@ -34,6 +35,7 @@ public class RendezVous {
         this.patientNom   = patientNom;
         this.patientPrenom = patientPrenom;
         this.patientTel   = patientTel;
+        this.patientEmail = patientEmail;
     }
 
     public int       getId()                { return id; }
@@ -65,6 +67,9 @@ public class RendezVous {
 
     public String getPatientTel()                   { return patientTel; }
     public void   setPatientTel(String patientTel)  { this.patientTel = patientTel; }
+
+    public String getPatientEmail()                   { return patientEmail; }
+    public void   setPatientEmail(String patientEmail)  { this.patientEmail = patientEmail; }
 
     @Override
     public String toString() {

@@ -14,13 +14,16 @@ import services.MedecinService;
 import services.RendezVousService;
 import services.ReponseRendezVousService;
 
+import javafx.scene.chart.PieChart;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class EspaceMedecinController implements Initializable {
 
+    @FXML private PieChart chartPriorite;
     @FXML private ComboBox<Medecin> cbMedecinSession;
     @FXML private Label lblBadgeNotif, lblTotalRdv, lblAttenteRdv, lblConfirmeRdv;
 
@@ -151,12 +154,32 @@ public class EspaceMedecinController implements Initializable {
             // 3. Charger les réponses
             listeReponses.setAll(repService.getReponsesByMedecinId(medecinId));
 
+            // 4. Charger le graphique
+            chargerStatsChart(medecinId);
+
         } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    private void chargerStatsChart(int medecinId) {
+        try {
+            Map<String, Integer> stats = rdvService.getStatsByPriorite(medecinId);
+            ObservableList<PieChart.Data> chartData = FXCollections.observableArrayList();
+            
+            stats.forEach((label, count) -> {
+                chartData.add(new PieChart.Data(label + " (" + count + ")", count));
+            });
+            
+            chartPriorite.setData(chartData);
+            chartPriorite.setTitle("Urgences - Distribution");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void viderDonnees() {
         listeNouveaux.clear();
         listeReponses.clear();
+        chartPriorite.setData(FXCollections.emptyObservableList());
         lblTotalRdv.setText("0");
         lblAttenteRdv.setText("0");
         lblConfirmeRdv.setText("0");
@@ -171,7 +194,7 @@ public class EspaceMedecinController implements Initializable {
 
     private void handleRepondre(RendezVous rdv) {
         if (mainController != null) {
-            mainController.openForm("REPONSE", rdv); 
+            mainController.openForm("REPONSE", rdv, false); 
         }
     }
 }

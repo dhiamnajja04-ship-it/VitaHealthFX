@@ -3,92 +3,106 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.chart.*?>
 
 <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.EspaceMedecinController">
-    <VBox spacing="25" style="-fx-padding: 10;">
+    <VBox spacing="30" style="-fx-padding: 5;">
         
-        <!-- Header / Doctor Selection Card -->
+        <!-- Top Stats Row -->
+        <HBox spacing="20">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label text="TOTAL RENDEZ-VOUS" styleClass="stat-label" />
+                <Label fx:id="lblTotalRdv" text="0" styleClass="stat-value" />
+                <Label text="Toutes périodes" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="EN ATTENTE" styleClass="stat-label" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Circle radius="5" fill="#f59e0b" />
+                </HBox>
+                <Label fx:id="lblAttenteRdv" text="0" styleClass="stat-value" style="-fx-text-fill: #f59e0b;" />
+                <Label text="Demandes à traiter" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="CONFIRMÉS" styleClass="stat-label" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Circle radius="5" fill="#10b981" />
+                </HBox>
+                <Label fx:id="lblConfirmeRdv" text="0" styleClass="stat-value" style="-fx-text-fill: #10b981;" />
+                <Label text="Planning validé" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;" />
+            </VBox>
+        </HBox>
+
+        <!-- Doctor Management Bar -->
         <VBox styleClass="card" spacing="15">
             <HBox spacing="15" alignment="CENTER_LEFT">
-                <Label text="👤 Session Médicale" styleClass="card-title" />
+                <VBox>
+                    <Label text="Session Médicale Active" styleClass="card-title" style="-fx-padding: 0;"/>
+                    <Label text="Gérez les consultations pour le praticien sélectionné." style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                </VBox>
                 <Region HBox.hgrow="ALWAYS" />
-                <Button text="🔄 Actualiser" onAction="#handleRefresh" styleClass="btn-secondary" />
-            </HBox>
-            <HBox spacing="15" alignment="CENTER_LEFT">
-                <Label text="Sélectionnez un profil médecin pour gérer ses activités :" textFill="#6c757d" />
                 <ComboBox fx:id="cbMedecinSession" promptText="Choisir un médecin..." prefWidth="300" />
+                <Button text="Actualiser les données" onAction="#handleRefresh" styleClass="btn-primary" />
             </HBox>
         </VBox>
 
-        <!-- Main Dashboard Content -->
-        <HBox spacing="25">
+        <!-- Main Workspace -->
+        <HBox spacing="25" VBox.vgrow="ALWAYS">
             
-            <!-- Left Column: Appointments & History -->
+            <!-- Left: Workspace Content -->
             <VBox spacing="25" HBox.hgrow="ALWAYS">
-                
-                <!-- New Appointments Card -->
                 <VBox spacing="15" styleClass="card" VBox.vgrow="ALWAYS">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="📅 Nouveaux Rendez-vous" styleClass="card-title" />
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label text="Demandes Entrantes" styleClass="card-title" />
                         <StackPane>
-                            <Circle radius="12" fill="#dc3545" />
-                            <Label fx:id="lblBadgeNotif" text="0" textFill="white" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                            <Circle radius="12" fill="#6366f1" opacity="0.1" />
+                            <Label fx:id="lblBadgeNotif" text="0" textFill="#6366f1" style="-fx-font-weight: 800; -fx-font-size: 12px;"/>
                         </StackPane>
                     </HBox>
                     
-                    <TableView fx:id="tableNouveauxRdv" prefHeight="250">
+                    <TableView fx:id="tableNouveauxRdv" prefHeight="300">
                         <placeholder>
-                            <Label text="Aucune demande en attente" />
+                            <Label text="Aucune nouvelle demande pour ce médecin." style="-fx-text-fill: #94a3b8;"/>
                         </placeholder>
                         <columns>
-                            <TableColumn fx:id="colDate" text="Date" prefWidth="100" />
-                            <TableColumn fx:id="colHeure" text="Heure" prefWidth="80" />
-                            <TableColumn fx:id="colPatient" text="Patient" prefWidth="180" />
-                            <TableColumn fx:id="colMotif" text="Motif" prefWidth="250" />
-                            <TableColumn fx:id="colPriorite" text="Priorité" prefWidth="100" />
-                            <TableColumn fx:id="colAction" text="Action" prefWidth="120" />
+                            <TableColumn fx:id="colDate" text="DATE" prefWidth="100" />
+                            <TableColumn fx:id="colHeure" text="HEURE" prefWidth="80" />
+                            <TableColumn fx:id="colPatient" text="PATIENT" prefWidth="180" />
+                            <TableColumn fx:id="colMotif" text="MOTIF" prefWidth="220" />
+                            <TableColumn fx:id="colPriorite" text="URGENCE" prefWidth="100" />
+                            <TableColumn fx:id="colAction" text="ACTION" prefWidth="120" />
                         </columns>
                     </TableView>
                 </VBox>
-
-                <!-- Sent Responses Card -->
+                
                 <VBox spacing="15" styleClass="card" VBox.vgrow="ALWAYS">
-                    <Label text="📜 Historique des Réponses" styleClass="card-title" />
+                    <Label text="Historique des Réponses" styleClass="card-title" />
                     <TableView fx:id="tableMesReponses" prefHeight="250">
                         <columns>
-                            <TableColumn fx:id="colRepDate" text="Date Envoi" prefWidth="150" />
-                            <TableColumn fx:id="colRepRdvInfo" text="Rendez-vous" prefWidth="200" />
-                            <TableColumn fx:id="colRepType" text="Décision" prefWidth="100" />
-                            <TableColumn fx:id="colRepMessage" text="Message" prefWidth="350" />
+                            <TableColumn fx:id="colRepDate" text="DATE" prefWidth="150" />
+                            <TableColumn fx:id="colRepRdvInfo" text="RDV #" prefWidth="100" />
+                            <TableColumn fx:id="colRepType" text="TYPE" prefWidth="120" />
+                            <TableColumn fx:id="colRepMessage" text="MESSAGE" prefWidth="350" />
                         </columns>
                     </TableView>
                 </VBox>
             </VBox>
 
-            <!-- Right Column: Stats -->
-            <VBox spacing="25" prefWidth="320">
-                <VBox spacing="20" styleClass="card">
-                    <Label text="📊 Statistiques Globales" styleClass="card-title" />
-                    <Separator />
-                    <VBox spacing="12">
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="Total RDV :" textFill="#6c757d" />
-                            <Region HBox.hgrow="ALWAYS" />
-                            <Label fx:id="lblTotalRdv" text="0" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="💰 En attente :" textFill="#dc3545" />
-                            <Region HBox.hgrow="ALWAYS" />
-                            <Label fx:id="lblAttenteRdv" text="0" style="-fx-font-weight: bold; -fx-text-fill: #dc3545; -fx-font-size: 16px;" />
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="✅ Confirmés :" textFill="#198754" />
-                            <Region HBox.hgrow="ALWAYS" />
-                            <Label fx:id="lblConfirmeRdv" text="0" style="-fx-font-weight: bold; -fx-text-fill: #198754; -fx-font-size: 16px;" />
-                        </HBox>
-                    </VBox>
+            <!-- Right: Insights & Charts -->
+            <VBox spacing="25" prefWidth="380">
+                <VBox spacing="15" styleClass="card">
+                    <Label text="📈 Répartitions des Urgences" styleClass="card-title" />
+                    <PieChart fx:id="chartPriorite" prefHeight="300" legendSide="BOTTOM" labelsVisible="true" />
+                </VBox>
+                
+                <VBox spacing="15" styleClass="card">
+                    <Label text="💡 Conseils" styleClass="card-title" />
+                    <Label text="Priorisez les rendez-vous marqués 'Urgente' pour une meilleure réactivité patient." wrapText="true" style="-fx-text-fill: #64748b;"/>
                 </VBox>
             </VBox>
         </HBox>
+
     </VBox>
 </ScrollPane>

@@ -7,13 +7,17 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import models.RendezVous;
+import models.Medecin;
 
 public class ReponseRendezVousService {
 
-    private Connection cnx;
+    // On ne stocke plus 'cnx' pour éviter les erreurs de "connection closed" après un timeout.
+    // On appelle MyConnection.getInstance().getConnection() à chaque besoin.
 
     public ReponseRendezVousService() throws SQLException {
-        this.cnx = MyConnection.getInstance().getConnection();
+        // Le constructeur reste vide ou vérifie juste la connexion
+        MyConnection.getInstance();
     }
 
     // ─── Validation ────────────────────────────────────────────────────────────
@@ -37,6 +41,7 @@ public class ReponseRendezVousService {
     // ─── CRUD ──────────────────────────────────────────────────────────────────
 
     public void ajouter(ReponseRendezVous r) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String erreur = valider(r);
         if (erreur != null) throw new IllegalArgumentException(erreur);
 
@@ -57,6 +62,7 @@ public class ReponseRendezVousService {
     }
 
     public void modifier(ReponseRendezVous r) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String erreur = valider(r);
         if (erreur != null) throw new IllegalArgumentException(erreur);
 
@@ -74,6 +80,7 @@ public class ReponseRendezVousService {
     }
 
     public void supprimer(int id) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String sql = "DELETE FROM reponse_rendez_vous WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -82,8 +89,13 @@ public class ReponseRendezVousService {
     }
 
     public List<ReponseRendezVous> afficher() throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         List<ReponseRendezVous> liste = new ArrayList<>();
-        String sql = "SELECT * FROM reponse_rendez_vous ORDER BY date_reponse DESC";
+        String sql = "SELECT rep.*, m.nom as medecin_nom " +
+                     "FROM reponse_rendez_vous rep " +
+                     "LEFT JOIN rendez_vous rdv ON rep.rendez_vous_id = rdv.id " +
+                     "LEFT JOIN medecin m ON rdv.medecin_id = m.id " +
+                     "ORDER BY rep.date_reponse DESC";
         try (Statement st = cnx.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) liste.add(mapper(rs));
@@ -92,7 +104,12 @@ public class ReponseRendezVousService {
     }
 
     public ReponseRendezVous getById(int id) throws SQLException {
-        String sql = "SELECT * FROM reponse_rendez_vous WHERE id=?";
+        Connection cnx = MyConnection.getInstance().getConnection();
+        String sql = "SELECT rep.*, m.nom as medecin_nom " +
+                     "FROM reponse_rendez_vous rep " +
+                     "LEFT JOIN rendez_vous rdv ON rep.rendez_vous_id = rdv.id " +
+                     "LEFT JOIN medecin m ON rdv.medecin_id = m.id " +
+                     "WHERE rep.id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -103,6 +120,7 @@ public class ReponseRendezVousService {
     }
 
     public List<ReponseRendezVous> getReponsesByRendezVousId(int rendezVousId) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         List<ReponseRendezVous> liste = new ArrayList<>();
         String sql = "SELECT * FROM reponse_rendez_vous WHERE rendez_vous_id=? ORDER BY date_reponse DESC";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
@@ -115,6 +133,7 @@ public class ReponseRendezVousService {
     }
 
     public List<ReponseRendezVous> getReponsesByMedecinId(int medecinId) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         List<ReponseRendezVous> liste = new ArrayList<>();
         String sql = "SELECT rep.* FROM reponse_rendez_vous rep " +
                      "JOIN rendez_vous rdv ON rep.rendez_vous_id = rdv.id " +
@@ -132,6 +151,7 @@ public class ReponseRendezVousService {
     // ─── Helpers ───────────────────────────────────────────────────────────────
 
     private boolean existeDejaReponse(int rendezVousId, int excludeId) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String sql = "SELECT id FROM reponse_rendez_vous WHERE rendez_vous_id=? AND id != ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, rendezVousId);
@@ -143,6 +163,7 @@ public class ReponseRendezVousService {
     }
 
     private void mettreAJourStatutRdv(int rendezVousId, String typeReponse) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         if ("accepte".equals(typeReponse)) {
             // Vérifier si le créneau est déjà pris par un autre RDV confirmé
             String checkSql = "SELECT r1.id FROM rendez_vous r1 " +
@@ -171,15 +192,39 @@ public class ReponseRendezVousService {
             ps.setInt(2, rendezVousId);
             ps.executeUpdate();
         }
+        
+        if ("confirme".equals(statut)) {
+            RendezVousService rdvService = new RendezVousService();
+            RendezVous rv = rdvService.getById(rendezVousId);
+            if (rv != null) {
+                MedecinService medService = new MedecinService();
+                Medecin medecin = medService.getById(rv.getMedecinId());
+                String medNom = medecin != null ? medecin.getNom() : "";
+                
+                EmailService.envoyerEmailConfirmation(
+                    rv.getPatientEmail(),
+                    rv.getPatientPrenom() + " " + rv.getPatientNom(),
+                    rv.getDate() != null ? rv.getDate().toString() : "",
+                    rv.getHeure() != null ? rv.getHeure().toString() : "",
+                    medNom
+                );
+            }
+        }
     }
 
     private ReponseRendezVous mapper(ResultSet rs) throws SQLException {
+        String medNom = "";
+        try {
+            medNom = rs.getString("medecin_nom");
+        } catch (SQLException ignored) {}
+
         return new ReponseRendezVous(
             rs.getInt("id"),
             rs.getString("message"),
             rs.getTimestamp("date_reponse").toLocalDateTime(),
             rs.getInt("rendez_vous_id"),
-            rs.getString("type_reponse")
+            rs.getString("type_reponse"),
+            medNom != null ? medNom : ""
         );
     }
 }

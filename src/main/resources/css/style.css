@@ -1,201 +1,316 @@
-/* 
-    VitalHealth - NiceAdmin Inspired Theme
-    Primary Color: #4154f1
-    Secondary Color: #012970
-    Background: #f6f9ff
+/*
+    VitalHealth - Ultra Modern & Vibrant Design System
+    Theme: Vivid Tech (Electric Indigo & Cyber Teal)
 */
 
 .root {
-    -fx-base: #f6f9ff;
-    -fx-background-color: #f6f9ff;
-    -fx-accent: #4154f1;
-    -fx-default-button: #4154f1;
-    -fx-focus-color: #717ff5;
-    -fx-faint-focus-color: rgba(65, 84, 241, 0.1);
-    -fx-font-family: 'Segoe UI', 'Roboto', 'Outfit', sans-serif;
+    -fx-font-family: 'Segoe UI Semibold', 'Inter', sans-serif;
+    -fx-base: #f0fdfa;
+    -fx-background-color: linear-gradient(to bottom right, #f0fdfa, #e2e8f0);
+    -fx-accent: #0d9488;
+    -fx-default-button: #0d9488;
+    -fx-focus-color: rgba(13, 148, 136, 0.4);
 }
 
-/* Sidebar Styling */
+/* ==================== SIDEBAR (Vibrant Medical) ==================== */
 .sidebar {
-    -fx-background-color: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 5, 0);
-    -fx-padding: 20 0 20 0;
+    -fx-background-color: linear-gradient(to bottom, #0d9488, #134e4a);
+    -fx-padding: 40 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.3), 30, 0, 10, 0);
+}
+
+.sidebar-category {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: 900;
+    -fx-padding: 30 0 10 15;
+    -fx-letter-spacing: 1.8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 2, 0, 0, 1);
 }
 
 .sidebar-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #444444;
+    -fx-text-fill: white; /* Pure White */
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 12 20 12 25;
+    -fx-padding: 14 20;
     -fx-font-size: 15px;
-    -fx-font-weight: 600;
-    -fx-background-radius: 0;
+    -fx-font-weight: 800;
+    -fx-background-radius: 12;
     -fx-cursor: hand;
-    -fx-min-width: 250;
+    -fx-min-width: 220;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);
 }
 
 .sidebar-btn:hover {
-    -fx-background-color: #f6f9ff;
-    -fx-text-fill: #4154f1;
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-translate-x: 5;
 }
 
 .sidebar-btn-active {
-    -fx-background-color: #f6f9ff;
-    -fx-text-fill: #4154f1;
+    -fx-background-color: linear-gradient(to right, #10b981, #34d399);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.5), 15, 0, 0, 5);
 }
 
-.sidebar-category {
-    -fx-text-fill: #899bbd;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-padding: 20 0 5 25;
-}
-
-/* Header Styling */
+/* ==================== HEADER (Glassmorphism) ==================== */
 .header {
-    -fx-background-color: white;
-    -fx-padding: 15 25;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);
+    -fx-background-color: rgba(255, 255, 255, 0.7);
+    -fx-padding: 15 40;
+    -fx-border-color: transparent transparent rgba(226, 232, 240, 0.5) transparent;
+    -fx-border-width: 0 0 2 0;
 }
 
 .logo-text {
-    -fx-font-size: 24px;
-    -fx-font-weight: 800;
-    -fx-text-fill: #012970;
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+    -fx-text-fill: linear-gradient(to right, #0d9488, #10b981);
 }
 
-/* Card Styling */
+/* ==================== CARDS (Soft & Floating) ==================== */
 .card {
     -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-effect: dropshadow(three-pass-box, rgba(1, 41, 112, 0.1), 20, 0, 0, 0);
-    -fx-padding: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 25, 0, 0, 10);
 }
 
 .card-title {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #012970;
-    -fx-padding: 0 0 15 0;
-}
-
-/* Common Labels */
-.title-label {
     -fx-font-size: 22px;
-    -fx-font-weight: 700;
-    -fx-text-fill: #012970;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1e1b4b;
 }
 
-/* Buttons */
+.title-label {
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1e1b4b;
+}
+
+/* ==================== BUTTONS (Pill Shaped & Vivid) ==================== */
 .button {
-    -fx-background-radius: 4;
-    -fx-padding: 8 20;
-    -fx-font-weight: bold;
+    -fx-background-radius: 30;
+    -fx-padding: 12 25;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
     -fx-cursor: hand;
 }
 
 .btn-primary {
-    -fx-background-color: #4154f1;
+    -fx-background-color: linear-gradient(to right, #0d9488, #10b981);
     -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.4), 12, 0, 0, 5);
 }
-.btn-primary:hover { -fx-background-color: #717ff5; }
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to right, #14b8a6, #34d399);
+    -fx-scale-x: 1.05; -fx-scale-y: 1.05;
+}
 
 .btn-success {
-    -fx-background-color: #198754;
+    -fx-background-color: linear-gradient(to right, #10b981, #3b82f6);
     -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 12, 0, 0, 5);
 }
-.btn-success:hover { -fx-background-color: #157347; }
-
-.btn-info {
-    -fx-background-color: #0dcaf0;
-    -fx-text-fill: white;
-}
-.btn-info:hover { -fx-background-color: #31d2f2; }
+.btn-success:hover { -fx-scale-x: 1.05; -fx-scale-y: 1.05; }
 
 .btn-danger {
-    -fx-background-color: #dc3545;
+    -fx-background-color: linear-gradient(to right, #f43f5e, #fb7185);
     -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(244, 63, 94, 0.3), 12, 0, 0, 5);
 }
-.btn-danger:hover { -fx-background-color: #bb2d3b; }
 
 .btn-secondary {
-    -fx-background-color: #6c757d;
-    -fx-text-fill: white;
+    -fx-background-color: #f0fdfa;
+    -fx-text-fill: #0d9488;
+    -fx-border-color: #ccfbf1;
+    -fx-border-radius: 30;
+    -fx-border-width: 1.5;
 }
-.btn-secondary:hover { -fx-background-color: #5c636a; }
 
-/* TableView */
+/* ==================== TABLEVIEW (Clean & Minimal) ==================== */
 .table-view {
     -fx-background-color: transparent;
+    -fx-background-radius: 20;
     -fx-border-color: transparent;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #f6f9ff;
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 20 20 0 0;
 }
 
 .table-view .column-header {
     -fx-background-color: transparent;
-    -fx-padding: 12;
+    -fx-padding: 18;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #444444;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 800;
+    -fx-font-size: 12px;
 }
 
 .table-row-cell {
     -fx-background-color: white;
-    -fx-border-color: transparent transparent #ebeef4 transparent;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-padding: 8 0;
 }
 
 .table-row-cell:filled:hover {
-    -fx-background-color: #f6f9ff;
+    -fx-background-color: #f0fdfa;
 }
 
 .table-row-cell:filled:selected {
-    -fx-background-color: #e0e7ff;
+    -fx-background-color: #ccfbf1;
+    -fx-text-fill: #0d9488;
 }
 
-/* Form Controls */
-.text-field, .password-field, .text-area, .combo-box, .date-picker {
+/* ==================== STAT CARDS (Vivid) ==================== */
+.stat-card {
     -fx-background-color: white;
-    -fx-border-color: #dee2e6;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 8;
+    -fx-background-radius: 20;
+    -fx-padding: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.08), 20, 0, 0, 10);
+    -fx-border-color: transparent transparent #0d9488 transparent;
+    -fx-border-width: 0 0 4 0;
 }
 
-.text-field:focused, .password-field:focused, .text-area:focused, .combo-box:focused {
-    -fx-border-color: #4154f1;
-    -fx-effect: dropshadow(three-pass-box, rgba(65, 84, 241, 0.25), 5, 0, 0, 0);
+.stat-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #134e4a;
 }
 
-.label {
-    -fx-text-fill: #444444;
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #0d9488;
+    -fx-font-weight: 800;
+    -fx-letter-spacing: 1px;
+}
+
+/* ==================== BADGES ==================== */
+.badge {
+    -fx-background-radius: 10;
+    -fx-padding: 6 15;
+    -fx-font-weight: 800;
+}
+.badge-urgent { -fx-background-color: #ffe4e6; -fx-text-fill: #e11d48; }
+.badge-normal { -fx-background-color: #f0fdfa; -fx-text-fill: #0d9488; }
+.badge-low    { -fx-background-color: #f0fdf4; -fx-text-fill: #166534; }
+
+/* ==================== FORMS (Modern & Clean) ==================== */
+.text-field, .password-field, .text-area, .date-picker {
+    -fx-background-color: white;
+    -fx-border-color: #ccfbf1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 12 18;
+    -fx-font-size: 14px;
+    -fx-text-fill: #134e4a;
+}
+
+.text-field:focused, .password-field:focused, .text-area:focused, .date-picker:focused {
+    -fx-border-color: #0d9488;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.15), 10, 0, 0, 0);
+}
+
+/* ==================== COMBOBOX (Modern Dropdown) ==================== */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #ccfbf1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-font-size: 14px;
 }
 
-/* Badge Styles */
-.badge {
-    -fx-background-radius: 50;
-    -fx-padding: 3 12;
-    -fx-text-fill: white;
-    -fx-font-size: 11px;
+.combo-box:focused {
+    -fx-border-color: #0d9488;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.15), 10, 0, 0, 0);
+}
+
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #134e4a;
+    -fx-padding: 10 15;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 15 0 0;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #0d9488;
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #ccfbf1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 5);
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: white;
+    -fx-padding: 12 15;
+    -fx-text-fill: #134e4a;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #f0fdfa;
+    -fx-text-fill: #0d9488;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #ccfbf1;
+    -fx-text-fill: #0d9488;
     -fx-font-weight: bold;
-    -fx-alignment: center;
 }
 
-.badge-urgent {
-    -fx-background-color: #dc3545; /* Red */
+.label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 14px;
 }
 
-.badge-normal {
-    -fx-background-color: #4154f1; /* Blue */
+/* ==================== CHARTS (Themed & Innovative) ==================== */
+.chart {
+    -fx-padding: 20;
 }
 
-.badge-low {
-    -fx-background-color: #198754; /* Green */
+.chart-pie-label {
+    -fx-fill: #134e4a;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+/* Vivid Clinical Colors for Pie Slices (Solid for stability) */
+.data0.chart-pie { 
+    -fx-pie-color: #0d9488; 
+    -fx-border-color: white; 
+    -fx-border-width: 3;
+}
+.data1.chart-pie { 
+    -fx-pie-color: #f43f5e; 
+    -fx-border-color: white; 
+    -fx-border-width: 3;
+}
+.data2.chart-pie { 
+    -fx-pie-color: #10b981; 
+    -fx-border-color: white; 
+    -fx-border-width: 3;
+}
+
+.chart-legend {
+    -fx-background-color: #f0fdfa;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 0);
+}
+
+.chart-legend-item {
+    -fx-text-fill: #134e4a;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
 }

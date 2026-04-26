@@ -10,10 +10,8 @@ import java.util.regex.Pattern;
 
 public class MedecinService {
 
-    private Connection cnx;
-
     public MedecinService() throws SQLException {
-        this.cnx = MyConnection.getInstance().getConnection();
+        MyConnection.getInstance();
     }
 
     // ─── Validation ────────────────────────────────────────────────────────────
@@ -48,6 +46,7 @@ public class MedecinService {
     // ─── CRUD ──────────────────────────────────────────────────────────────────
 
     public void ajouter(Medecin m) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String erreur = valider(m);
         if (erreur != null) throw new IllegalArgumentException(erreur);
 
@@ -66,6 +65,7 @@ public class MedecinService {
     }
 
     public void modifier(Medecin m) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String erreur = valider(m);
         if (erreur != null) throw new IllegalArgumentException(erreur);
 
@@ -85,6 +85,7 @@ public class MedecinService {
     }
 
     public void supprimer(int id) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String sql = "DELETE FROM medecin WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -93,6 +94,7 @@ public class MedecinService {
     }
 
     public List<Medecin> afficher() throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         List<Medecin> liste = new ArrayList<>();
         String sql = "SELECT * FROM medecin ORDER BY nom, prenom";
         try (Statement st = cnx.createStatement();
@@ -105,6 +107,7 @@ public class MedecinService {
     }
 
     public Medecin getById(int id) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         String sql = "SELECT * FROM medecin WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -116,6 +119,7 @@ public class MedecinService {
     }
 
     public List<Medecin> rechercher(String motCle) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         List<Medecin> liste = new ArrayList<>();
         String sql = "SELECT * FROM medecin WHERE nom LIKE ? OR prenom LIKE ? OR specialite LIKE ?";
         String pattern = "%" + motCle + "%";
@@ -133,6 +137,7 @@ public class MedecinService {
     // ─── Helpers ───────────────────────────────────────────────────────────────
 
     private boolean existeParEmail(String email, int excludeId) throws SQLException {
+        Connection cnx = MyConnection.getInstance().getConnection();
         if (email == null || email.isEmpty()) return false;
         String sql = "SELECT id FROM medecin WHERE email=? AND id != ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {

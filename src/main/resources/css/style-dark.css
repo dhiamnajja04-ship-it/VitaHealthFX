@@ -1,0 +1,348 @@
+/* ==================== DARK MODE - DESIGN GLASSMORPHISM ==================== */
+.root {
+    -fx-font-family: 'Segoe UI', 'Roboto', 'Open Sans', sans-serif;
+    -fx-background-color: #0a0f1a;
+}
+
+/* ==================== TOP BAR DARK ==================== */
+.top-bar {
+    -fx-background-color: #1a2533;
+    -fx-padding: 15 25;
+    -fx-spacing: 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
+}
+
+.logo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #27ae60;
+}
+
+.subtitle {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.user-label {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 14px;
+}
+
+.theme-btn, .theme-btn-login, .theme-btn-register, .theme-btn-home {
+    -fx-background-color: transparent;
+    -fx-text-fill: #a0b3d9;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+
+.theme-btn:hover, .theme-btn-login:hover, .theme-btn-register:hover, .theme-btn-home:hover {
+    -fx-text-fill: #27ae60;
+}
+
+.logout-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* ==================== STAT CARDS DARK ==================== */
+.stat-card {
+    -fx-background-color: #2c3e50;
+    -fx-background-radius: 24;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.stat-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(39,174,96,0.3), 15, 0, 0, 5);
+    -fx-translate-y: -2;
+}
+
+.stat-card-green {
+    -fx-background-color: #27ae60;
+}
+
+.stat-card-blue {
+    -fx-background-color: #3498db;
+}
+
+.stat-card-orange {
+    -fx-background-color: #f39c12;
+}
+
+.stat-card-purple {
+    -fx-background-color: #9b59b6;
+}
+
+.stat-card-small {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-alignment: CENTER;
+}
+
+.stat-icon {
+    -fx-font-size: 32px;
+    -fx-text-fill: #27ae60;
+}
+
+.stat-icon-small {
+    -fx-font-size: 28px;
+}
+
+.stat-number {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 10 0 5 0;
+}
+
+.stat-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #a0b3d9;
+}
+
+.stat-trend-up {
+    -fx-text-fill: #27ae60;
+    -fx-font-size: 12px;
+    -fx-padding: 5 0 0 0;
+}
+
+.bmi-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #27ae60;
+}
+
+/* ==================== BOUTONS DARK ==================== */
+.btn-primary {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2ecc71;
+}
+
+.btn-secondary {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #5dade2;
+}
+
+.btn-danger {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.btn-outline {
+    -fx-background-color: transparent;
+    -fx-text-fill: #27ae60;
+    -fx-border-color: #27ae60;
+    -fx-border-width: 2px;
+    -fx-border-radius: 25;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.btn-outline:hover {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+}
+
+/* ==================== FORMULAIRES DARK ==================== */
+.text-field, .password-field, .text-area, .combo-box, .date-picker, .search-field, .input-field, .register-field {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-text-fill: white;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #27ae60;
+    -fx-border-width: 2px;
+}
+
+/* ==================== TABLEAUX DARK ==================== */
+.table-view, .custom-table {
+    -fx-background-color: rgba(255,255,255,0.05);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-radius: 12;
+}
+
+.table-view .column-header-background, .custom-table .column-header-background {
+    -fx-background-color: #2c3e50;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header .label, .custom-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: rgba(255,255,255,0.03);
+    -fx-border-color: rgba(255,255,255,0.05);
+    -fx-text-fill: #a0b3d9;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: rgba(39, 174, 96, 0.1);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(39, 174, 96, 0.2);
+}
+
+/* ==================== ONGLETS DARK ==================== */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #2c3e50;
+    -fx-background-radius: 12 12 0 0;
+    -fx-padding: 12 30;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #27ae60;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab-label {
+    -fx-text-fill: #a0b3d9;
+    -fx-font-size: 14px;
+}
+
+/* ==================== LOGIN/REGISTER CARDS DARK ==================== */
+.login-card, .register-card {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-radius: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0, 0, 10);
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-width: 1px;
+    -fx-border-radius: 30px;
+}
+
+.login-root, .register-root {
+    -fx-background-color: #1a1a2e;
+}
+
+.login-title, .register-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-fill: white;
+}
+
+.login-subtitle, .register-subtitle {
+    -fx-font-size: 13px;
+    -fx-fill: #a0b3d9;
+}
+
+/* ==================== HOME PAGE DARK ==================== */
+.hero-title {
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.hero-subtitle {
+    -fx-font-size: 18px;
+    -fx-text-fill: #a0b3d9;
+}
+
+.feature-card {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-padding: 30;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+    -fx-cursor: hand;
+}
+
+.feature-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(39,174,96,0.3), 15, 0, 0, 8);
+}
+
+.feature-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.feature-desc {
+    -fx-font-size: 13px;
+    -fx-text-fill: #a0b3d9;
+}
+
+.footer {
+    -fx-background-color: #1a2533;
+    -fx-padding: 20;
+    -fx-alignment: CENTER;
+}
+
+.footer-text {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 12px;
+}
+
+/* ==================== DIALOG DARK ==================== */
+.dialog-pane {
+    -fx-background-color: #1a2533;
+    -fx-background-radius: 15;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #27ae60;
+    -fx-background-radius: 15 15 0 0;
+}
+
+.dialog-pane .content {
+    -fx-text-fill: white;
+}
+
+/* ==================== TOOLTIPS DARK ==================== */
+.tooltip {
+    -fx-background-color: #1a2533;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12;
+}

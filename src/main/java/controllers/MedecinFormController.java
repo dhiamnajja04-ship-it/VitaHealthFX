@@ -103,6 +103,18 @@ public class MedecinFormController implements Initializable {
         return m;
     }
 
+    public void setViewMode() {
+        tfMedNom.setDisable(true);
+        tfMedPrenom.setDisable(true);
+        tfMedSpecialite.setDisable(true);
+        tfMedTelephone.setDisable(true);
+        tfMedEmail.setDisable(true);
+        btnAjouter.setVisible(false);
+        btnAjouter.setManaged(false);
+        btnModifier.setVisible(false);
+        btnModifier.setManaged(false);
+    }
+
     private void afficherErreur(String msg) {
         lblMedErreur.setStyle("-fx-text-fill: red;");
         lblMedErreur.setText("⚠ " + msg);

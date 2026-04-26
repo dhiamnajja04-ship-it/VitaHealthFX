@@ -10,6 +10,8 @@ import models.Medecin;
 import models.RendezVous;
 import services.MedecinService;
 import services.RendezVousService;
+import services.WeatherService;
+import javafx.application.Platform;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -20,11 +22,11 @@ import java.util.ResourceBundle;
 public class RdvFormController implements Initializable {
 
     @FXML private DatePicker dpRdvDate;
-    @FXML private TextField tfRdvHeure, tfRdvPatientNom, tfRdvPatientPrenom, tfRdvPatientTel;
+    @FXML private TextField tfRdvHeure, tfRdvPatientNom, tfRdvPatientPrenom, tfRdvPatientTel, tfRdvPatientEmail;
     @FXML private TextArea taRdvMotif;
     @FXML private ComboBox<String> cbRdvPriorite;
     @FXML private ComboBox<Medecin> cbRdvMedecin;
-    @FXML private Label lblRdvErreur;
+    @FXML private Label lblRdvErreur, lblWeather;
     @FXML private Button btnAjouter, btnModifier;
 
     private RendezVousService service;
@@ -54,6 +56,13 @@ public class RdvFormController implements Initializable {
                     setDisable(empty || date.compareTo(java.time.LocalDate.now()) < 0);
                 }
             });
+
+            // Smart Queue & Weather Listeners
+            dpRdvDate.valueProperty().addListener((obs, oldVal, newVal) -> {
+                suggérerHeureAutomatique();
+                mettreAJourMétéo(newVal);
+            });
+            cbRdvMedecin.valueProperty().addListener((obs, oldVal, newVal) -> suggérerHeureAutomatique());
             
             chargerMedecins();
         } catch (SQLException e) {
@@ -69,12 +78,14 @@ public class RdvFormController implements Initializable {
         if (rv != null) {
             rdvSelectionne = rv;
             dpRdvDate.setValue(rv.getDate());
+            mettreAJourMétéo(rv.getDate());
             tfRdvHeure.setText(rv.getHeure().toString());
             taRdvMotif.setText(rv.getMotif());
             cbRdvPriorite.setValue(rv.getPriorite());
             tfRdvPatientNom.setText(rv.getPatientNom());
             tfRdvPatientPrenom.setText(rv.getPatientPrenom());
             tfRdvPatientTel.setText(rv.getPatientTel());
+            if (tfRdvPatientEmail != null) tfRdvPatientEmail.setText(rv.getPatientEmail());
             
             cbRdvMedecin.getItems().stream()
                 .filter(m -> m.getId() == rv.getMedecinId())
@@ -120,6 +131,7 @@ public class RdvFormController implements Initializable {
         dpRdvDate.setValue(null); tfRdvHeure.clear(); taRdvMotif.clear();
         cbRdvPriorite.setValue("Normale"); cbRdvMedecin.setValue(null);
         tfRdvPatientNom.clear(); tfRdvPatientPrenom.clear(); tfRdvPatientTel.clear();
+        if (tfRdvPatientEmail != null) tfRdvPatientEmail.clear();
         lblRdvErreur.setText("");
     }
 
@@ -165,14 +177,63 @@ public class RdvFormController implements Initializable {
             throw new IllegalArgumentException("Le numéro de téléphone doit contenir exactement 8 chiffres.");
         }
         rv.setPatientTel(tel);
-        
+        if (tfRdvPatientEmail != null) {
+            rv.setPatientEmail(tfRdvPatientEmail.getText().trim());
+        }
+
         if (rv.getPatientNom().isEmpty()) throw new IllegalArgumentException("Le nom du patient est requis.");
         
         return rv;
     }
 
+    public void setViewMode() {
+        dpRdvDate.setDisable(true);
+        tfRdvHeure.setDisable(true);
+        taRdvMotif.setDisable(true);
+        cbRdvPriorite.setDisable(true);
+        cbRdvMedecin.setDisable(true);
+        tfRdvPatientNom.setDisable(true);
+        tfRdvPatientPrenom.setDisable(true);
+        tfRdvPatientTel.setDisable(true);
+        if (tfRdvPatientEmail != null) tfRdvPatientEmail.setDisable(true);
+        
+        btnAjouter.setVisible(false);
+        btnAjouter.setManaged(false);
+        btnModifier.setVisible(false);
+        btnModifier.setManaged(false);
+    }
+
+    private void suggérerHeureAutomatique() {
+        if (rdvSelectionne != null) return; // Mode édition : on laisse l'heure choisie
+        
+        Medecin m = cbRdvMedecin.getValue();
+        java.time.LocalDate d = dpRdvDate.getValue();
+        
+        if (m != null && d != null) {
+            try {
+                LocalTime next = service.genererProchainCreneau(m.getId(), d);
+                tfRdvHeure.setText(next.toString());
+                lblRdvErreur.setText("");
+            } catch (IllegalStateException e) {
+                tfRdvHeure.clear();
+                afficherErreur(e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Erreur SmartQueue: " + e.getMessage());
+            }
+        }
+    }
+
     private void afficherErreur(String msg) {
         lblRdvErreur.setStyle("-fx-text-fill: red;");
         lblRdvErreur.setText("⚠ " + msg);
+    }
+
+    private void mettreAJourMétéo(java.time.LocalDate date) {
+        if (date == null || lblWeather == null) return;
+        
+        lblWeather.setText("...☁");
+        WeatherService.getWeatherForecast(date).thenAccept(weather -> {
+            Platform.runLater(() -> lblWeather.setText("🌤 " + weather));
+        });
     }
 }

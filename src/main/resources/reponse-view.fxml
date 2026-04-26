@@ -6,24 +6,27 @@
 <VBox spacing="10" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.ReponseRendezVousController">
     <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
 
-    <Label text="Liste des Réponses aux Rendez-vous" styleClass="title-label" />
-
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Region HBox.hgrow="ALWAYS" />
-        <Button text="+ Nouvelle Réponse" onAction="#handleNouveau" styleClass="btn-success" />
-        <Button text="Modifier" onAction="#handleEditSelected" styleClass="btn-info" />
-        <Button text="Supprimer" onAction="#handleSupprimer" styleClass="btn-danger" />
-    </HBox>
-
-    <TableView fx:id="tableReponse" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colId" text="ID" prefWidth="40" />
-            <TableColumn fx:id="colRdvId" text="RDV ID" prefWidth="60" />
-            <TableColumn fx:id="colType" text="Type Réponse" prefWidth="120" />
-            <TableColumn fx:id="colDate" text="Date Réponse" prefWidth="180" />
-            <TableColumn fx:id="colMessage" text="Message" prefWidth="300" />
-        </columns>
-    </TableView>
-
-    <Label fx:id="lblErreur" textFill="red" />
-</VBox>
+    <Label text="Historique des Réponses (RDV)" styleClass="title-label" />
+ 
+     <HBox spacing="10" alignment="CENTER_LEFT">
+         <TextField fx:id="tfSearch" promptText="Rechercher par message ou type..." prefWidth="400" />
+         <Region HBox.hgrow="ALWAYS" />
+         <Button text="Supprimer" onAction="#handleSupprimer" styleClass="btn-danger" />
+     </HBox>
+ 
+     <TableView fx:id="tableReponse" VBox.vgrow="ALWAYS">
+         <columns>
+             <TableColumn fx:id="colId" text="ID" prefWidth="40" />
+             <TableColumn fx:id="colRdvId" text="RDV ID" prefWidth="60" />
+             <TableColumn fx:id="colMedecin" text="Médecin" prefWidth="120" />
+             <TableColumn fx:id="colType" text="Type Réponse" prefWidth="120" />
+             <TableColumn fx:id="colDate" text="Date Réponse" prefWidth="180" />
+             <TableColumn fx:id="colMessage" text="Message" prefWidth="350" />
+         </columns>
+     </TableView>
+ 
+     <HBox alignment="CENTER_RIGHT" spacing="10">
+         <Label fx:id="lblErreur" textFill="red" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+         <Button text="Exporter CSV" onAction="#handleExportCSV" styleClass="btn-info" />
+     </HBox>
+ </VBox>

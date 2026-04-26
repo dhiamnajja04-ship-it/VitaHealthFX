@@ -10,6 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,7 +74,24 @@ public class MainController implements Initializable {
                 setupSubController(ctrl);
             }
 
-            contentArea.getChildren().setAll(view);
+            // Conserver le fond décoratif (index 0) et remplacer le contenu
+            if (contentArea.getChildren().size() > 1) {
+                contentArea.getChildren().remove(1, contentArea.getChildren().size());
+            }
+            contentArea.getChildren().add(view);
+            
+            // Animation combinée : Fondu + Glissement
+            FadeTransition ft = new FadeTransition(Duration.millis(400), view);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            
+            TranslateTransition tt = new TranslateTransition(Duration.millis(400), view);
+            tt.setFromX(20);
+            tt.setToX(0);
+            
+            ft.play();
+            tt.play();
+
             updateButtonStyles(activeBtn);
 
         } catch (IOException e) {
@@ -109,14 +129,19 @@ public class MainController implements Initializable {
         }
     }
 
-    public void openForm(String type, Object data) {
+    public void openForm(String type, Object data, boolean isViewOnly) {
         try {
-            String fxmlFile = switch (type.toUpperCase()) {
-                case "MEDECIN" -> "/medecin-form.fxml";
-                case "RDV"     -> "/rendezvous-form.fxml";
-                case "REPONSE" -> "/reponse-form.fxml";
-                default -> throw new IllegalArgumentException("Type inconnu : " + type);
-            };
+            String fxmlFile;
+            if (isViewOnly) {
+                fxmlFile = "/consultation-fiche.fxml";
+            } else {
+                fxmlFile = switch (type.toUpperCase()) {
+                    case "MEDECIN" -> "/medecin-form.fxml";
+                    case "RDV"     -> "/rendezvous-form.fxml";
+                    case "REPONSE" -> "/reponse-form.fxml";
+                    default -> throw new IllegalArgumentException("Type inconnu : " + type);
+                };
+            }
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = loader.load();
@@ -126,23 +151,27 @@ public class MainController implements Initializable {
             if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
             Stage stage = new Stage();
-            stage.setTitle("VitalHealth - Edition " + type);
+            stage.setTitle("VitalHealth - " + (isViewOnly ? "Détails " : "Édition ") + type);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
 
             Object ctrl = loader.getController();
-            if (ctrl instanceof MedecinFormController c) {
-                c.setMainController(this);
-                c.setMedecin((models.Medecin) data);
-            } else if (ctrl instanceof RdvFormController c) {
-                c.setMainController(this);
-                c.setRendezVous((models.RendezVous) data);
-            } else if (ctrl instanceof ReponseFormController c) {
-                c.setMainController(this);
-                if (data instanceof models.ReponseRendezVous rep) {
-                    c.setReponse(rep);
-                } else if (data instanceof models.RendezVous rdv) {
-                    c.setRendezVous(rdv);
+            if (isViewOnly && ctrl instanceof ConsultationFicheController c) {
+                c.setData(data);
+            } else {
+                if (ctrl instanceof MedecinFormController c) {
+                    c.setMainController(this);
+                    c.setMedecin((models.Medecin) data);
+                } else if (ctrl instanceof RdvFormController c) {
+                    c.setMainController(this);
+                    c.setRendezVous((models.RendezVous) data);
+                } else if (ctrl instanceof ReponseFormController c) {
+                    c.setMainController(this);
+                    if (data instanceof models.ReponseRendezVous rep) {
+                        c.setReponse(rep);
+                    } else if (data instanceof models.RendezVous rdv) {
+                        c.setRendezVous(rdv);
+                    }
                 }
             }
 

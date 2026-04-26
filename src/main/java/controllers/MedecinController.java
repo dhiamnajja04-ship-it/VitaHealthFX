@@ -2,6 +2,8 @@ package controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -24,9 +26,14 @@ public class MedecinController implements Initializable {
     @FXML private TableColumn<Medecin, String>  colSpecialite;
     @FXML private TableColumn<Medecin, String>  colTelephone;
     @FXML private TableColumn<Medecin, String>  colEmail;
+    @FXML private TableColumn<Medecin, Void>    colActions;
+
+    @FXML private TextField tfSearch;
+    @FXML private Label lblCount;
 
     private MedecinService service;
     private ObservableList<Medecin> listeMedecins = FXCollections.observableArrayList();
+    private FilteredList<Medecin> filteredData;
     
     private MainController mainController;
 
@@ -46,8 +53,46 @@ public class MedecinController implements Initializable {
         colTelephone.setCellValueFactory(new PropertyValueFactory<>("telephone"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        tableMedecin.setItems(listeMedecins);
+        // Colonne Actions (Bouton View)
+        colActions.setCellFactory(column -> new TableCell<>() {
+            private final Button btnView = new Button("👁 Voir");
+            {
+                btnView.getStyleClass().add("btn-info");
+                btnView.setOnAction(event -> {
+                    Medecin m = getTableView().getItems().get(getIndex());
+                    if (mainController != null) mainController.openForm("MEDECIN", m, true);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) setGraphic(null);
+                else setGraphic(btnView);
+            }
+        });
+
+        setupSearch();
         chargerDonnees();
+    }
+
+    private void setupSearch() {
+        filteredData = new FilteredList<>(listeMedecins, p -> true);
+
+        tfSearch.textProperty().addListener((obs, oldVal, newVal) -> {
+            String filter = newVal.toLowerCase();
+            filteredData.setPredicate(m -> {
+                if (filter == null || filter.isEmpty()) return true;
+                return m.getNom().toLowerCase().contains(filter) || 
+                       m.getPrenom().toLowerCase().contains(filter) ||
+                       m.getSpecialite().toLowerCase().contains(filter);
+            });
+            lblCount.setText(filteredData.size() + " médecin(s) trouvé(s)");
+        });
+
+        SortedList<Medecin> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tableMedecin.comparatorProperty());
+        tableMedecin.setItems(sortedData);
     }
 
     public void setMainController(MainController mainController) {
@@ -57,7 +102,7 @@ public class MedecinController implements Initializable {
     @FXML
     private void handleNouveau() {
         if (mainController != null) {
-            mainController.openForm("MEDECIN", null);
+            mainController.openForm("MEDECIN", null, false);
         }
     }
 
@@ -69,7 +114,7 @@ public class MedecinController implements Initializable {
             return;
         }
         if (mainController != null) {
-            mainController.openForm("MEDECIN", m);
+            mainController.openForm("MEDECIN", m, false);
         }
     }
 
@@ -99,6 +144,7 @@ public class MedecinController implements Initializable {
     public void chargerDonnees() {
         try {
             listeMedecins.setAll(service.afficher());
+            lblCount.setText(listeMedecins.size() + " médecin(s) au total");
             lblErreur.setText("");
         } catch (SQLException e) {
             afficherErreur("Impossible de charger les médecins : " + e.getMessage());
