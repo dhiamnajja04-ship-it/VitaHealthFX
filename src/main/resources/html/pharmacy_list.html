@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmacies à proximité</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 15px; background: #f4f6f9; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h2 { color: #2c3e50; text-align: center; }
+        .search-box { background: white; border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        input { width: calc(100% - 20px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        button { background-color: #27ae60; border: none; color: white; padding: 12px; font-size: 16px; border-radius: 30px; cursor: pointer; width: 100%; font-weight: bold; }
+        button:hover { background-color: #2ecc71; }
+        .status { text-align: center; padding: 8px; background: #fff3cd; border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
+        .pharmacy-list { list-style: none; padding: 0; margin: 0; }
+        .pharmacy-item { background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .pharmacy-name { font-weight: bold; color: #2c3e50; }
+        .pharmacy-address { color: #7f8c8d; font-size: 13px; margin: 5px 0; }
+        .pharmacy-distance { color: #27ae60; font-size: 12px; font-weight: bold; }
+        .map-link { background-color: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 15px; text-decoration: none; font-size: 12px; display: inline-block; margin-top: 5px; cursor: pointer; }
+        .map-link:hover { background-color: #2980b9; }
+        .footer { text-align: center; font-size: 11px; color: #95a5a6; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>💊 Pharmacies à proximité (2 km)</h2>
+    <div class="search-box">
+        <input type="text" id="addressInput" placeholder="Entrez une ville, une adresse..." value="Tunis, Tunisie">
+        <button id="searchBtn">🔍 Rechercher</button>
+    </div>
+    <div id="status" class="status">Entrez une adresse (ex: Tunis, Ariana, Sfax...)</div>
+    <ul id="pharmacyList" class="pharmacy-list"></ul>
+    <div class="footer">Données OpenStreetMap</div>
+</div>
+
+<script>
+    let currentLat = null, currentLon = null;
+
+    function updateStatus(text, isError) {
+        const div = document.getElementById('status');
+        div.innerText = text;
+        div.style.color = isError ? '#e74c3c' : '#2c3e50';
+    }
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        const c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R*c;
+    }
+
+    function displayPharmacies(pharmacies) {
+        const list = document.getElementById('pharmacyList');
+        list.innerHTML = '';
+        if (!pharmacies || pharmacies.length === 0) {
+            list.innerHTML = '<li class="pharmacy-item">Aucune pharmacie trouvée.</li>';
+            return;
+        }
+        pharmacies.forEach(p => {
+            const li = document.createElement('li');
+            li.className = 'pharmacy-item';
+            const dist = p.distance ? p.distance.toFixed(1) + ' km' : '';
+            li.innerHTML = `
+                <div class="pharmacy-name">${p.name}</div>
+                <div class="pharmacy-address">${p.address || 'Adresse non disponible'}</div>
+                <div class="pharmacy-distance">📏 ${dist}</div>
+                <a class="map-link" href="https://www.google.com/maps/dir/${currentLat},${currentLon}/${p.lat},${p.lon}/" target="_blank">🗺️ Itinéraire</a>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function searchPharmacies(lat, lon) {
+        currentLat = lat;
+        currentLon = lon;
+        updateStatus('🔍 Recherche des pharmacies à 2 km...', false);
+        const radius = 2000; // 2 km
+        const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(node["amenity"="pharmacy"](around:${radius},${lat},${lon});way["amenity"="pharmacy"](around:${radius},${lat},${lon});relation["amenity"="pharmacy"](around:${radius},${lat},${lon}););out center;`;
+        fetch(overpassUrl, { headers: { 'User-Agent': 'VitaHealthFX/2.0' } })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.elements || data.elements.length === 0) {
+                    updateStatus('❌ Aucune pharmacie trouvée dans les 2 km', true);
+                    displayPharmacies([]);
+                    return;
+                }
+                const pharmacies = [];
+                data.elements.forEach(el => {
+                    const tags = el.tags || {};
+                    const ph = {
+                        lat: el.lat || (el.center ? el.center.lat : null),
+                        lon: el.lon || (el.center ? el.center.lon : null),
+                        name: tags.name || 'Pharmacie',
+                        address: (tags['addr:street'] || '') + (tags['addr:city'] ? ', ' + tags['addr:city'] : ''),
+                        phone: tags.phone,
+                        hours: tags.opening_hours
+                    };
+                    if (ph.lat && ph.lon) pharmacies.push(ph);
+                });
+                // Calculer distance par rapport au point central
+                pharmacies.forEach(p => p.distance = getDistance(lat, lon, p.lat, p.lon));
+                pharmacies.sort((a,b) => a.distance - b.distance);
+                updateStatus(`✅ ${pharmacies.length} pharmacie(s) trouvée(s)`, false);
+                displayPharmacies(pharmacies);
+            })
+            .catch(err => {
+                updateStatus('⚠️ Erreur réseau Overpass', true);
+                console.error(err);
+            });
+    }
+
+    function geocodeAndSearch() {
+        const address = document.getElementById('addressInput').value.trim();
+        if (!address) {
+            updateStatus('Veuillez entrer une adresse ou une ville', true);
+            return;
+        }
+        updateStatus('📍 Recherche de l\'adresse...', false);
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+        fetch(url, { headers: { 'User-Agent': 'VitaHealthFX/2.0' } })
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    updateStatus('❌ Adresse introuvable. Essayez "Tunis, Tunisie"', true);
+                    return;
+                }
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                updateStatus(`📍 Position : ${data[0].display_name.substring(0, 60)}...`, false);
+                searchPharmacies(lat, lon);
+            })
+            .catch(err => {
+                updateStatus('Erreur de géocodage', true);
+                console.error(err);
+            });
+    }
+
+    window.addEventListener('load', () => {
+        geocodeAndSearch(); // Lance automatiquement la recherche sur "Tunis, Tunisie"
+    });
+    document.getElementById('searchBtn').addEventListener('click', geocodeAndSearch);
+</script>
+</body>
+</html>

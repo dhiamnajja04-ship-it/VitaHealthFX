@@ -4,38 +4,49 @@ import com.vitahealth.dao.AppointmentDAO;
 import com.vitahealth.dao.HealthProfileDAO;
 import com.vitahealth.dao.ParaMedicalDAO;
 import com.vitahealth.dao.PrescriptionDAO;
+import com.vitahealth.dao.SeuilDAO;
 import com.vitahealth.dao.UserDAO;
 import com.vitahealth.entity.Appointment;
 import com.vitahealth.entity.HealthProfile;
 import com.vitahealth.entity.ParaMedical;
 import com.vitahealth.entity.Prescription;
 import com.vitahealth.entity.User;
+import com.vitahealth.util.PDFGenerator;
 import com.vitahealth.util.SessionManager;
 import javafx.animation.ScaleTransition;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class PatientController {
 
     @FXML private Label userLabel;
     @FXML private Button logoutBtn;
 
+    // Rendez-vous
     @FXML private TableView<Appointment> appointmentsTable;
     @FXML private TableColumn<Appointment, LocalDateTime> colDate;
     @FXML private TableColumn<Appointment, String> colDoctor;
@@ -45,6 +56,7 @@ public class PatientController {
     @FXML private Button newAppointmentBtn;
     @FXML private Button refreshAppointmentsBtn;
 
+    // Profil santé
     @FXML private TextField heightField;
     @FXML private TextField weightField;
     @FXML private ComboBox<String> bloodTypeCombo;
@@ -56,6 +68,7 @@ public class PatientController {
     @FXML private Button saveHealthBtn;
     @FXML private Button refreshHealthBtn;
 
+    // Paramètres médicaux
     @FXML private TextField poidsField;
     @FXML private TextField tailleField;
     @FXML private TextField glycemieField;
@@ -63,7 +76,6 @@ public class PatientController {
     @FXML private Label imcCalculLabel;
     @FXML private Label interpretationLabel;
     @FXML private Button ajouterParametreBtn;
-    @FXML private Button modifierParametreBtn;
     @FXML private Button supprimerParametreBtn;
     @FXML private Button rafraichirParametresBtn;
     @FXML private TableView<ParaMedical> parametreTable;
@@ -73,13 +85,20 @@ public class PatientController {
     @FXML private TableColumn<ParaMedical, Double> colParamGlycemie;
     @FXML private TableColumn<ParaMedical, String> colParamTension;
     @FXML private TableColumn<ParaMedical, Double> colParamImc;
+    @FXML private TableColumn<ParaMedical, String> colAlerte;
 
+    // Prescriptions
     @FXML private TableView<Prescription> prescriptionTable;
     @FXML private TableColumn<Prescription, LocalDateTime> colPrescDate;
     @FXML private TableColumn<Prescription, String> colMedicaments;
     @FXML private TableColumn<Prescription, String> colDuree;
     @FXML private TableColumn<Prescription, String> colInstructions;
+    @FXML private TableColumn<Prescription, Void> colActionsPresc;
 
+    // Graphiques
+    @FXML private Button showTrendsBtn;
+
+    // Menu
     @FXML private MenuItem changerVersMedecin;
     @FXML private MenuItem quitter;
     @FXML private MenuItem aPropos;
@@ -89,12 +108,14 @@ public class PatientController {
     private UserDAO userDAO;
     private ParaMedicalDAO paraMedicalDAO;
     private PrescriptionDAO prescriptionDAO;
+    private SeuilDAO seuilDAO;
 
     private User currentUser;
     private ObservableList<Appointment> appointmentsList;
     private ObservableList<ParaMedical> parametresList;
     private ObservableList<Prescription> prescriptionsList;
 
+    private Map<String, Map<String, Double>> seuils;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @FXML
@@ -104,13 +125,13 @@ public class PatientController {
         userDAO = new UserDAO();
         paraMedicalDAO = new ParaMedicalDAO();
         prescriptionDAO = new PrescriptionDAO();
+        seuilDAO = new SeuilDAO();
 
         currentUser = SessionManager.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            userLabel.setText("👤 " + currentUser.getFullName());
-        } else {
-            userLabel.setText("👤 Patient");
-        }
+        if (currentUser != null) userLabel.setText("👤 " + currentUser.getFullName());
+        else userLabel.setText("👤 Patient");
+
+        seuils = seuilDAO.getSeuils();
 
         setupAppointmentsTable();
         setupHealthProfile();
@@ -129,22 +150,34 @@ public class PatientController {
         saveHealthBtn.setOnAction(e -> saveHealthProfile());
         refreshHealthBtn.setOnAction(e -> loadHealthProfile());
 
-        ajouterParametreBtn.setOnAction(e -> ajouterParametre());
-        modifierParametreBtn.setOnAction(e -> modifierParametre());
+        ajouterParametreBtn.setOnAction(e -> ajouterOuModifierParametre());
         supprimerParametreBtn.setOnAction(e -> supprimerParametre());
         rafraichirParametresBtn.setOnAction(e -> loadParametres());
+
+        parametreTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null) {
+                poidsField.setText(String.valueOf(newVal.getPoids()));
+                tailleField.setText(String.valueOf(newVal.getTaille()));
+                glycemieField.setText(String.valueOf(newVal.getGlycemie()));
+                tensionField.setText(newVal.getTensionSystolique());
+                ajouterParametreBtn.setText("✏️ Mettre à jour");
+            } else {
+                ajouterParametreBtn.setText("➕ Ajouter");
+            }
+        });
+
+        showTrendsBtn.setOnAction(e -> showTrendsForPatient(currentUser.getId()));
 
         logoutBtn.setOnAction(e -> logout());
         if (changerVersMedecin != null) changerVersMedecin.setOnAction(e -> changerVersMedecin());
         if (quitter != null) quitter.setOnAction(e -> System.exit(0));
-        if (aPropos != null) aPropos.setOnAction(e -> showAlert("À propos", "VitaHealthFX - Version 1.0\nEspace Patient", Alert.AlertType.INFORMATION));
+        if (aPropos != null) aPropos.setOnAction(e -> showAlert("À propos", "VitaHealthFX - Version 2.0\nEspace Patient\nFonctionnalités : PDF (traduction LibreTranslate), graphiques, alertes", Alert.AlertType.INFORMATION));
     }
 
     private void setupAppointmentsTable() {
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colDate.setCellFactory(column -> new TableCell<Appointment, LocalDateTime>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
+            @Override protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.format(formatter));
             }
@@ -153,8 +186,7 @@ public class PatientController {
         colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setCellFactory(column -> new TableCell<Appointment, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
+            @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) setText(null);
                 else {
@@ -179,8 +211,7 @@ public class PatientController {
                     cancelAppointment(app);
                 });
             }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
+            @Override protected void updateItem(Void item, boolean empty) {
                 setGraphic(empty ? null : cancelBtn);
             }
         });
@@ -202,20 +233,33 @@ public class PatientController {
             Double imc = cellData.getValue().getImc();
             return new javafx.beans.property.SimpleObjectProperty<>(imc != null ? imc : 0.0);
         });
+
+        colAlerte.setCellValueFactory(cellData -> new SimpleStringProperty(verifierAlerte(cellData.getValue())));
+        colAlerte.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) setText(null);
+                else {
+                    setText(item);
+                    if (item.startsWith("⚠️")) setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                    else setStyle("-fx-text-fill: green;");
+                }
+            }
+        });
+
         colParamDate.setCellFactory(column -> new TableCell<ParaMedical, LocalDateTime>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
+            @Override protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.format(formatter));
             }
         });
         colParamImc.setCellFactory(column -> new TableCell<ParaMedical, Double>() {
-            @Override
-            protected void updateItem(Double item, boolean empty) {
+            @Override protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : String.format("%.2f", item));
             }
         });
+
         poidsField.textProperty().addListener((obs, old, val) -> calculerIMCParam());
         tailleField.textProperty().addListener((obs, old, val) -> calculerIMCParam());
     }
@@ -226,13 +270,79 @@ public class PatientController {
         colDuree.setCellValueFactory(new PropertyValueFactory<>("duration"));
         colInstructions.setCellValueFactory(new PropertyValueFactory<>("instructions"));
         colPrescDate.setCellFactory(column -> new TableCell<Prescription, LocalDateTime>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
+            @Override protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.format(formatter));
             }
         });
+
+        colActionsPresc.setCellFactory(col -> new TableCell<>() {
+            private final Button pdfBtn = new Button("📄 PDF");
+            {
+                pdfBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 10; -fx-cursor: hand;");
+                pdfBtn.setOnAction(e -> {
+                    Prescription p = getTableView().getItems().get(getIndex());
+                    genererPDFPrescription(p);
+                });
+            }
+            @Override protected void updateItem(Void item, boolean empty) {
+                setGraphic(empty ? null : pdfBtn);
+            }
+        });
     }
+
+    // ================== NOUVELLE GÉNÉRATION PDF AVEC LIBRETRANSLATE ==================
+    private void genererPDFPrescription(Prescription prescription) {
+        User doctor = prescriptionDAO.getDoctorByPrescriptionId(prescription.getId());
+        if (doctor == null) {
+            showAlert("Erreur", "Impossible de récupérer le médecin", Alert.AlertType.ERROR);
+            return;
+        }
+
+        // Boîte de dialogue pour choisir la langue
+        ChoiceDialog<String> langDialog = new ChoiceDialog<>("fr", "fr", "en", "ar");
+        langDialog.setTitle("Choisir la langue");
+        langDialog.setHeaderText("Langue du document PDF");
+        langDialog.setContentText("Sélectionnez la langue pour la traduction (LibreTranslate) :");
+        langDialog.getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        String selectedLang = langDialog.showAndWait().orElse(null);
+        if (selectedLang == null) return;
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer la prescription PDF");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
+        fileChooser.setInitialFileName("prescription_" + prescription.getId() + ".pdf");
+        File file = fileChooser.showSaveDialog(null);
+        if (file == null) return;
+
+        // Alerte de progression (simple)
+        Alert progressAlert = new Alert(Alert.AlertType.INFORMATION);
+        progressAlert.setTitle("Génération PDF");
+        progressAlert.setHeaderText(null);
+        progressAlert.setContentText("Traduction en cours via LibreTranslate...\nVeuillez patienter.");
+        progressAlert.show();
+
+        // Tâche asynchrone pour ne pas bloquer l'interface
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                PDFGenerator.generatePrescriptionPDF(prescription, currentUser, doctor, file.getAbsolutePath(), selectedLang);
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> {
+            progressAlert.close();
+            showAlert("Succès", "PDF généré et traduit avec succès !", Alert.AlertType.INFORMATION);
+        });
+        task.setOnFailed(e -> {
+            progressAlert.close();
+            Throwable ex = task.getException();
+            showAlert("Erreur", "Échec de la génération : " + (ex != null ? ex.getMessage() : "Erreur inconnue"), Alert.AlertType.ERROR);
+            ex.printStackTrace();
+        });
+        new Thread(task).start();
+    }
+    // ================== FIN NOUVELLE MÉTHODE ==================
 
     private void setupButtons() {
         newAppointmentBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
@@ -240,18 +350,18 @@ public class PatientController {
         saveHealthBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
         refreshHealthBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
         ajouterParametreBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
-        modifierParametreBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
         supprimerParametreBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
         rafraichirParametresBtn.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
+        showTrendsBtn.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
 
         addHoverAnimation(newAppointmentBtn);
         addHoverAnimation(refreshAppointmentsBtn);
         addHoverAnimation(saveHealthBtn);
         addHoverAnimation(refreshHealthBtn);
         addHoverAnimation(ajouterParametreBtn);
-        addHoverAnimation(modifierParametreBtn);
         addHoverAnimation(supprimerParametreBtn);
         addHoverAnimation(rafraichirParametresBtn);
+        addHoverAnimation(showTrendsBtn);
     }
 
     private void addHoverAnimation(Button btn) {
@@ -345,58 +455,81 @@ public class PatientController {
         } catch (NumberFormatException e) { imcCalculLabel.setText("--"); interpretationLabel.setText(""); }
     }
 
-    private void ajouterParametre() {
+    private void ajouterOuModifierParametre() {
+        ParaMedical selected = parametreTable.getSelectionModel().getSelectedItem();
         try {
-            ParaMedical pm = new ParaMedical();
-            pm.setPoids(Double.parseDouble(poidsField.getText()));
-            pm.setTaille(Double.parseDouble(tailleField.getText()));
-            pm.setGlycemie(Double.parseDouble(glycemieField.getText()));
-            pm.setTensionSystolique(tensionField.getText());
-            if (paraMedicalDAO.ajouter(currentUser.getId(), pm)) {
-                showAlert("✅ Succès", "Paramètre médical ajouté avec succès !", Alert.AlertType.INFORMATION);
-                loadParametres();
-                viderChampsParam();
+            double poids = Double.parseDouble(poidsField.getText());
+            double taille = Double.parseDouble(tailleField.getText());
+            double glycemie = Double.parseDouble(glycemieField.getText());
+            String tension = tensionField.getText();
+
+            if (selected != null) {
+                selected.setPoids(poids);
+                selected.setTaille(taille);
+                selected.setGlycemie(glycemie);
+                selected.setTensionSystolique(tension);
+                if (paraMedicalDAO.modifier(selected)) {
+                    showAlert("✅ Succès", "Paramètre modifié", Alert.AlertType.INFORMATION);
+                    loadParametres();
+                    viderChampsParam();
+                    parametreTable.getSelectionModel().clearSelection();
+                    verifierAlerteApresAjout(selected);
+                } else showAlert("❌ Erreur", "Échec modification", Alert.AlertType.ERROR);
             } else {
-                showAlert("❌ Erreur", "Échec de l'ajout", Alert.AlertType.ERROR);
+                ParaMedical pm = new ParaMedical();
+                pm.setPoids(poids);
+                pm.setTaille(taille);
+                pm.setGlycemie(glycemie);
+                pm.setTensionSystolique(tension);
+                if (paraMedicalDAO.ajouter(currentUser.getId(), pm)) {
+                    showAlert("✅ Succès", "Paramètre ajouté", Alert.AlertType.INFORMATION);
+                    loadParametres();
+                    viderChampsParam();
+                    verifierAlerteApresAjout(pm);
+                } else showAlert("❌ Erreur", "Échec ajout", Alert.AlertType.ERROR);
             }
         } catch (NumberFormatException e) {
             showAlert("❌ Erreur", "Valeurs numériques invalides", Alert.AlertType.ERROR);
         }
     }
 
-    private void modifierParametre() {
-        ParaMedical selected = parametreTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("Info", "Sélectionnez un paramètre à modifier", Alert.AlertType.WARNING);
-            return;
+    private void verifierAlerteApresAjout(ParaMedical pm) {
+        String alerte = verifierAlerte(pm);
+        if (!alerte.equals("✓ Normal")) {
+            Alert warning = new Alert(Alert.AlertType.WARNING);
+            warning.setTitle("Valeur critique");
+            warning.setHeaderText("Attention : mesures hors normes");
+            warning.setContentText(alerte);
+            warning.show();
         }
+    }
+
+    private String verifierAlerte(ParaMedical pm) {
+        StringBuilder alerte = new StringBuilder();
+        double gly = pm.getGlycemie();
+        Map<String, Double> glySeuil = seuils.get("glycemie");
+        if (glySeuil != null && (gly < glySeuil.get("min") || gly > glySeuil.get("max"))) alerte.append("⚠️ Glycémie anormale ");
         try {
-            selected.setPoids(Double.parseDouble(poidsField.getText()));
-            selected.setTaille(Double.parseDouble(tailleField.getText()));
-            selected.setGlycemie(Double.parseDouble(glycemieField.getText()));
-            selected.setTensionSystolique(tensionField.getText());
-            if (paraMedicalDAO.modifier(selected)) {
-                showAlert("✅ Succès", "Paramètre médical modifié avec succès !", Alert.AlertType.INFORMATION);
-                loadParametres();
-            } else {
-                showAlert("❌ Erreur", "Modification impossible", Alert.AlertType.ERROR);
-            }
-        } catch (NumberFormatException e) {
-            showAlert("❌ Erreur", "Valeurs invalides", Alert.AlertType.ERROR);
-        }
+            int tens = Integer.parseInt(pm.getTensionSystolique());
+            Map<String, Double> tensSeuil = seuils.get("tension");
+            if (tensSeuil != null && (tens < tensSeuil.get("min") || tens > tensSeuil.get("max"))) alerte.append("⚠️ Tension anormale ");
+        } catch (NumberFormatException ignored) {}
+        double imc = pm.getImc();
+        Map<String, Double> imcSeuil = seuils.get("imc");
+        if (imcSeuil != null && (imc < imcSeuil.get("min") || imc > imcSeuil.get("max"))) alerte.append("⚠️ IMC anormal ");
+        return alerte.length() > 0 ? alerte.toString() : "✓ Normal";
     }
 
     private void supprimerParametre() {
         ParaMedical selected = parametreTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "⚠️ Supprimer ce paramètre médical ?\nCette action est irréversible !",
-                ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirmation de suppression");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer ?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES && paraMedicalDAO.supprimer(selected.getId())) {
-                showAlert("✅ Succès", "Paramètre médical supprimé avec succès !", Alert.AlertType.INFORMATION);
+                showAlert("✅ Succès", "Paramètre supprimé", Alert.AlertType.INFORMATION);
                 loadParametres();
+                viderChampsParam();
+                parametreTable.getSelectionModel().clearSelection();
             }
         });
     }
@@ -415,12 +548,67 @@ public class PatientController {
         prescriptionTable.setItems(prescriptionsList);
     }
 
-    private void openNewAppointmentDialog() {
-        List<User> doctors = appointmentDAO.getAllDoctors();
-        if (doctors.isEmpty()) {
-            showAlert("Info", "Aucun médecin disponible", Alert.AlertType.INFORMATION);
+    private void showTrendsForPatient(int patientId) {
+        List<ParaMedical> data = paraMedicalDAO.getByUserId(patientId);
+        if (data.isEmpty()) {
+            showAlert("Info", "Aucune donnée médicale pour afficher les tendances", Alert.AlertType.INFORMATION);
             return;
         }
+        Stage stage = new Stage();
+        stage.setTitle("Tendances des paramètres médicaux");
+        TabPane tabPane = new TabPane();
+
+        data.sort(Comparator.comparing(ParaMedical::getCreatedAt));
+
+        LineChart<String, Number> glycemieChart = createLineChart(data, "glycemie", "Glycémie (mmol/L)");
+        Tab glycemieTab = new Tab("Glycémie", glycemieChart);
+        glycemieTab.setClosable(false);
+
+        LineChart<String, Number> imcChart = createLineChart(data, "imc", "IMC (kg/m²)");
+        Tab imcTab = new Tab("IMC", imcChart);
+        imcTab.setClosable(false);
+
+        LineChart<String, Number> tensionChart = createLineChart(data, "tension", "Tension systolique (mmHg)");
+        Tab tensionTab = new Tab("Tension", tensionChart);
+        tensionTab.setClosable(false);
+
+        tabPane.getTabs().addAll(glycemieTab, imcTab, tensionTab);
+        Scene scene = new Scene(tabPane, 800, 600);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private LineChart<String, Number> createLineChart(List<ParaMedical> data, String type, String yLabel) {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Date");
+        yAxis.setLabel(yLabel);
+        LineChart<String, Number> chart = new LineChart<>(xAxis, yAxis);
+        chart.setTitle(yLabel);
+        chart.setCreateSymbols(true);
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Valeurs");
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM");
+        for (ParaMedical pm : data) {
+            String dateStr = pm.getCreatedAt().format(dateFormat);
+            Number value = 0;
+            switch (type) {
+                case "glycemie": value = pm.getGlycemie(); break;
+                case "imc": value = pm.getImc(); break;
+                case "tension":
+                    try { value = Integer.parseInt(pm.getTensionSystolique()); } catch (NumberFormatException e) { value = 0; }
+                    break;
+            }
+            series.getData().add(new XYChart.Data<>(dateStr, value));
+        }
+        chart.getData().add(series);
+        return chart;
+    }
+
+    // ================== MÉTHODES EXISTANTES (RENDEZ-VOUS, ANNULATION, CHANGEMENT DE RÔLE, LOGOUT, ALERTE) ==================
+    private void openNewAppointmentDialog() {
+        List<User> doctors = appointmentDAO.getAllDoctors();
+        if (doctors.isEmpty()) { showAlert("Info", "Aucun médecin disponible", Alert.AlertType.INFORMATION); return; }
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Nouveau rendez-vous");
         dialog.setHeaderText("Prendre un rendez-vous");
@@ -486,9 +674,8 @@ public class PatientController {
         if ("DOCTOR".equals(currentUser.getRole()) || "ADMIN".equals(currentUser.getRole())) {
             try {
                 Parent root = FXMLLoader.load(getClass().getResource("/fxml/DoctorDashboard.fxml"));
-                Scene scene = new Scene(root, 1200, 800);
                 Stage stage = (Stage) logoutBtn.getScene().getWindow();
-                stage.setScene(scene);
+                stage.setScene(new Scene(root, 1200, 800));
                 stage.setTitle("VitaHealthFX - Espace Médecin");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -501,12 +688,13 @@ public class PatientController {
 
     private void logout() {
         SessionManager.getInstance().logout();
-        LoginController loginController = new LoginController();
-        Scene scene = loginController.getScene();
-        Stage stage = (Stage) logoutBtn.getScene().getWindow();
-        stage.setScene(scene);
-        stage.setTitle("VitaHealthFX - Connexion");
-        stage.show();
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/LoginView.fxml"));
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setTitle("VitaHealthFX - Connexion");
+            stage.show();
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     private void showAlert(String title, String msg, Alert.AlertType type) {

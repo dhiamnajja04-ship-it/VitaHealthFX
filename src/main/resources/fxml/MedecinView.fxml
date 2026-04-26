@@ -10,84 +10,87 @@
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
                 <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="VitaHealthFX" />
-                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Medecin" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Médecin" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Medecin" />
-                <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="Deconnexion" />
+                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Médecin" />
+                <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="Déconnexion" />
             </HBox>
 
-            <!-- Barre de recherche par maladie -->
             <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15 20 0 20;">
                 <Label text="Recherche par maladie :" style="-fx-font-weight: bold;" />
-                <TextField fx:id="searchMaladieField" promptText="Ex: Diabete, Hypertension..." prefWidth="250" />
+                <TextField fx:id="searchMaladieField" promptText="Ex: Diabète, Hypertension..." prefWidth="250" />
                 <Button fx:id="searchMaladieBtn" text="Filtrer" />
-                <Button fx:id="resetMaladieBtn" text="Reinitialiser" />
+                <Button fx:id="resetMaladieBtn" text="Réinitialiser" />
             </HBox>
 
             <TabPane>
                 <!-- ONGLET PRESCRIPTIONS -->
                 <Tab text="Prescriptions" closable="false">
                     <VBox spacing="15" style="-fx-padding: 20;">
+                        <Label text="💡 Cliquez sur une prescription pour la modifier, puis cliquez sur 'Ajouter / Mettre à jour'" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" />
+
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <Label text="Patient :" style="-fx-font-weight: bold;" />
                             <ComboBox fx:id="patientPrescCombo" prefWidth="300" promptText="Choisir un patient" />
                             <Button fx:id="loadPatientPrescBtn" text="Charger" />
-                            <Button fx:id="refreshPrescListBtn" text="Rafraichir" />
+                            <Button fx:id="refreshPrescListBtn" text="Rafraîchir" />
                         </HBox>
 
                         <Separator />
 
                         <GridPane hgap="15" vgap="10">
-                            <Label style="-fx-font-weight: bold;" text="Medicaments :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                            <TextArea fx:id="medicamentsArea" prefHeight="80" prefWidth="400" promptText="Ex: Paracetamol 500mg&#10;Amoxicilline 1g" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            <Label style="-fx-font-weight: bold;" text="Médicaments :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextArea fx:id="medicamentsArea" prefHeight="80" prefWidth="400" promptText="Ex: Paracétamol 500mg&#10;Amoxicilline 1g" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                            <Label style="-fx-font-weight: bold;" text="Duree :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <Label style="-fx-font-weight: bold;" text="Durée :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                             <TextField fx:id="dureeField" promptText="ex: 7 jours" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                             <Label style="-fx-font-weight: bold;" text="Instructions :" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                            <TextArea fx:id="instructionsArea" prefHeight="60" promptText="Prendre matin et soir apres les repas" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <TextArea fx:id="instructionsArea" prefHeight="60" promptText="Prendre matin et soir après les repas" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         </GridPane>
 
                         <HBox alignment="CENTER" spacing="10">
-                            <Button fx:id="ajouterPrescriptionBtn" text="Ajouter" />
-                            <Button fx:id="modifierPrescriptionBtn" text="Modifier" />
-                            <Button fx:id="supprimerPrescriptionBtn" text="Supprimer" />
-                            <Button fx:id="viderPrescChampsBtn" text="Vider" />
+                            <Button fx:id="ajouterPrescriptionBtn" text="➕ Ajouter" />
+                            <Button fx:id="supprimerPrescriptionBtn" text="🗑️ Supprimer" />
+                            <Button fx:id="viderPrescChampsBtn" text="🧹 Vider" />
+                            <Button fx:id="genererPdfBtn" text="📄 Générer PDF" />
                         </HBox>
 
                         <TableView fx:id="prescriptionTable" prefHeight="300">
                             <columns>
                                 <TableColumn fx:id="colPrescDate" text="Date" prefWidth="150" />
-                                <TableColumn fx:id="colMedicaments" text="Medicaments" prefWidth="300" />
-                                <TableColumn fx:id="colDuree" text="Duree" prefWidth="120" />
+                                <TableColumn fx:id="colMedicaments" text="Médicaments" prefWidth="300" />
+                                <TableColumn fx:id="colDuree" text="Durée" prefWidth="120" />
                                 <TableColumn fx:id="colInstructions" text="Instructions" prefWidth="350" />
                             </columns>
                         </TableView>
                     </VBox>
                 </Tab>
 
-                <!-- ONGLET PARAMETRES MEDICAUX -->
-                <Tab text="Parametres medicaux" closable="false">
+                <!-- ONGLET PARAMÈTRES MÉDICAUX -->
+                <Tab text="Paramètres médicaux" closable="false">
                     <VBox spacing="15" style="-fx-padding: 20;">
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <Label text="Patient :" style="-fx-font-weight: bold;" />
                             <ComboBox fx:id="patientParamCombo" prefWidth="300" promptText="Choisir un patient" />
                             <Button fx:id="loadPatientParamBtn" text="Charger" />
-                            <Button fx:id="refreshParamListBtn" text="Rafraichir" />
+                            <Button fx:id="refreshParamListBtn" text="Rafraîchir" />
+                            <Button fx:id="showTrendsBtn" text="📈 Voir tendances" />
                         </HBox>
 
                         <Separator />
 
-                        <Label text="Historique des parametres medicaux" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                        <Label text="Historique des paramètres médicaux" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
                         <TableView fx:id="parametreTable" prefHeight="500">
                             <columns>
                                 <TableColumn fx:id="colParamDate" text="Date" prefWidth="150" />
                                 <TableColumn fx:id="colPoids" text="Poids (kg)" prefWidth="100" />
                                 <TableColumn fx:id="colTaille" text="Taille (m)" prefWidth="100" />
-                                <TableColumn fx:id="colGlycemie" text="Glycemie" prefWidth="100" />
+                                <TableColumn fx:id="colGlycemie" text="Glycémie" prefWidth="100" />
                                 <TableColumn fx:id="colTension" text="Tension" prefWidth="100" />
                                 <TableColumn fx:id="colImc" text="IMC" prefWidth="80" />
-                                <TableColumn fx:id="colInterpretation" text="Interpretation" prefWidth="200" />
+                                <TableColumn fx:id="colInterpretation" text="Interprétation" prefWidth="200" />
+                                <TableColumn fx:id="colAlerte" text="Alerte" prefWidth="200" />
                             </columns>
                         </TableView>
                     </VBox>
