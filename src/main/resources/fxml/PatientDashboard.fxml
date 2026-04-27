@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" alignment="CENTER" style="-fx-padding: 40; -fx-background-color: linear-gradient(135deg, #667eea, #764ba2);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.vitahealthfx.controller.PatientController">
+    
+    <VBox alignment="CENTER" spacing="15" style="-fx-background-color: white; -fx-background-radius: 30; -fx-padding: 30;">
+        <Label text="👤 Espace Patient" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <Label text="Bienvenue sur votre espace personnel" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+        
+        <Button text="🔓 Déconnexion" onAction="#logout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 30;"/>
+    </VBox>
+    
+</VBox>

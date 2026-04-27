@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" alignment="TOP_CENTER" style="-fx-padding: 20; -fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.vitahealthfx.controller.AdminController">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="👑 Administration" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="adminNameLabel" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+        <Button text="🔓 Déconnexion" onAction="#logout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Statistiques -->
+    <HBox spacing="15" alignment="CENTER">
+        <VBox alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15;" HBox.hgrow="ALWAYS">
+            <Label text="👥 Total" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #3498db;"/>
+        </VBox>
+        <VBox alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15;" HBox.hgrow="ALWAYS">
+            <Label text="👨‍⚕️ Médecins" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="totalDoctorsLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+        </VBox>
+        <VBox alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15;" HBox.hgrow="ALWAYS">
+            <Label text="🤒 Patients" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="totalPatientsLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"/>
+        </VBox>
+        <VBox alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15;" HBox.hgrow="ALWAYS">
+            <Label text="🆕 Nouveaux (30j)" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="newUsersLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #9b59b6;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Barre de recherche et filtres -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="🔍 Rechercher par nom, email..." style="-fx-padding: 10; -fx-background-radius: 20; -fx-border-color: #ddd; -fx-border-radius: 20;" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="roleFilter" promptText="Tous les rôles" style="-fx-background-radius: 20;">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Tous"/>
+                    <String fx:value="ADMIN"/>
+                    <String fx:value="DOCTOR"/>
+                    <String fx:value="PATIENT"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="Chercher" onAction="#searchUsers" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"/>
+        <Button text="🔄 Rafraîchir" onAction="#refreshTable" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Tableau des utilisateurs -->
+    <TableView fx:id="userTable" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50" sortable="true"/>
+            <TableColumn fx:id="colFirstName" text="Prénom" prefWidth="120" sortable="true"/>
+            <TableColumn fx:id="colLastName" text="Nom" prefWidth="120" sortable="true"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="220" sortable="true"/>
+            <TableColumn fx:id="colRole" text="Rôle" prefWidth="100" sortable="true"/>
+            <TableColumn fx:id="colPhone" text="Téléphone" prefWidth="120"/>
+            <TableColumn fx:id="colCreatedAt" text="Date inscription" prefWidth="150" sortable="true"/>
+        </columns>
+    </TableView>
+
+    <!-- Boutons d'action -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="➕ Ajouter" onAction="#openAddUserDialog" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+        <Button text="✏️ Modifier" onAction="#openEditUserDialog" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+        <Button text="🗑️ Supprimer" onAction="#deleteUser" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+        <Button text="📊 Exporter CSV" onAction="#exportCSV" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+        <Button text="📄 Exporter PDF" onAction="#exportPDF" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 25; -fx-cursor: hand;"/>
+    </HBox>
+
+    <Label fx:id="statusLabel" style="-fx-text-fill: #27ae60; -fx-font-size: 12px;"/>
+
+</VBox>

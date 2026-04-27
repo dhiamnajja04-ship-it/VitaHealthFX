@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="650.0" prefWidth="550.0" style="-fx-background-color: linear-gradient(135deg, #1a1a2e, #16213e);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.vitahealthfx.controller.LoginController">
+    <children>
+        <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 30px;" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+            <padding><Insets bottom="35.0" left="30.0" right="30.0" top="35.0" /></padding>
+            <Text text="🏥 VITA" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
+            <TextField fx:id="emailField" promptText="📧 Email" style="-fx-padding: 12; -fx-background-radius: 12;" />
+            <PasswordField fx:id="passwordField" promptText="🔒 Mot de passe" style="-fx-padding: 12; -fx-background-radius: 12;" />
+            <HBox spacing="10.0" alignment="CENTER">
+                <TextField fx:id="captchaField" promptText="Code captcha" prefWidth="120" />
+                <Label fx:id="captchaLabel" style="-fx-background-color: #ecf0f1; -fx-padding: 10 15; -fx-font-weight: bold;"/>
+                <Button text="⟳" onAction="#refreshCaptcha" style="-fx-background-color: #bdc3c7; -fx-background-radius: 20;"/>
+            </HBox>
+            <Label fx:id="messageLabel" style="-fx-text-fill: #e74c3c;" />
+            <Button fx:id="loginBtn" onAction="#handleLogin" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 12;" text="🔑 SE CONNECTER" />
+            <HBox alignment="CENTER" spacing="15.0">
+                <Hyperlink onAction="#handleForgotPassword" text="Mot de passe oublié ?" />
+                <Label text="|" />
+                <Hyperlink onAction="#openRegister" text="S'inscrire" />
+            </HBox>
+        </VBox>
+    </children>
+</AnchorPane>
