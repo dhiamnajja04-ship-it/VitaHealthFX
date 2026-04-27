@@ -39,6 +39,7 @@
                 </Tab>
 
                 <!-- ONGLET 2 : MON PROFIL SANTÉ -->
+                <!-- (identique, inchangé) -->
                 <Tab text="🩺 Mon profil santé" closable="false">
                     <ScrollPane fitToWidth="true">
                         <VBox spacing="20.0" style="-fx-padding: 20;">
@@ -93,11 +94,14 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- ONGLET 3 : PARAMÈTRES MÉDICAUX -->
+                <!-- ONGLET 3 : PARAMÈTRES MÉDICAUX (modifié : ajout du label niveauActiviteLabel) -->
                 <Tab text="📊 Paramètres médicaux" closable="false">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <Label text="📝 Ajouter / Modifier des paramètres" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
                         <Label text="💡 Cliquez sur une ligne pour la modifier, puis cliquez sur 'Ajouter / Mettre à jour'" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-font-size: 12px;" />
+
+                        <!-- Nouveau label pour le niveau d'activité -->
+                        <Label fx:id="niveauActiviteLabel" style="-fx-font-size: 14px; -fx-padding: 0 0 10 0;"/>
 
                         <GridPane hgap="15.0" vgap="10.0">
                             <Label text="Poids (kg):" GridPane.columnIndex="0" GridPane.rowIndex="0" />

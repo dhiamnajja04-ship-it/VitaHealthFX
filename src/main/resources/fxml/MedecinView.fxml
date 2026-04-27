@@ -38,6 +38,14 @@
 
                         <Separator />
 
+                        <!-- Recherche médicament -->
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="🔎 Rechercher un médicament :" style="-fx-font-weight: bold;" />
+                            <TextField fx:id="rechercheMedicamentField" promptText="ex: paracétamol, amoxicilline..." prefWidth="300" />
+                            <Button fx:id="rechercherMedicamentBtn" text="Rechercher" />
+                        </HBox>
+                        <ListView fx:id="resultatsMedicaments" prefHeight="120" visible="false" managed="false" />
+
                         <GridPane hgap="15" vgap="10">
                             <Label style="-fx-font-weight: bold;" text="Médicaments :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                             <TextArea fx:id="medicamentsArea" prefHeight="80" prefWidth="400" promptText="Ex: Paracétamol 500mg&#10;Amoxicilline 1g" GridPane.columnIndex="1" GridPane.rowIndex="0" />
@@ -91,6 +99,7 @@
                                 <TableColumn fx:id="colImc" text="IMC" prefWidth="80" />
                                 <TableColumn fx:id="colInterpretation" text="Interprétation" prefWidth="200" />
                                 <TableColumn fx:id="colAlerte" text="Alerte" prefWidth="200" />
+                                <TableColumn fx:id="colNiveauActivite" text="Niveau d'activité" prefWidth="200" />
                             </columns>
                         </TableView>
                     </VBox>

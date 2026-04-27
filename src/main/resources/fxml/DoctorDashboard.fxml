@@ -24,7 +24,7 @@
             </HBox>
 
             <TabPane>
-                <!-- ONGLET PRESCRIPTIONS (remplacement QR → PDF) -->
+                <!-- ONGLET PRESCRIPTIONS -->
                 <Tab text="Prescriptions" closable="false">
                     <VBox spacing="15" style="-fx-padding: 20;">
                         <Label text="💡 Cliquez sur une prescription pour la modifier, puis cliquez sur 'Ajouter / Mettre à jour'" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;" />
@@ -37,6 +37,14 @@
                         </HBox>
 
                         <Separator />
+
+                        <!-- Recherche médicament -->
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="🔎 Rechercher un médicament :" style="-fx-font-weight: bold;" />
+                            <TextField fx:id="rechercheMedicamentField" promptText="ex: paracétamol, amoxicilline..." prefWidth="300" />
+                            <Button fx:id="rechercherMedicamentBtn" text="Rechercher" />
+                        </HBox>
+                        <ListView fx:id="resultatsMedicaments" prefHeight="120" visible="false" managed="false" />
 
                         <GridPane hgap="15" vgap="10">
                             <Label style="-fx-font-weight: bold;" text="Médicaments :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
@@ -67,7 +75,7 @@
                     </VBox>
                 </Tab>
 
-                <!-- ONGLET PARAMÈTRES MÉDICAUX (inchangé) -->
+                <!-- ONGLET PARAMÈTRES MÉDICAUX -->
                 <Tab text="Paramètres médicaux" closable="false">
                     <VBox spacing="15" style="-fx-padding: 20;">
                         <HBox spacing="10" alignment="CENTER_LEFT">
@@ -91,6 +99,7 @@
                                 <TableColumn fx:id="colImc" text="IMC" prefWidth="80" />
                                 <TableColumn fx:id="colInterpretation" text="Interprétation" prefWidth="200" />
                                 <TableColumn fx:id="colAlerte" text="Alerte" prefWidth="200" />
+                                <TableColumn fx:id="colNiveauActivite" text="Niveau d'activité" prefWidth="200" />
                             </columns>
                         </TableView>
                     </VBox>

@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,7 @@ public class PatientController {
     @FXML private TableColumn<ParaMedical, String> colParamTension;
     @FXML private TableColumn<ParaMedical, Double> colParamImc;
     @FXML private TableColumn<ParaMedical, String> colAlerte;
+    @FXML private Label niveauActiviteLabel; // Ajouté
 
     // Prescriptions
     @FXML private TableView<Prescription> prescriptionTable;
@@ -171,8 +173,48 @@ public class PatientController {
         logoutBtn.setOnAction(e -> logout());
         if (changerVersMedecin != null) changerVersMedecin.setOnAction(e -> changerVersMedecin());
         if (quitter != null) quitter.setOnAction(e -> System.exit(0));
-        if (aPropos != null) aPropos.setOnAction(e -> showAlert("À propos", "VitaHealthFX - Version 2.0\nEspace Patient\nFonctionnalités : PDF (traduction LibreTranslate), graphiques, alertes", Alert.AlertType.INFORMATION));
+        if (aPropos != null) aPropos.setOnAction(e -> showAlert("À propos", "VitaHealthFX - Version 2.0\nEspace Patient\nFonctionnalités : PDF, graphiques, alertes", Alert.AlertType.INFORMATION));
+
+        // Mise à jour du niveau d'activité
+        updateNiveauActivite();
     }
+
+    // ================== NIVEAU D'ACTIVITÉ ==================
+    private void updateNiveauActivite() {
+        String niveau = getNiveauActivite();
+        if (niveauActiviteLabel != null) {
+            niveauActiviteLabel.setText("🏋️ Niveau d'activité : " + niveau);
+            if (niveau.startsWith("Actif")) {
+                niveauActiviteLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+            } else if (niveau.startsWith("Moyen")) {
+                niveauActiviteLabel.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
+            } else {
+                niveauActiviteLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+            }
+        }
+    }
+
+    private String getNiveauActivite() {
+        List<ParaMedical> liste = paraMedicalDAO.getByUserId(currentUser.getId());
+        if (liste.isEmpty()) {
+            return "Non actif (aucune saisie)";
+        }
+        LocalDateTime derniereSaisie = liste.stream()
+                .map(ParaMedical::getCreatedAt)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+        if (derniereSaisie == null) return "Non actif";
+        long jours = ChronoUnit.DAYS.between(derniereSaisie, LocalDateTime.now());
+        if (jours <= 7) {
+            return "Actif (dernière saisie dans les 7 jours)";
+        } else if (jours <= 30) {
+            return "Moyen (dernière saisie entre 7 et 30 jours)";
+        } else {
+            return "Non actif (plus de 30 jours sans saisie)";
+        }
+    }
+
+    // ================== FIN NIVEAU D'ACTIVITÉ ==================
 
     private void setupAppointmentsTable() {
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
@@ -291,7 +333,6 @@ public class PatientController {
         });
     }
 
-    // ================== NOUVELLE GÉNÉRATION PDF AVEC LIBRETRANSLATE ==================
     private void genererPDFPrescription(Prescription prescription) {
         User doctor = prescriptionDAO.getDoctorByPrescriptionId(prescription.getId());
         if (doctor == null) {
@@ -299,11 +340,10 @@ public class PatientController {
             return;
         }
 
-        // Boîte de dialogue pour choisir la langue
         ChoiceDialog<String> langDialog = new ChoiceDialog<>("fr", "fr", "en", "ar");
         langDialog.setTitle("Choisir la langue");
         langDialog.setHeaderText("Langue du document PDF");
-        langDialog.setContentText("Sélectionnez la langue pour la traduction (LibreTranslate) :");
+        langDialog.setContentText("Sélectionnez la langue pour la traduction :");
         langDialog.getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
         String selectedLang = langDialog.showAndWait().orElse(null);
         if (selectedLang == null) return;
@@ -315,14 +355,12 @@ public class PatientController {
         File file = fileChooser.showSaveDialog(null);
         if (file == null) return;
 
-        // Alerte de progression (simple)
         Alert progressAlert = new Alert(Alert.AlertType.INFORMATION);
         progressAlert.setTitle("Génération PDF");
         progressAlert.setHeaderText(null);
-        progressAlert.setContentText("Traduction en cours via LibreTranslate...\nVeuillez patienter.");
+        progressAlert.setContentText("Traduction en cours...\nVeuillez patienter.");
         progressAlert.show();
 
-        // Tâche asynchrone pour ne pas bloquer l'interface
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -332,17 +370,16 @@ public class PatientController {
         };
         task.setOnSucceeded(e -> {
             progressAlert.close();
-            showAlert("Succès", "PDF généré et traduit avec succès !", Alert.AlertType.INFORMATION);
+            showAlert("Succès", "PDF généré avec succès !", Alert.AlertType.INFORMATION);
         });
         task.setOnFailed(e -> {
             progressAlert.close();
             Throwable ex = task.getException();
-            showAlert("Erreur", "Échec de la génération : " + (ex != null ? ex.getMessage() : "Erreur inconnue"), Alert.AlertType.ERROR);
+            showAlert("Erreur", "Échec : " + (ex != null ? ex.getMessage() : "Erreur inconnue"), Alert.AlertType.ERROR);
             ex.printStackTrace();
         });
         new Thread(task).start();
     }
-    // ================== FIN NOUVELLE MÉTHODE ==================
 
     private void setupButtons() {
         newAppointmentBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
@@ -436,6 +473,7 @@ public class PatientController {
     private void loadParametres() {
         parametresList = FXCollections.observableArrayList(paraMedicalDAO.getByUserId(currentUser.getId()));
         parametreTable.setItems(parametresList);
+        updateNiveauActivite(); // Met à jour après chargement
     }
 
     private void calculerIMCParam() {
@@ -474,6 +512,7 @@ public class PatientController {
                     viderChampsParam();
                     parametreTable.getSelectionModel().clearSelection();
                     verifierAlerteApresAjout(selected);
+                    updateNiveauActivite(); // Mise à jour
                 } else showAlert("❌ Erreur", "Échec modification", Alert.AlertType.ERROR);
             } else {
                 ParaMedical pm = new ParaMedical();
@@ -486,6 +525,7 @@ public class PatientController {
                     loadParametres();
                     viderChampsParam();
                     verifierAlerteApresAjout(pm);
+                    updateNiveauActivite(); // Mise à jour
                 } else showAlert("❌ Erreur", "Échec ajout", Alert.AlertType.ERROR);
             }
         } catch (NumberFormatException e) {
@@ -530,6 +570,7 @@ public class PatientController {
                 loadParametres();
                 viderChampsParam();
                 parametreTable.getSelectionModel().clearSelection();
+                updateNiveauActivite(); // Mise à jour
             }
         });
     }
@@ -605,7 +646,7 @@ public class PatientController {
         return chart;
     }
 
-    // ================== MÉTHODES EXISTANTES (RENDEZ-VOUS, ANNULATION, CHANGEMENT DE RÔLE, LOGOUT, ALERTE) ==================
+    // ================== RENDEZ-VOUS ET NAVIGATION ==================
     private void openNewAppointmentDialog() {
         List<User> doctors = appointmentDAO.getAllDoctors();
         if (doctors.isEmpty()) { showAlert("Info", "Aucun médecin disponible", Alert.AlertType.INFORMATION); return; }
