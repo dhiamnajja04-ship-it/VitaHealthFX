@@ -1,33 +1,21 @@
 package tn.esprit.workshopjdbc;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import tn.esprit.workshopjdbc.Entities.User;
-import tn.esprit.workshopjdbc.Utils.UserSession;
-import java.util.ArrayList;
-import java.util.List;
+import tn.esprit.workshopjdbc.Controllers.LoginController;
 
 public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // --- PREVENTING AUTH FOR TESTING ---
-        User godModeUser = new User();
-        godModeUser.setId(8);
-        godModeUser.setFirstName("admin");
-        godModeUser.setLastName("admin");
-        List<String> roles = new ArrayList<>();
-        roles.add("ROLE_ADMIN");
-        godModeUser.setRoles(roles);
-        godModeUser.setMaladie("Diabetes");
-        UserSession.setSession(godModeUser);
-        // ------------------------------------
+        // We initialize his LoginController and use his custom Scene builder
+        LoginController loginController = new LoginController();
 
-        Parent root = FXMLLoader.load(getClass().getResource("/MainDashboard.fxml"));
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setTitle("VitaHealth - Event Management");
+        primaryStage.setScene(loginController.getScene());
+        primaryStage.setTitle("VitaHealth - Login");
         primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

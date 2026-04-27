@@ -16,23 +16,23 @@
 
                 <Separator />
 
-                <Label text="Title" style="-fx-font-weight: bold;" textFill="#475569" />
+                <Label text="Title" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                 <TextField fx:id="titleField" promptText="Enter event title" style="-fx-background-radius: 8; -fx-padding: 8;" />
 
-                <Label text="Description" style="-fx-font-weight: bold;" textFill="#475569" />
+                <Label text="Description" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                 <TextArea fx:id="descField" prefHeight="100.0" promptText="Describe the workshop..." style="-fx-background-radius: 8;" wrapText="true" />
 
-                <Label text="Date &amp; Time" style="-fx-font-weight: bold;" textFill="#475569" />
+                <Label text="Date &amp; Time" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                 <DatePicker fx:id="datePicker" maxWidth="Infinity" style="-fx-background-radius: 8;" />
 
                 <HBox spacing="10.0">
                     <children>
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label text="Lat" style="-fx-font-weight: bold;" textFill="#475569" />
+                            <Label text="Lat" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                             <TextField fx:id="latField" promptText="0.0" style="-fx-background-radius: 8;" />
                         </VBox>
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label text="Lng" style="-fx-font-weight: bold;" textFill="#475569" />
+                            <Label text="Lng" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                             <TextField fx:id="lngField" promptText="0.0" style="-fx-background-radius: 8;" />
                         </VBox>
                     </children>
@@ -59,9 +59,9 @@
                     </children>
                 </HBox>
 
-                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox fx:id="eventContainer" spacing="15.0" style="-fx-padding: 5;">
+                        <VBox fx:id="eventContainer" spacing="15.0" style="-fx-padding: 5; -fx-background-color: transparent;">
                         </VBox>
                     </content>
                 </ScrollPane>

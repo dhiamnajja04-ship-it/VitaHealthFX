@@ -38,15 +38,14 @@ public class EventController {
         if (selected == null) return;
 
         try {
-            // Use the absolute path from the root of your resources
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventRegistration.fxml"));
+            // FIXED: Ensure this path matches your file name exactly (e.g., EventRegistration.fxml)
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/event/EventRegistration.fxml"));
             Parent root = loader.load();
 
-            // Pass the event to the next controller
             EventRegistrationController regController = loader.getController();
             regController.setEvent(selected);
 
-            // Access the contentArea from the MainDashboard
+            // Access the contentArea from the current scene
             StackPane contentArea = (StackPane) eventList.getScene().lookup("#contentArea");
 
             if (contentArea != null) {
@@ -55,7 +54,6 @@ public class EventController {
             } else {
                 System.err.println("Error: Could not find contentArea StackPane!");
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

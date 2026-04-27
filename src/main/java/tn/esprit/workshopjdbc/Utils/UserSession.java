@@ -1,7 +1,5 @@
 package tn.esprit.workshopjdbc.Utils;
-
 import tn.esprit.workshopjdbc.Entities.User;
-
 public class UserSession {
     private static User instance;
 

@@ -22,8 +22,8 @@ public class AdminEventController {
     @FXML private DatePicker datePicker;
     @FXML private VBox eventContainer;
 
-    private EventService eventService = new EventService();
-    private ParticipationService pService = new ParticipationService();
+    private final EventService eventService = new EventService();
+    private final ParticipationService pService = new ParticipationService();
     private Event selectedEvent = null;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
 
@@ -41,8 +41,11 @@ public class AdminEventController {
 
     private void displayEvents(List<Event> events) {
         eventContainer.getChildren().clear();
+
         if (events.isEmpty()) {
-            VBox empty = new VBox(new Label("No events found."));
+            Label emptyLabel = new Label("No workshops found.");
+            emptyLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 16px;");
+            VBox empty = new VBox(emptyLabel);
             empty.setAlignment(Pos.CENTER);
             empty.setPadding(new Insets(50));
             eventContainer.getChildren().add(empty);
@@ -57,26 +60,28 @@ public class AdminEventController {
 
             VBox details = new VBox(8);
             HBox.setHgrow(details, Priority.ALWAYS);
+
+            // TITLE - Forced Dark Navy
             Label title = new Label(e.getTitle());
             title.setFont(Font.font("System", FontWeight.BOLD, 18));
-            title.setTextFill(Color.web("#1e293b"));
+            title.setStyle("-fx-text-fill: #1e293b;");
 
+            // DESCRIPTION - Forced Slate Grey
             Label desc = new Label(e.getDescription());
-            desc.setTextFill(Color.web("#64748b"));
             desc.setWrapText(true);
             desc.setMaxWidth(500);
+            desc.setStyle("-fx-text-fill: #64748b;");
 
-            HBox meta = new HBox(15);
+            // DATE - Working Blue
             Label date = new Label("📅 " + e.getDate().format(formatter));
-            date.setTextFill(Color.web("#0ea5e9"));
-            date.setStyle("-fx-font-weight: bold;");
+            date.setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;");
 
-            meta.getChildren().addAll(date);
-            details.getChildren().addAll(title, desc, meta);
+            details.getChildren().addAll(title, desc, date);
 
             VBox statusBox = new VBox(10);
             statusBox.setAlignment(Pos.CENTER_RIGHT);
             boolean isUpcoming = e.getDate().isAfter(LocalDateTime.now());
+
             Label statusBadge = new Label(isUpcoming ? "UPCOMING" : "PAST");
             statusBadge.setStyle("-fx-background-color: " + (isUpcoming ? "#dcfce7;" : "#f1f5f9;") +
                     "-fx-text-fill: " + (isUpcoming ? "#166534;" : "#475569;") +
@@ -88,6 +93,7 @@ public class AdminEventController {
 
             statusBox.getChildren().addAll(statusBadge, participants);
             card.getChildren().addAll(details, statusBox);
+
             card.setOnMouseClicked(event -> selectEvent(e, card));
             eventContainer.getChildren().add(card);
         }
@@ -101,23 +107,15 @@ public class AdminEventController {
         latField.setText(String.valueOf(e.getLatitude()));
         lngField.setText(String.valueOf(e.getLongitude()));
 
-        eventContainer.getChildren().forEach(node -> node.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: transparent;"));
+        eventContainer.getChildren().forEach(node ->
+                node.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: transparent;")
+        );
         card.setStyle("-fx-background-color: #f0f9ff; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #0ea5e9; -fx-border-width: 2;");
     }
 
     @FXML
     private void handleAdd() {
         if (!validate()) return;
-
-        // NEW: Check for duplicates before calling service
-        String title = titleField.getText();
-        LocalDateTime dateTime = datePicker.getValue().atStartOfDay();
-
-        if (eventService.exists(title, dateTime)) {
-            showError("A workshop with this title already exists on this date!");
-            return;
-        }
-
         Event e = new Event();
         fillEventData(e);
         eventService.add(e);
@@ -152,7 +150,7 @@ public class AdminEventController {
     private void handleClear() {
         titleField.clear(); descField.clear(); latField.clear(); lngField.clear();
         datePicker.setValue(null); selectedEvent = null;
-        eventContainer.getChildren().forEach(n -> n.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12;"));
+        loadData();
     }
 
     private void fillEventData(Event e) {

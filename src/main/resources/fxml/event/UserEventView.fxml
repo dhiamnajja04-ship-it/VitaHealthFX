@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="700.0" prefWidth="1000.0" spacing="0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.UserEventController">
+    <children>
+        <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 30 40; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+            <children>
+                <Label fx:id="welcomeLabel" text="Upcoming Health Events" textFill="#1e293b">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <Label fx:id="descriptionLabel" text="Discover and join health workshops and seminars near you." textFill="#64748b" />
+
+                <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-padding: 10 0 0 0;">
+                    <children>
+                        <TextField fx:id="searchField" prefHeight="40.0" prefWidth="400.0" promptText="🔍 Search for events..." style="-fx-background-radius: 20; -fx-padding: 0 20; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8;" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#handleOpenMyParticipations" prefHeight="40.0" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0f172a; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 20; -fx-cursor: hand; -fx-border-color: #cbd5e1; -fx-border-radius: 20;" text="📋 My Bookings" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+            <content>
+                <FlowPane fx:id="eventFlowPane" hgap="25.0" style="-fx-padding: 30;" vgap="25.0" />
+            </content>
+        </ScrollPane>
+    </children>
+</VBox>

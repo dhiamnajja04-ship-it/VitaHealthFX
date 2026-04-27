@@ -1,8 +1,8 @@
 package tn.esprit.workshopjdbc.Interfaces;
 import tn.esprit.workshopjdbc.Entities.Participation;
-import tn.esprit.workshopjdbc.Entities.User;
 import tn.esprit.workshopjdbc.Entities.Event;
 import java.util.List;
+import tn.esprit.workshopjdbc.Entities.User;
 
 public interface IParticipation {
 

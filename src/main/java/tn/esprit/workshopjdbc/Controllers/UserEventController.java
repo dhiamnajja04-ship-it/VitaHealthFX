@@ -4,17 +4,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import tn.esprit.workshopjdbc.Entities.Event;
 import tn.esprit.workshopjdbc.Entities.User;
 import tn.esprit.workshopjdbc.Services.EventService;
-import tn.esprit.workshopjdbc.Utils.UserSession;
+import tn.esprit.workshopjdbc.Utils.SessionManager;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -23,19 +24,35 @@ public class UserEventController {
     @FXML private FlowPane eventFlowPane;
     @FXML private TextField searchField;
     @FXML private Label welcomeLabel;
+    @FXML private Label descriptionLabel;
 
     private EventService eventService = new EventService();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd");
 
     @FXML
     public void initialize() {
-        User currentUser = UserSession.getSession();
+        // 1. Session check using the verified SessionManager
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+
         if (currentUser != null && welcomeLabel != null) {
-            welcomeLabel.setText("Hello " + currentUser.getFirstName() + " 👋");
+            welcomeLabel.setText("Nos événements");
+        }
+
+        // 2. CSS Priority Fix: Force visibility because style.css makes labels white
+        String forceDark = "-fx-text-fill: #1e293b !important;";
+        if (welcomeLabel != null) {
+            welcomeLabel.setStyle(forceDark + "-fx-font-weight: bold;");
+        }
+        if (descriptionLabel != null) {
+            descriptionLabel.setStyle("-fx-text-fill: #64748b !important;");
+        }
+        if (searchField != null) {
+            searchField.setStyle("-fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8; -fx-background-radius: 20;");
         }
 
         loadEvents();
 
+        // 3. Search Listener
         if (searchField != null) {
             searchField.textProperty().addListener((obs, old, newVal) -> {
                 displayEvents(eventService.searchByTitleOrDescription(newVal));
@@ -48,6 +65,7 @@ public class UserEventController {
     }
 
     private void displayEvents(List<Event> events) {
+        if (eventFlowPane == null) return;
         eventFlowPane.getChildren().clear();
         for (Event e : events) {
             VBox card = createEventCard(e);
@@ -58,76 +76,77 @@ public class UserEventController {
     private VBox createEventCard(Event e) {
         VBox card = new VBox(15);
         card.setPrefWidth(320);
-        card.setStyle("-fx-background-color: white; " +
+        card.setStyle("-fx-background-color: #FFFFFF !important; " +
                 "-fx-background-radius: 15; " +
                 "-fx-padding: 25; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);");
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); " +
+                "-fx-border-color: #e2e8f0; -fx-border-width: 1;");
 
         Label category = new Label("HEALTH EVENT");
-        category.setFont(Font.font("System", FontWeight.BOLD, 10));
-        category.setTextFill(Color.web("#94a3b8"));
+        category.setStyle("-fx-text-fill: #94a3b8 !important; -fx-font-weight: bold; -fx-font-size: 10px;");
 
         Label title = new Label(e.getTitle());
-        title.setFont(Font.font("System", FontWeight.BOLD, 20));
-        title.setTextFill(Color.web("#1e293b"));
+        title.setStyle("-fx-text-fill: #1e293b !important; -fx-font-weight: bold; -fx-font-size: 18px;");
         title.setWrapText(true);
         title.setMinHeight(50);
 
         Label date = new Label("📅 " + (e.getDate() != null ? e.getDate().format(formatter) : "Upcoming"));
-        date.setTextFill(Color.web("#0d9488"));
-        date.setStyle("-fx-font-weight: bold;");
+        date.setStyle("-fx-text-fill: #0d9488 !important; -fx-font-weight: bold;");
 
         Label desc = new Label(e.getDescription());
-        desc.setTextFill(Color.web("#64748b"));
+        desc.setStyle("-fx-text-fill: #475569 !important; -fx-font-size: 13px; -fx-opacity: 1.0;");
         desc.setWrapText(true);
         desc.setMaxHeight(60);
-
-        HBox footer = new HBox();
-        footer.setAlignment(Pos.CENTER_RIGHT);
+        desc.setMinHeight(60);
 
         Button registerBtn = new Button("Register Now");
-        registerBtn.setStyle("-fx-background-color: #0d9488; " +
-                "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
-                "-fx-background-radius: 10; " +
-                "-fx-padding: 10 20; " +
-                "-fx-cursor: hand;");
-
-        // --- THE REDIRECT LOGIC ---
+        registerBtn.setStyle("-fx-background-color: #0d9488; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;");
         registerBtn.setOnAction(event -> handleNavigationToForm(e));
 
-        footer.getChildren().add(registerBtn);
-        card.getChildren().addAll(category, title, date, desc, new Separator(), footer);
+        HBox footer = new HBox(registerBtn);
+        footer.setAlignment(Pos.CENTER_RIGHT);
 
+        card.getChildren().addAll(category, title, date, desc, new Separator(), footer);
         return card;
     }
 
-    /**
-     * This method handles the redirection to the Registration Form
-     */
     private void handleNavigationToForm(Event e) {
+        openModal("/fxml/event/EventRegistration.fxml", "Registration: " + e.getTitle(), e);
+    }
+
+    @FXML
+    private void handleOpenMyParticipations() {
+        openModal("/fxml/event/MyParticipationsView.fxml", "My Bookings", null);
+    }
+
+    /**
+     * Helper method to open any FXML as a Popup Modal
+     */
+    private void openModal(String fxmlPath, String title, Event e) {
         try {
-            // 1. Load the FXML for the registration form
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventRegistration.fxml"));
-            Parent root = loader.load();
-
-            // 2. Get the form's controller and pass the selected Event
-            EventRegistrationController regController = loader.getController();
-            regController.setEvent(e);
-
-            // 3. Find the contentArea StackPane from the scene and swap views
-            StackPane contentArea = (StackPane) eventFlowPane.getScene().lookup("#contentArea");
-
-            if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(root);
-            } else {
-                // Fallback if lookup fails: log error
-                System.err.println("❌ Navigation Error: Could not find contentArea StackPane.");
+            URL fxmlLocation = getClass().getResource(fxmlPath);
+            if (fxmlLocation == null) {
+                System.err.println("❌ FXML not found: " + fxmlPath);
+                return;
             }
 
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            // If it's the registration form, pass the event
+            if (e != null && loader.getController() instanceof EventRegistrationController) {
+                EventRegistrationController regController = loader.getController();
+                regController.setEvent(e);
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle(title);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+
         } catch (IOException ex) {
-            System.err.println("❌ Failed to load EventRegistration.fxml: " + ex.getMessage());
             ex.printStackTrace();
         }
     }

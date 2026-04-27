@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="20" style="-fx-background-color: #f8fafc; -fx-padding: 30;" prefWidth="600" prefHeight="500"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.workshopjdbc.Controllers.MyParticipationsController">
+
+    <Label text="My Registered Events" style="-fx-text-fill: #1e293b; -fx-font-weight: bold;">
+        <font><Font size="22.0" /></font>
+    </Label>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <VBox fx:id="participationContainer" spacing="10" />
+    </ScrollPane>
+</VBox>

@@ -4,14 +4,11 @@ import tn.esprit.workshopjdbc.Entities.User;
 import tn.esprit.workshopjdbc.Utils.DbConnection;
 import tn.esprit.workshopjdbc.Utils.UserSession;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AuthService {
     private Connection cnx = DbConnection.getInstance().getCnx();
 
     public boolean login(String email, String password) {
-        // Simple query for testing. Your teammate will likely add BCrypt later.
         String query = "SELECT * FROM user WHERE email = ? AND password = ?";
 
         try (PreparedStatement pst = cnx.prepareStatement(query)) {
@@ -23,13 +20,18 @@ public class AuthService {
                 User user = new User();
                 user.setId(rs.getInt("id"));
                 user.setEmail(rs.getString("email"));
-                user.setFirstName(rs.getString("first_name")); // Make sure this matches your DB column
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
 
-                // Handling Roles: This assumes roles are stored as "ROLE_ADMIN" or "ROLE_USER"
+                // --- FIXED AREA ---
+                // We take the role string from DB and pass it to setRole(String)
                 String roleStr = rs.getString("roles");
-                List<String> roles = new ArrayList<>();
-                roles.add(roleStr.replace("[", "").replace("]", "").replace("\"", ""));
-                user.setRoles(roles);
+                if (roleStr != null) {
+                    // Clean up brackets if they exist in the DB string
+                    roleStr = roleStr.replace("[", "").replace("]", "").replace("\"", "");
+                    user.setRole(roleStr);
+                }
+                // ------------------
 
                 UserSession.setSession(user);
                 return true;

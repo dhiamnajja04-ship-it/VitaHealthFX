@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.PatientController">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
+                <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="🏥 VitaHealthFX" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Patient" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Patient" />
+                <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
+            </HBox>
+
+            <TabPane>
+                <Tab closable="false" text="📅 Mes rendez-vous">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0">
+                            <Button fx:id="newAppointmentBtn" text="➕ Nouveau rendez-vous" />
+                            <Button fx:id="refreshAppointmentsBtn" text="🔄 Actualiser" />
+                        </HBox>
+                        <TableView fx:id="appointmentsTable" prefHeight="550.0">
+                            <columns>
+                                <TableColumn fx:id="colDate" prefWidth="180" text="Date et heure" />
+                                <TableColumn fx:id="colDoctor" prefWidth="200" text="Médecin" />
+                                <TableColumn fx:id="colReason" prefWidth="250" text="Motif" />
+                                <TableColumn fx:id="colStatus" prefWidth="120" text="Statut" />
+                                <TableColumn fx:id="colActions" prefWidth="100" text="Actions" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </Tab>
+
+                <Tab closable="false" text="🩺 Mon profil santé">
+                    <ScrollPane fitToWidth="true">
+                        <VBox spacing="20.0" style="-fx-padding: 20;">
+                            <HBox spacing="20.0">
+                                <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="📏 Taille (cm)" />
+                                    <TextField fx:id="heightField" promptText="Taille en cm" />
+                                </VBox>
+                                <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="⚖️ Poids (kg)" />
+                                    <TextField fx:id="weightField" promptText="Poids en kg" />
+                                </VBox>
+                                <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="📊 IMC" />
+                                    <Label fx:id="bmiLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #27ae60;" text="---" />
+                                </VBox>
+                            </HBox>
+                            <Separator />
+                            <VBox spacing="8.0">
+                                <Label style="-fx-font-weight: bold;" text="🩸 Groupe sanguin" />
+                                <ComboBox fx:id="bloodTypeCombo" promptText="Sélectionner" />
+                            </VBox>
+                            <VBox spacing="8.0">
+                                <Label style="-fx-font-weight: bold;" text="🤧 Allergies" />
+                                <TextArea fx:id="allergiesArea" prefHeight="60" promptText="Listez vos allergies" />
+                            </VBox>
+                            <VBox spacing="8.0">
+                                <Label style="-fx-font-weight: bold;" text="🏥 Maladies chroniques" />
+                                <TextArea fx:id="diseasesArea" prefHeight="60" promptText="Diabète, hypertension, etc." />
+                            </VBox>
+
+                            <HBox spacing="20.0">
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="👤 Contact d'urgence" />
+                                    <TextField fx:id="emergencyContactField" promptText="Nom du contact" />
+                                </VBox>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold;" text="📞 Téléphone d'urgence" />
+                                    <TextField fx:id="emergencyPhoneField" promptText="Numéro de téléphone" />
+                                </VBox>
+                            </HBox>
+
+                            <HBox spacing="15.0">
+                                <Button fx:id="saveHealthBtn" text="💾 Enregistrer" />
+                                <Button fx:id="refreshHealthBtn" text="🔄 Actualiser" />
+                            </HBox>
+                        </VBox>
+                    </ScrollPane>
+                </Tab>
+
+                <Tab closable="false" text="📊 Paramètres médicaux">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <GridPane hgap="15.0" vgap="10.0">
+                            <Label text="Poids (kg):" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="poidsField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                            <Label text="Taille (m):" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextField fx:id="tailleField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <Label text="Glycémie:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <TextField fx:id="glycemieField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                            <Label text="Tension:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                            <TextField fx:id="tensionField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                            <Label style="-fx-font-weight: bold;" text="IMC Calculé:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                            <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                <Label fx:id="imcCalculLabel" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;" text="0.0" />
+                                <Label fx:id="interpretationLabel" style="-fx-font-style: italic;" text="(Interprétation)" />
+                            </HBox>
+                        </GridPane>
+
+                        <HBox spacing="15.0">
+                            <Button fx:id="ajouterParametreBtn" text="Ajouter" />
+                            <Button fx:id="modifierParametreBtn" text="Modifier" />
+                            <Button fx:id="supprimerParametreBtn" text="Supprimer" />
+                            <Button fx:id="rafraichirParametresBtn" text="🔄 Actualiser" />
+                        </HBox>
+
+                        <TableView fx:id="parametreTable" prefHeight="350">
+                            <columns>
+                                <TableColumn fx:id="colParamDate" prefWidth="150" text="Date" />
+                                <TableColumn fx:id="colParamPoids" prefWidth="80" text="Poids" />
+                                <TableColumn fx:id="colParamTaille" prefWidth="80" text="Taille" />
+                                <TableColumn fx:id="colParamImc" prefWidth="80" text="IMC" />
+                                <TableColumn fx:id="colParamGlycemie" prefWidth="100" text="Glycémie" />
+                                <TableColumn fx:id="colParamTension" prefWidth="100" text="Tension" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </Tab>
+
+                <Tab closable="false" text="📋 Mes prescriptions">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0">
+                            <Button fx:id="refreshPrescriptionsBtn" text="🔄 Actualiser" />
+                        </HBox>
+                        <TableView fx:id="prescriptionTable" prefHeight="550">
+                            <columns>
+                                <TableColumn fx:id="colPrescDate" prefWidth="150" text="Date" />
+                                <TableColumn fx:id="colMedicaments" prefWidth="250" text="Médicaments" />
+                                <TableColumn fx:id="colInstructions" prefWidth="250" text="Instructions" />
+                                <TableColumn fx:id="colDuree" prefWidth="100" text="Durée" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </Tab>
+
+                <Tab closable="false" text="🎓 Ateliers &amp; Événements">
+                    <VBox spacing="20.0" style="-fx-padding: 25; -fx-background-color: #f8fafc;">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                <children>
+                                    <VBox>
+                                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Catalogue des Ateliers" />
+                                        <Label style="-fx-text-fill: #64748b;" text="Inscrivez-vous aux sessions de sensibilisation santé." />
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="searchWorkshopField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Rechercher un événement..." style="-fx-background-radius: 20; -fx-padding: 0 20;" />
+                                </children>
+                            </HBox>
+                            <Separator />
+                            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                                <content>
+                                    <FlowPane fx:id="workshopGrid" hgap="25.0" style="-fx-padding: 10;" vgap="25.0" />
+                                </content>
+                            </ScrollPane>
+                        </children>
+                    </VBox>
+                </Tab>
+            </TabPane>
+        </VBox>
+    </top>
+</BorderPane>
