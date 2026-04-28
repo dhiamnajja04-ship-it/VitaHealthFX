@@ -1,0 +1,242 @@
+/* ==================== VARIABLES ==================== */
+.root {
+    -fx-primary: #2c3e66;
+    -fx-secondary: #27ae60;
+    -fx-accent: #e74c3c;
+    -fx-background: #f5f7fa;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* ==================== CONTENEUR PRINCIPAL ==================== */
+.main-container {
+    -fx-background-color: -fx-background;
+}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar {
+    -fx-background-color: -fx-primary;
+    -fx-padding: 20 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 5, 0);
+}
+
+.sidebar .logo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 0 0 30 15;
+}
+
+.sidebar .nav-item {
+    -fx-padding: 12 15;
+    -fx-text-fill: rgba(255,255,255,0.7);
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+}
+
+.sidebar .nav-item:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: white;
+}
+
+.sidebar .nav-item.active {
+    -fx-background-color: rgba(255,255,255,0.2);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* ==================== HEADER ==================== */
+.header {
+    -fx-background-color: white;
+    -fx-padding: 15 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.header .search-bar {
+    -fx-background-color: #f5f7fa;
+    -fx-background-radius: 25;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 25;
+    -fx-padding: 8 15;
+}
+
+.header .profile {
+    -fx-alignment: center-right;
+    -fx-spacing: 10;
+}
+
+/* ==================== CARTES STATISTIQUES ==================== */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 5);
+}
+
+.stat-card:hover {
+    -fx-translate-y: -3;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);
+}
+
+.stat-card .stat-title {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 14px;
+}
+
+.stat-card .stat-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-primary;
+}
+
+.stat-card .stat-trend-up {
+    -fx-text-fill: #27ae60;
+}
+
+.stat-card .stat-trend-down {
+    -fx-text-fill: #e74c3c;
+}
+
+/* ==================== TABLEAU MODERNE ==================== */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 10;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: white;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #ecf0f1 transparent;
+    -fx-padding: 12 5;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -fx-primary;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #ecf0f1 transparent;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e8f4fd;
+}
+
+/* ==================== BADGES DE RÔLES ==================== */
+.badge {
+    -fx-padding: 5 12;
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-alignment: center;
+}
+
+.badge-patient {
+    -fx-background-color: #27ae60;
+}
+
+.badge-doctor {
+    -fx-background-color: -fx-primary;
+}
+
+.badge-admin {
+    -fx-background-color: #9b59b6;
+}
+
+/* ==================== BOUTONS ==================== */
+.btn-primary {
+    -fx-background-color: -fx-secondary;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #219a52;
+}
+
+.btn-delete {
+    -fx-background-color: #fceae9;
+    -fx-text-fill: -fx-accent;
+    -fx-background-radius: 5;
+    -fx-padding: 5 12;
+    -fx-cursor: hand;
+}
+
+.btn-delete:hover {
+    -fx-background-color: #f5c6c4;
+}
+
+.btn-edit {
+    -fx-background-color: #e8f0fe;
+    -fx-text-fill: -fx-primary;
+    -fx-background-radius: 5;
+    -fx-padding: 5 12;
+    -fx-cursor: hand;
+}
+
+.btn-edit:hover {
+    -fx-background-color: #d0e0f8;
+}
+
+.btn-export {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-primary;
+    -fx-border-color: -fx-primary;
+    -fx-border-radius: 8;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+/* ==================== BARRE DE RECHERCHE ==================== */
+.search-field {
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 25;
+    -fx-padding: 8 15;
+}
+
+.search-field:focused {
+    -fx-border-color: -fx-secondary;
+}
+
+/* ==================== COMBOBOX ==================== */
+.combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 8;
+}
+
+.combo-box:focused {
+    -fx-border-color: -fx-secondary;
+}
+
+/* ==================== TOAST NOTIFICATION ==================== */
+.toast {
+    -fx-background-color: #27ae60;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+.toast .label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}

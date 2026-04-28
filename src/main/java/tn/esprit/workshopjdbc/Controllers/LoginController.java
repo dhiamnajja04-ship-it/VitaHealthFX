@@ -9,13 +9,12 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import tn.esprit.workshopjdbc.Services.ServiceVitaHealth;
 import tn.esprit.workshopjdbc.Entities.User;
-import tn.esprit.workshopjdbc.Entities.Role;
-import com.vitahealth.App;
 import tn.esprit.workshopjdbc.Utils.SessionManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class LoginController {
@@ -54,13 +53,20 @@ public class LoginController {
         loginBtn.setMaxWidth(Double.MAX_VALUE);
         loginBtn.setOnAction(e -> handleLogin());
 
+        // Bouton Mot de passe oublié
+        Button forgotPasswordBtn = new Button("🔐 Mot de passe oublié ?");
+        forgotPasswordBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e74c3c; " +
+                "-fx-font-size: 12px; -fx-cursor: hand;");
+        forgotPasswordBtn.setMaxWidth(Double.MAX_VALUE);
+        forgotPasswordBtn.setOnAction(e -> handleForgotPassword());
+
         Hyperlink registerLink = new Hyperlink("Pas encore de compte ? S'inscrire");
         registerLink.setStyle("-fx-text-fill: #2c3e66; -fx-font-size: 12px;");
         registerLink.setOnAction(e -> openRegister());
 
         passwordField.setOnAction(e -> handleLogin());
 
-        card.getChildren().addAll(title, emailField, passwordField, messageLabel, loginBtn, registerLink);
+        card.getChildren().addAll(title, emailField, passwordField, messageLabel, loginBtn, forgotPasswordBtn, registerLink);
         root.getChildren().add(card);
 
         Scene scene = new Scene(root, 1200, 800);
@@ -96,15 +102,32 @@ public class LoginController {
         }
     }
 
+    // ==================== MOT DE PASSE OUBLIÉ (SANS @FXML) ====================
+    private void handleForgotPassword() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ForgotPasswordView.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle("VitaHealth - Mot de passe oublié");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Impossible d'ouvrir la page de récupération");
+        }
+    }
+
     private void redirectByRole(User user) {
         try {
-            switch (user.getRole()) {
-                case Role.ADMIN:
+            String role = user.getRole();
+            
+            switch (role) {
+                case "ADMIN":
                     AdminDashboardController adminController = new AdminDashboardController(user);
                     Scene adminScene = adminController.getScene();
 
                     if (adminScene != null) {
-                        // Get the current stage from the emailField
                         Stage stage = (Stage) emailField.getScene().getWindow();
                         stage.setScene(adminScene);
                         stage.setTitle("VitaHealth - Admin Dashboard");
@@ -115,15 +138,15 @@ public class LoginController {
                         showError("Erreur: Impossible de générer la vue Admin.");
                     }
                     break;
-                case Role.MEDECIN:
-                    Parent medecinRoot = FXMLLoader.load(getClass().getResource("/fxml/MedecinView.fxml"));
+                case "DOCTOR":
+                    Parent medecinRoot = FXMLLoader.load(getClass().getResource("/fxml/DoctorDashboard.fxml"));
                     Scene medecinScene = new Scene(medecinRoot, 1200, 800);
                     medecinScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
                     Stage medecinStage = (Stage) emailField.getScene().getWindow();
                     medecinStage.setScene(medecinScene);
-                    medecinStage.setTitle("Espace Medecin");
+                    medecinStage.setTitle("Espace Médecin");
                     break;
-                case Role.PATIENT:
+                case "PATIENT":
                     Parent patientRoot = FXMLLoader.load(getClass().getResource("/fxml/PatientDashboard.fxml"));
                     Scene patientScene = new Scene(patientRoot, 1200, 800);
                     patientScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
@@ -132,7 +155,7 @@ public class LoginController {
                     patientStage.setTitle("Espace Patient");
                     break;
                 default:
-                    showError("Role inconnu : " + user.getRole());
+                    showError("Rôle inconnu : " + role);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -69,16 +69,14 @@ public class PDFExporter {
             document.add(new Paragraph(" "));
 
             // Tableau des utilisateurs
-            PdfPTable table = new PdfPTable(7); // 7 colonnes (ajout de statut)
+            PdfPTable table = new PdfPTable(7);
             table.setWidthPercentage(100);
             table.setSpacingBefore(15);
             table.setSpacingAfter(15);
             
-            // Définir les largeurs des colonnes
             float[] columnWidths = {10, 15, 15, 25, 15, 15, 10};
             table.setWidths(columnWidths);
 
-            // En-têtes avec style amélioré
             String[] headers = {"ID", "Prénom", "Nom", "Email", "Rôle", "Téléphone", "Statut"};
             Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
             
@@ -86,53 +84,57 @@ public class PDFExporter {
                 PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                cell.setBackgroundColor(new BaseColor(52, 152, 219)); // Bleu moderne
+                cell.setBackgroundColor(new BaseColor(52, 152, 219));
                 cell.setPadding(8);
                 table.addCell(cell);
             }
 
-            // Données avec alternance de couleurs
             boolean isEvenRow = false;
             for (User u : users) {
-                // Couleur de fond alternée
                 BaseColor rowColor = isEvenRow ? new BaseColor(240, 240, 240) : BaseColor.WHITE;
                 
+                // ID
                 PdfPCell cellId = new PdfPCell(new Phrase(String.valueOf(u.getId())));
                 cellId.setBackgroundColor(rowColor);
                 cellId.setHorizontalAlignment(Element.ALIGN_CENTER);
                 table.addCell(cellId);
                 
+                // Prénom
                 PdfPCell cellFirstName = new PdfPCell(new Phrase(u.getFirstName() != null ? u.getFirstName() : ""));
                 cellFirstName.setBackgroundColor(rowColor);
                 table.addCell(cellFirstName);
                 
+                // Nom
                 PdfPCell cellLastName = new PdfPCell(new Phrase(u.getLastName() != null ? u.getLastName() : ""));
                 cellLastName.setBackgroundColor(rowColor);
                 table.addCell(cellLastName);
                 
+                // Email
                 PdfPCell cellEmail = new PdfPCell(new Phrase(u.getEmail() != null ? u.getEmail() : ""));
                 cellEmail.setBackgroundColor(rowColor);
                 table.addCell(cellEmail);
                 
+                // Rôle
                 PdfPCell cellRole = new PdfPCell(new Phrase(u.getRole() != null ? u.getRole() : ""));
                 cellRole.setBackgroundColor(rowColor);
                 cellRole.setHorizontalAlignment(Element.ALIGN_CENTER);
                 table.addCell(cellRole);
                 
+                // Téléphone
                 PdfPCell cellPhone = new PdfPCell(new Phrase(u.getPhone() != null ? u.getPhone() : ""));
                 cellPhone.setBackgroundColor(rowColor);
                 cellPhone.setHorizontalAlignment(Element.ALIGN_CENTER);
                 table.addCell(cellPhone);
                 
-                // Statut (actif/inactif - à adapter selon ta logique)
-                String status = u.isActive() ? "Actif" : "Inactif";
+                // Statut - CORRIGÉ : isVerified() au lieu de isActive()
+                String status = u.isVerified() ? "Vérifié" : "Non vérifié";
                 PdfPCell cellStatus = new PdfPCell(new Phrase(status));
                 cellStatus.setBackgroundColor(rowColor);
                 cellStatus.setHorizontalAlignment(Element.ALIGN_CENTER);
-                if (u.isActive()) {
-                    cellStatus.setBackgroundColor(new BaseColor(144, 238, 144)); // Vert clair
+                if (u.isVerified()) {
+                    cellStatus.setBackgroundColor(new BaseColor(144, 238, 144));
                 } else {
-                    cellStatus.setBackgroundColor(new BaseColor(255, 182, 193)); // Rouge clair
+                    cellStatus.setBackgroundColor(new BaseColor(255, 182, 193));
                 }
                 table.addCell(cellStatus);
                 
