@@ -2,6 +2,7 @@ package tn.esprit.workshopjdbc.Controllers;
 
 import javafx.geometry.VPos;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Region;
 import tn.esprit.workshopjdbc.dao.AppointmentDAO;
 import tn.esprit.workshopjdbc.dao.HealthProfileDAO;
 import tn.esprit.workshopjdbc.dao.ParaMedicalDAO;
@@ -535,6 +536,15 @@ public class PatientController {
 
             // workshopGrid is the FlowPane in your Dashboard FXML
             workshopGrid.getChildren().clear();
+
+            // --- NEW: Fix the initial layout width ---
+            if (eventView instanceof Region) {
+                Region region = (Region) eventView;
+                // Subtracting 40 accounts for padding/margins so scrollbars don't appear unnecessarily
+                region.prefWidthProperty().bind(workshopGrid.widthProperty().subtract(40));
+            }
+            // -----------------------------------------
+
             workshopGrid.getChildren().add(eventView);
 
             // Ensure it scales correctly

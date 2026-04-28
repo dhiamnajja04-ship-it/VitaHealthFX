@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Rectangle?>
+
+<VBox spacing="25" style="-fx-background-color: #f8fafc; -fx-padding: 30;" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.UserEventDetailsController">
+    <children>
+        <VBox maxWidth="1100" spacing="25">
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <Button text="← Back to Workshops" onAction="#handleBack" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;"/>
+                </HBox>
+
+                <VBox spacing="12">
+                    <Label fx:id="titleLabel" wrapText="true" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Workshop Title"/>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <children>
+                            <Label fx:id="dateLabel" style="-fx-font-size: 16px; -fx-text-fill: #0ea5e9; -fx-font-weight: bold;" text="📅 Loading date..."/>
+
+                            <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-background-color: #e2e8f0; -fx-padding: 4 12; -fx-background-radius: 20;">
+                                <children>
+                                    <ImageView fx:id="weatherIcon" fitHeight="25.0" fitWidth="25.0" preserveRatio="true" />
+                                    <Label fx:id="weatherLabel" style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-weight: bold;" text="Météo..." />
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                </VBox>
+
+                <HBox spacing="30">
+                    <children>
+                        <VBox spacing="25" HBox.hgrow="ALWAYS">
+                            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);">
+                                <Label text="About this Event" style="-fx-font-weight: bold; -fx-font-size: 20px; -fx-text-fill: #1e293b;"/>
+                                <Label fx:id="descLabel" wrapText="true" style="-fx-font-size: 15px; -fx-line-spacing: 1.5; -fx-text-fill: #475569;" text="Detailed description..."/>
+                            </VBox>
+
+                            <Button fx:id="registerBtn" text="Register Now" onAction="#handleRegistration" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 18; -fx-background-radius: 12; -fx-font-size: 18px; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 10, 0, 0, 8);"/>
+                        </VBox>
+
+                        <VBox spacing="20" prefWidth="400" minWidth="400" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);">
+                            <children>
+                                <Label text="📍 Location" style="-fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: #1e293b;"/>
+
+                                <StackPane style="-fx-background-color: #f1f5f9; -fx-background-radius: 15; -fx-overflow: hidden;">
+                                    <ImageView fx:id="mapPreview" fitWidth="350" fitHeight="220" preserveRatio="false" />
+                                </StackPane>
+
+                                <Button onAction="#handleOpenInGoogleMaps" text="Open in Google Maps" maxWidth="Infinity" style="-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 10; -fx-cursor: hand;"/>
+
+                                <Separator />
+
+                                <VBox spacing="8">
+                                    <Label text="Information" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                                    <Label text="Make sure to arrive 15 minutes before the workshop starts. Please check the weather forecast above." wrapText="true" style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

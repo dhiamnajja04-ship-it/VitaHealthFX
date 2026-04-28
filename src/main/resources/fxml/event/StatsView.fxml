@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.StatsController">
+    <VBox spacing="25" style="-fx-padding: 25; -fx-background-color: #f0f2f5;">
+        <Label text="Analyses des Participations" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <HBox spacing="20" alignment="CENTER">
+            <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                <BarChart fx:id="eventBarChart" title="Participants par Événement" prefHeight="400">
+                    <xAxis><CategoryAxis label="Événements" /></xAxis>
+                    <yAxis><NumberAxis label="Total" /></yAxis>
+                </BarChart>
+            </VBox>
+
+            <VBox style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                <LineChart fx:id="trendLineChart" title="Tendance des Inscriptions (7 jours)" prefHeight="400">
+                    <xAxis><CategoryAxis label="Date" /></xAxis>
+                    <yAxis><NumberAxis label="Nouveaux" /></yAxis>
+                </LineChart>
+            </VBox>
+        </HBox>
+    </VBox>
+</ScrollPane>

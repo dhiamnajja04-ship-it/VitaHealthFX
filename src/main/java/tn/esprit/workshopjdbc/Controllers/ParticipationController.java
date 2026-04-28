@@ -4,11 +4,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import tn.esprit.workshopjdbc.Entities.Event;
 import tn.esprit.workshopjdbc.Entities.Participation;
 import tn.esprit.workshopjdbc.Services.EventService;
 import tn.esprit.workshopjdbc.Services.ParticipationService;
+import tn.esprit.workshopjdbc.Utils.ExcelExporter;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class ParticipationController {
@@ -27,7 +31,6 @@ public class ParticipationController {
 
     private void loadEvents() {
         eventListContainer.getChildren().clear();
-        // Filters sidebar to only show events with participants
         List<Event> events = eService.findEventsWithParticipants();
 
         if (events.isEmpty()) {
@@ -62,11 +65,49 @@ public class ParticipationController {
     }
 
     private void showParticipantsForEvent(Event event) {
-        selectedEventLabel.setText("Attendees for: " + event.getTitle());
         participationListContainer.getChildren().clear();
+
+        // --- TITLE & EXPORT HEADER ---
+        HBox titleBar = new HBox(15);
+        titleBar.setAlignment(Pos.CENTER_LEFT);
+        titleBar.setStyle("-fx-padding: 0 0 15 0;");
+
+        Label title = new Label("Attendees for: " + event.getTitle());
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button exportBtn = new Button("📥 Export Excel");
+        exportBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 8 15; -fx-cursor: hand;");
 
         List<Participation> list = pService.findByEvent(event.getId());
 
+        exportBtn.setOnAction(e -> {
+            if (list.isEmpty()) {
+                showAlert("Empty", "No data to export.", Alert.AlertType.WARNING);
+                return;
+            }
+
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Attendees List");
+            fileChooser.setInitialFileName("Attendees_" + event.getTitle().replaceAll("\\s+", "_") + ".xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx"));
+            File file = fileChooser.showSaveDialog(participationListContainer.getScene().getWindow());
+            if (file != null) {
+                try {
+                    ExcelExporter.exportParticipantsFromList(list, file.getAbsolutePath());
+                    showAlert("Success", "Excel file exported successfully!", Alert.AlertType.INFORMATION);
+                } catch (IOException ex) {
+                    showAlert("Error", "Export failed: " + ex.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
+
+        titleBar.getChildren().addAll(title, spacer, exportBtn);
+        participationListContainer.getChildren().add(titleBar);
+
+        // --- DATA ROWS ---
         participationListContainer.getChildren().add(createHeader());
 
         for (Participation p : list) {
@@ -86,28 +127,19 @@ public class ParticipationController {
             phone.setPrefWidth(150);
             phone.setStyle("-fx-text-fill: #64748b;");
 
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
+            Region rowSpacer = new Region();
+            HBox.setHgrow(rowSpacer, Priority.ALWAYS);
 
-            // The only action allowed: Row-level deletion
             Button delBtn = new Button("🗑");
             delBtn.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #ef4444; -fx-background-radius: 5; -fx-cursor: hand;");
 
             delBtn.setOnAction(ev -> {
                 pService.delete(p.getId());
-
-                List<Participation> remaining = pService.findByEvent(event.getId());
-                if (remaining.isEmpty()) {
-                    currentSelectedEvent = null;
-                }
-
                 loadEvents();
-                if (currentSelectedEvent != null) {
-                    showParticipantsForEvent(event);
-                }
+                showParticipantsForEvent(event);
             });
 
-            row.getChildren().addAll(nameBox, phone, spacer, delBtn);
+            row.getChildren().addAll(nameBox, phone, rowSpacer, delBtn);
             participationListContainer.getChildren().add(row);
         }
     }
@@ -121,5 +153,13 @@ public class ParticipationController {
         hName.setStyle(s); hPhone.setStyle(s);
         header.getChildren().addAll(hName, hPhone);
         return header;
+    }
+
+    private void showAlert(String title, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

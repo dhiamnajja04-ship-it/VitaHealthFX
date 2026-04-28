@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+<?import javafx.scene.control.Button?>
+
+<VBox prefHeight="500.0" prefWidth="700.0" spacing="10" style="-fx-padding: 10;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <WebView fx:id="mapView" VBox.vgrow="ALWAYS" />
+        <HBox alignment="CENTER_RIGHT">
+            <Button text="Confirm Location" onAction="#handleConfirm" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 5;" />
+        </HBox>
+    </children>
+</VBox>

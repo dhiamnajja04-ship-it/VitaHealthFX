@@ -5,8 +5,10 @@ import tn.esprit.workshopjdbc.Entities.Event;
 import tn.esprit.workshopjdbc.Entities.User;
 import tn.esprit.workshopjdbc.Utils.DbConnection;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
+
+
 
 public class ParticipationService {
     private Connection cnx = DbConnection.getInstance().getCnx();
@@ -199,5 +201,39 @@ public class ParticipationService {
             e.printStackTrace();
         }
         return list;
+    }
+    // Method 1: Get participation count per Event Name
+    public Map<String, Integer> getStatsByEvent() {
+        Map<String, Integer> stats = new HashMap<>();
+        String query = "SELECT e.title, COUNT(p.id) as total FROM event e " +
+                "LEFT JOIN participation p ON e.id = p.event_id " +
+                "GROUP BY e.title";
+        try (Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+            while (rs.next()) {
+                stats.put(rs.getString("title"), rs.getInt("total"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    // Method 2: Get registrations per day (for the last 7 days)
+    public Map<LocalDate, Integer> getRegistrationTrend() {
+        Map<LocalDate, Integer> stats = new TreeMap<>(); // TreeMap keeps dates in order
+        String query = "SELECT DATE(created_at) as reg_date, COUNT(*) as total " +
+                "FROM participation " +
+                "WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) " +
+                "GROUP BY reg_date";
+        try (Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+            while (rs.next()) {
+                stats.put(rs.getDate("reg_date").toLocalDate(), rs.getInt("total"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
     }
 }

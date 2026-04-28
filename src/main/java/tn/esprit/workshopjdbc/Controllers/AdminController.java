@@ -259,7 +259,7 @@ public class AdminController {
             showAlert("Erreur", "Impossible de charger les statistiques", Alert.AlertType.ERROR);
         }
     }
-
+    @FXML
     private void loadAllUsers() {
         try {
             usersList = FXCollections.observableArrayList(userDAO.findAll());
@@ -304,7 +304,7 @@ public class AdminController {
             appointmentTable.setItems(FXCollections.observableArrayList(filtered));
         }
     }
-
+    @FXML
     private void openAddUserDialog() {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -516,7 +516,7 @@ public class AdminController {
             }
         });
     }
-
+    @FXML
     private void refreshAll() {
         loadDashboardStats();
         loadAllUsers();
@@ -525,7 +525,7 @@ public class AdminController {
         appointmentSearchField.clear();
         avgAgeLabel.setText("📊 Moyenne des IDs");
     }
-
+    @FXML
     private void logout() {
         SessionManager.getInstance().logout();
         LoginController loginController = new LoginController();

@@ -146,17 +146,8 @@
                 <Tab closable="false" text="🎓 Ateliers &amp; Événements">
                     <VBox spacing="20.0" style="-fx-padding: 25; -fx-background-color: #f8fafc;">
                         <children>
-                            <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                <children>
-                                    <VBox>
-                                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Catalogue des Ateliers" />
-                                        <Label style="-fx-text-fill: #64748b;" text="Inscrivez-vous aux sessions de sensibilisation santé." />
-                                    </VBox>
-                                    <Region HBox.hgrow="ALWAYS" />
-                                    <TextField fx:id="searchWorkshopField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Rechercher un événement..." style="-fx-background-radius: 20; -fx-padding: 0 20;" />
-                                </children>
-                            </HBox>
-                            <Separator />
+
+
                             <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
                                 <content>
                                     <FlowPane fx:id="workshopGrid" hgap="25.0" style="-fx-padding: 10;" vgap="25.0" />

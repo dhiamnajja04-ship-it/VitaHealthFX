@@ -17,7 +17,9 @@
 
                 <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-padding: 10 0 0 0;">
                     <children>
-                        <TextField fx:id="searchField" prefHeight="40.0" prefWidth="400.0" promptText="🔍 Search for events..." style="-fx-background-radius: 20; -fx-padding: 0 20; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8;" />
+                        <TextField fx:id="searchField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Search for events..." style="-fx-background-radius: 20; -fx-padding: 0 20; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8;" />
+
+                        <Button onAction="#handleGoToGlobalDiscovery" prefHeight="40.0" style="-fx-background-color: #026cdf; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 20; -fx-cursor: hand;" text="🌍 Discover Global Events" />
 
                         <Region HBox.hgrow="ALWAYS" />
 

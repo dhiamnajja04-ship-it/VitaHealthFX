@@ -13,7 +13,7 @@ public class Event {
     private Float latitude;
     private Float longitude;
     private List<Participation> participations;
-
+    private String url;
     // Constructor
     public Event() {
         this.participations = new ArrayList<>();
@@ -71,7 +71,14 @@ public class Event {
     public List<Participation> getParticipations() {
         return participations;
     }
+    public String getUrl() {
+        return url;
+    }
 
+    // 3. Add the Setter method (This is what fixes the red "setUrl" error)
+    public void setUrl(String url) {
+        this.url = url;
+    }
     // Relationship logic (add/remove)
     public void addParticipation(Participation participation) {
         if (!this.participations.contains(participation)) {
