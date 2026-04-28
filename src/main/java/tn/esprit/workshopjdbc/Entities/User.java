@@ -16,6 +16,7 @@ public class User {
     private Double glycemie;
     private String tension;
     private String maladie;
+    private String phone;  // ← AJOUT DE TON CHAMP
 
     public User() {}
 
@@ -35,6 +36,7 @@ public class User {
     public Double getGlycemie() { return glycemie; }
     public String getTension() { return tension; }
     public String getMaladie() { return maladie; }
+    public String getPhone() { return phone; }  // ← AJOUT DE TON GETTER
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -52,6 +54,8 @@ public class User {
     public void setGlycemie(Double glycemie) { this.glycemie = glycemie; }
     public void setTension(String tension) { this.tension = tension; }
     public void setMaladie(String maladie) { this.maladie = maladie; }
+    public void setPhone(String phone) { this.phone = phone; }  // ← AJOUT DE TON SETTER
+
     public String getFullName() {
         return firstName + " " + lastName;
     }
@@ -60,6 +64,4 @@ public class User {
     public String toString() {
         return getFullName();
     }
-
-
 }

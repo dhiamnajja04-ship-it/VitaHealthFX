@@ -1,4 +1,4 @@
-package tn.esprit.vitahealthfx.util;
+package tn.esprit.workshopjdbc.Utils;
 
 import java.util.Random;
 

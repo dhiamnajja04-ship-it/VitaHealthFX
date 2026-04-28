@@ -1,6 +1,6 @@
-package tn.esprit.vitahealthfx.util;
+package tn.esprit.workshopjdbc.Utils;
 
-import tn.esprit.vitahealthfx.entity.User;
+import tn.esprit.workshopjdbc.Entities.User;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -17,65 +17,144 @@ import java.util.List;
 public class PDFExporter {
 
     public static void exportUsersToPDF(List<User> users, Stage stage) {
+        if (users == null || users.isEmpty()) {
+            AlertUtils.showWarning("Aucune donnée", "Il n'y a aucun utilisateur à exporter.");
+            return;
+        }
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Enregistrer le PDF");
         fileChooser.setInitialFileName("utilisateurs_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".pdf");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
 
         File file = fileChooser.showSaveDialog(stage);
         if (file == null) return;
 
-        Document document = new Document();
+        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
         try {
             PdfWriter.getInstance(document, new FileOutputStream(file));
             document.open();
 
-            // Titre
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
-            Paragraph title = new Paragraph("Liste des utilisateurs - VITA", titleFont);
+            // Titre principal
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY);
+            Paragraph title = new Paragraph("LISTE DES UTILISATEURS - VITA HEALTH", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
             document.add(new Paragraph(" "));
 
-            // Date d'export
-            Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
-            Paragraph date = new Paragraph("Exporté le : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")), dateFont);
-            document.add(date);
+            // Sous-titre
+            Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.GRAY);
+            Paragraph subtitle = new Paragraph("Application de gestion de santé VITA", subtitleFont);
+            subtitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(subtitle);
             document.add(new Paragraph(" "));
 
-            // Tableau
-            PdfPTable table = new PdfPTable(6);
-            table.setWidthPercentage(100);
-            table.setSpacingBefore(10);
-            table.setSpacingAfter(10);
+            // Ligne de séparation
+            Paragraph separator = new Paragraph("___________________________________________________");
+            separator.setAlignment(Element.ALIGN_CENTER);
+            document.add(separator);
+            document.add(new Paragraph(" "));
 
-            // En-têtes
-            String[] headers = {"ID", "Prénom", "Nom", "Email", "Rôle", "Téléphone"};
+            // Informations d'export
+            Font infoFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLUE);
+            Paragraph exportInfo = new Paragraph("Exporté le : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm:ss")), infoFont);
+            exportInfo.setAlignment(Element.ALIGN_RIGHT);
+            document.add(exportInfo);
+            document.add(new Paragraph(" "));
+
+            // Statistiques
+            Font statsFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
+            Paragraph stats = new Paragraph("Nombre total d'utilisateurs : " + users.size(), statsFont);
+            document.add(stats);
+            document.add(new Paragraph(" "));
+
+            // Tableau des utilisateurs
+            PdfPTable table = new PdfPTable(7); // 7 colonnes (ajout de statut)
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(15);
+            table.setSpacingAfter(15);
+            
+            // Définir les largeurs des colonnes
+            float[] columnWidths = {10, 15, 15, 25, 15, 15, 10};
+            table.setWidths(columnWidths);
+
+            // En-têtes avec style amélioré
+            String[] headers = {"ID", "Prénom", "Nom", "Email", "Rôle", "Téléphone", "Statut"};
+            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
+            
             for (String header : headers) {
-                PdfPCell cell = new PdfPCell(new Phrase(header, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
+                PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setBackgroundColor(new BaseColor(52, 152, 219)); // Bleu moderne
+                cell.setPadding(8);
                 table.addCell(cell);
             }
 
-            // Données
+            // Données avec alternance de couleurs
+            boolean isEvenRow = false;
             for (User u : users) {
-                table.addCell(String.valueOf(u.getId()));
-                table.addCell(u.getFirstName() != null ? u.getFirstName() : "");
-                table.addCell(u.getLastName() != null ? u.getLastName() : "");
-                table.addCell(u.getEmail() != null ? u.getEmail() : "");
-                table.addCell(u.getRole() != null ? u.getRole() : "");
-                table.addCell(u.getPhone() != null ? u.getPhone() : "");
+                // Couleur de fond alternée
+                BaseColor rowColor = isEvenRow ? new BaseColor(240, 240, 240) : BaseColor.WHITE;
+                
+                PdfPCell cellId = new PdfPCell(new Phrase(String.valueOf(u.getId())));
+                cellId.setBackgroundColor(rowColor);
+                cellId.setHorizontalAlignment(Element.ALIGN_CENTER);
+                table.addCell(cellId);
+                
+                PdfPCell cellFirstName = new PdfPCell(new Phrase(u.getFirstName() != null ? u.getFirstName() : ""));
+                cellFirstName.setBackgroundColor(rowColor);
+                table.addCell(cellFirstName);
+                
+                PdfPCell cellLastName = new PdfPCell(new Phrase(u.getLastName() != null ? u.getLastName() : ""));
+                cellLastName.setBackgroundColor(rowColor);
+                table.addCell(cellLastName);
+                
+                PdfPCell cellEmail = new PdfPCell(new Phrase(u.getEmail() != null ? u.getEmail() : ""));
+                cellEmail.setBackgroundColor(rowColor);
+                table.addCell(cellEmail);
+                
+                PdfPCell cellRole = new PdfPCell(new Phrase(u.getRole() != null ? u.getRole() : ""));
+                cellRole.setBackgroundColor(rowColor);
+                cellRole.setHorizontalAlignment(Element.ALIGN_CENTER);
+                table.addCell(cellRole);
+                
+                PdfPCell cellPhone = new PdfPCell(new Phrase(u.getPhone() != null ? u.getPhone() : ""));
+                cellPhone.setBackgroundColor(rowColor);
+                cellPhone.setHorizontalAlignment(Element.ALIGN_CENTER);
+                table.addCell(cellPhone);
+                
+                // Statut (actif/inactif - à adapter selon ta logique)
+                String status = u.isActive() ? "Actif" : "Inactif";
+                PdfPCell cellStatus = new PdfPCell(new Phrase(status));
+                cellStatus.setBackgroundColor(rowColor);
+                cellStatus.setHorizontalAlignment(Element.ALIGN_CENTER);
+                if (u.isActive()) {
+                    cellStatus.setBackgroundColor(new BaseColor(144, 238, 144)); // Vert clair
+                } else {
+                    cellStatus.setBackgroundColor(new BaseColor(255, 182, 193)); // Rouge clair
+                }
+                table.addCell(cellStatus);
+                
+                isEvenRow = !isEvenRow;
             }
 
             document.add(table);
+            
+            // Pied de page
+            document.add(new Paragraph(" "));
+            Font footerFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, BaseColor.GRAY);
+            Paragraph footer = new Paragraph("Document généré automatiquement par VITA Health System", footerFont);
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.add(footer);
+
             document.close();
 
-            AlertUtils.showInfo("Succès", "PDF exporté avec succès !\n" + file.getAbsolutePath());
+            AlertUtils.showInfo("✅ Succès", "PDF exporté avec succès !\n\n📁 Emplacement : " + file.getAbsolutePath());
 
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtils.showError("Erreur", "Impossible d'exporter le PDF : " + e.getMessage());
+            AlertUtils.showError("❌ Erreur", "Impossible d'exporter le PDF :\n" + e.getMessage());
         }
     }
 }
