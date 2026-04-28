@@ -57,9 +57,11 @@ public class MedecinFormController implements Initializable {
         try {
             service.ajouter(construireMedecin());
             if (mainController != null) mainController.rafraichirListes();
+            utils.NotificationUtils.showSuccess("Médecin ajouté", "Le médecin a été enregistré avec succès.");
             handleFermer();
         } catch (Exception e) {
             afficherErreur(e.getMessage());
+            utils.NotificationUtils.showError("Erreur", e.getMessage());
         }
     }
 
@@ -71,9 +73,11 @@ public class MedecinFormController implements Initializable {
             m.setId(medSelectionne.getId());
             service.modifier(m);
             if (mainController != null) mainController.rafraichirListes();
+            utils.NotificationUtils.showSuccess("Médecin modifié", "Les informations ont été mises à jour.");
             handleFermer();
         } catch (Exception e) {
             afficherErreur(e.getMessage());
+            utils.NotificationUtils.showError("Erreur", e.getMessage());
         }
     }
 

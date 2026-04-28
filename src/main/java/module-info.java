@@ -11,6 +11,10 @@ module VitalHJavaFx {
     requires jakarta.mail;
     requires com.google.gson;
     requires java.net.http;
+    requires com.google.zxing;
+    requires com.google.zxing.javase;
+    requires java.desktop;
+    requires org.controlsfx.controls;
 
     opens controllers to javafx.fxml;
     opens models to javafx.fxml, com.google.gson;

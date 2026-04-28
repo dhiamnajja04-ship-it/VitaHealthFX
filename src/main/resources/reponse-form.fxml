@@ -18,8 +18,14 @@
         <Label text="Date Enregistrée:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
         <Label fx:id="lblRepDate" text="-" styleClass="italic-label" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-        <Label text="Message:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <TextArea fx:id="taRepMessage" prefHeight="100" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3" />
+        <Label fx:id="lblNouvelleDateText" text="Nouvelle Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" visible="false" managed="false"/>
+        <DatePicker fx:id="dpNouvelleDate" prefWidth="150" GridPane.columnIndex="1" GridPane.rowIndex="2" visible="false" managed="false"/>
+
+        <Label fx:id="lblNouvelleHeureText" text="Nouvelle Heure (HH:mm):" GridPane.columnIndex="2" GridPane.rowIndex="2" visible="false" managed="false"/>
+        <TextField fx:id="tfNouvelleHeure" prefWidth="100" GridPane.columnIndex="3" GridPane.rowIndex="2" visible="false" managed="false"/>
+
+        <Label text="Message:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextArea fx:id="taRepMessage" prefHeight="100" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3" />
     </GridPane>
     
     <Label fx:id="lblRepErreur" />

@@ -111,8 +111,10 @@ public class ReponseRendezVousController implements Initializable {
                     );
                 }
                 afficherSucces("Exportation réussie : " + file.getName());
+                utils.NotificationUtils.showSuccess("Exportation réussie", "Le fichier a été enregistré : " + file.getName());
             } catch (Exception e) {
                 afficherErreur("Erreur lors de l'export : " + e.getMessage());
+                utils.NotificationUtils.showError("Erreur d'exportation", e.getMessage());
             }
         }
     }
@@ -120,7 +122,11 @@ public class ReponseRendezVousController implements Initializable {
     @FXML
     private void handleSupprimer() {
         ReponseRendezVous selected = tableReponse.getSelectionModel().getSelectedItem();
-        if (selected == null) { afficherErreur("Sélectionnez une réponse à supprimer."); return; }
+        if (selected == null) { 
+            afficherErreur("Sélectionnez une réponse à supprimer."); 
+            utils.NotificationUtils.showWarning("Sélection requise", "Veuillez sélectionner une réponse à supprimer.");
+            return; 
+        }
         
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
             "Supprimer cette réponse ?", ButtonType.YES, ButtonType.NO);
@@ -131,8 +137,10 @@ public class ReponseRendezVousController implements Initializable {
                     service.supprimer(selected.getId());
                     chargerDonnees();
                     afficherSucces("Réponse supprimée.");
+                    utils.NotificationUtils.showSuccess("Supprimé", "La réponse a été supprimée avec succès.");
                 } catch (SQLException e) {
                     afficherErreur("Erreur SQL : " + e.getMessage());
+                    utils.NotificationUtils.showError("Erreur", "Erreur lors de la suppression : " + e.getMessage());
                 }
             }
         });

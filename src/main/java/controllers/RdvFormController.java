@@ -104,9 +104,11 @@ public class RdvFormController implements Initializable {
         try {
             service.ajouter(construireRdv());
             if (mainController != null) mainController.rafraichirListes();
+            utils.NotificationUtils.showSuccess("Rendez-vous ajouté", "Le rendez-vous a été enregistré avec succès.");
             handleFermer();
         } catch (Exception e) {
             afficherErreur(e.getMessage());
+            utils.NotificationUtils.showError("Erreur", e.getMessage());
         }
     }
 
@@ -120,9 +122,11 @@ public class RdvFormController implements Initializable {
             rv.setStatut(rdvSelectionne.getStatut());
             service.modifier(rv);
             if (mainController != null) mainController.rafraichirListes();
+            utils.NotificationUtils.showSuccess("Rendez-vous modifié", "Le rendez-vous a été mis à jour.");
             handleFermer();
         } catch (Exception e) {
             afficherErreur(e.getMessage());
+            utils.NotificationUtils.showError("Erreur", e.getMessage());
         }
     }
 

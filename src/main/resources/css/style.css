@@ -314,3 +314,121 @@
     -fx-font-size: 12px;
     -fx-font-weight: 800;
 }
+
+/* ==================== SEARCH FIELD ==================== */
+.search-field {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 30;
+    -fx-background-radius: 30;
+    -fx-padding: 10 20;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 8, 0, 0, 3);
+}
+.search-field:focused {
+    -fx-border-color: #0d9488;
+    -fx-effect: dropshadow(three-pass-box, rgba(13, 148, 136, 0.18), 12, 0, 0, 0);
+}
+
+/* ==================== BTN-INFO ==================== */
+.btn-info {
+    -fx-background-color: linear-gradient(to right, #6366f1, #818cf8);
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 6 14;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+.btn-info:hover { -fx-scale-x: 1.04; -fx-scale-y: 1.04; }
+
+/* ==================== PAGINATION (Premium) ==================== */
+.page-control {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.page-control .pagination-control {
+    -fx-background-color: transparent;
+    -fx-padding: 6 0;
+}
+
+.page-control .number-button {
+    -fx-background-color: white;
+    -fx-text-fill: #334155;
+    -fx-background-radius: 8;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 2);
+}
+.page-control .number-button:hover {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #0d9488;
+    -fx-text-fill: #0d9488;
+}
+.page-control .number-button:selected,
+.page-control .number-button:pressed {
+    -fx-background-color: linear-gradient(to right, #0d9488, #10b981);
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(13,148,136,0.35), 10, 0, 0, 4);
+}
+
+.page-control .left-arrow-button,
+.page-control .right-arrow-button {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 2);
+}
+.page-control .left-arrow-button:hover,
+.page-control .right-arrow-button:hover {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #0d9488;
+}
+.page-control .left-arrow-button .left-arrow,
+.page-control .right-arrow-button .right-arrow {
+    -fx-background-color: #0d9488;
+}
+
+.page-control .page-information {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+/* ==================== CUSTOM PAGE BUTTONS ==================== */
+.page-btn {
+    -fx-background-color: white;
+    -fx-text-fill: #334155;
+    -fx-background-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 6, 0, 0, 2);
+}
+.page-btn:hover {
+    -fx-background-color: #f0fdfa;
+    -fx-border-color: #0d9488;
+    -fx-text-fill: #0d9488;
+    -fx-scale-x: 1.03; -fx-scale-y: 1.03;
+}
+.page-btn:disabled {
+    -fx-opacity: 0.4;
+    -fx-cursor: default;
+}

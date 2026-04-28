@@ -111,6 +111,7 @@ public class MedecinController implements Initializable {
         Medecin m = tableMedecin.getSelectionModel().getSelectedItem();
         if (m == null) {
             afficherErreur("Veuillez sélectionner un médecin à modifier.");
+            utils.NotificationUtils.showWarning("Sélection requise", "Veuillez sélectionner un médecin à modifier.");
             return;
         }
         if (mainController != null) {
@@ -121,7 +122,11 @@ public class MedecinController implements Initializable {
     @FXML
     private void handleSupprimer() {
         Medecin selected = tableMedecin.getSelectionModel().getSelectedItem();
-        if (selected == null) { afficherErreur("Sélectionnez un médecin à supprimer."); return; }
+        if (selected == null) { 
+            afficherErreur("Sélectionnez un médecin à supprimer."); 
+            utils.NotificationUtils.showWarning("Sélection requise", "Veuillez sélectionner un médecin à supprimer.");
+            return; 
+        }
         
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
             "Supprimer le médecin " + selected.getNom() + " ?",
@@ -133,8 +138,10 @@ public class MedecinController implements Initializable {
                     service.supprimer(selected.getId());
                     chargerDonnees();
                     afficherSucces("Médecin supprimé.");
+                    utils.NotificationUtils.showSuccess("Supprimé", "Le médecin " + selected.getNom() + " a été supprimé.");
                 } catch (SQLException e) {
                     afficherErreur("Erreur SQL : " + e.getMessage());
+                    utils.NotificationUtils.showError("Erreur", "Suppression échouée : " + e.getMessage());
                 }
             }
         });

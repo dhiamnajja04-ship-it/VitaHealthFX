@@ -58,7 +58,7 @@ public class ReponseRendezVousService {
             ps.executeUpdate();
         }
 
-        mettreAJourStatutRdv(r.getRendezVousId(), r.getTypeReponse());
+        mettreAJourStatutRdv(r.getRendezVousId(), r.getTypeReponse(), r.getMessage());
     }
 
     public void modifier(ReponseRendezVous r) throws SQLException {
@@ -76,7 +76,7 @@ public class ReponseRendezVousService {
             ps.executeUpdate();
         }
 
-        mettreAJourStatutRdv(r.getRendezVousId(), r.getTypeReponse());
+        mettreAJourStatutRdv(r.getRendezVousId(), r.getTypeReponse(), r.getMessage());
     }
 
     public void supprimer(int id) throws SQLException {
@@ -162,7 +162,7 @@ public class ReponseRendezVousService {
         }
     }
 
-    private void mettreAJourStatutRdv(int rendezVousId, String typeReponse) throws SQLException {
+    private void mettreAJourStatutRdv(int rendezVousId, String typeReponse, String causeMessage) throws SQLException {
         Connection cnx = MyConnection.getInstance().getConnection();
         if ("accepte".equals(typeReponse)) {
             // Vérifier si le créneau est déjà pris par un autre RDV confirmé
@@ -193,21 +193,53 @@ public class ReponseRendezVousService {
             ps.executeUpdate();
         }
         
-        if ("confirme".equals(statut)) {
-            RendezVousService rdvService = new RendezVousService();
-            RendezVous rv = rdvService.getById(rendezVousId);
-            if (rv != null) {
-                MedecinService medService = new MedecinService();
-                Medecin medecin = medService.getById(rv.getMedecinId());
-                String medNom = medecin != null ? medecin.getNom() : "";
-                
+        // Récupérer les infos du RDV et du médecin pour tous les types d'email
+        RendezVousService rdvService = new RendezVousService();
+        RendezVous rv = rdvService.getById(rendezVousId);
+        if (rv != null) {
+            MedecinService medService = new MedecinService();
+            Medecin medecin = medService.getById(rv.getMedecinId());
+            String medNom = medecin != null ? medecin.getNom() : "";
+            String nomPatient = rv.getPatientPrenom() + " " + rv.getPatientNom();
+
+            if ("confirme".equals(statut)) {
+                // Email de confirmation avec QR code
                 EmailService.envoyerEmailConfirmation(
                     rv.getPatientEmail(),
-                    rv.getPatientPrenom() + " " + rv.getPatientNom(),
+                    nomPatient,
                     rv.getDate() != null ? rv.getDate().toString() : "",
                     rv.getHeure() != null ? rv.getHeure().toString() : "",
                     medNom
                 );
+            } else if ("annule".equals(statut)) {
+                // Email de refus — le message complet sert de cause
+                new Thread(() -> EmailService.envoyerEmailRefus(
+                    rv.getPatientEmail(),
+                    nomPatient,
+                    medNom,
+                    causeMessage
+                )).start();
+            } else if ("en_attente".equals(statut) && "reporte".equals(typeReponse)) {
+                // Email de report — extraire date/heure de la mention ajoutée par le formulaire
+                String nouvelleDate = "";
+                String nouvelleHeure = "";
+                // Pattern: "[Proposition d'une autre date : le YYYY-MM-DD à HH:mm]"
+                java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("\\[Proposition d'une autre date : le ([\\d\\-]+) à ([\\d:]+)\\]")
+                    .matcher(causeMessage);
+                if (m.find()) {
+                    nouvelleDate  = m.group(1);
+                    nouvelleHeure = m.group(2);
+                }
+                final String nd = nouvelleDate, nh = nouvelleHeure;
+                new Thread(() -> EmailService.envoyerEmailReport(
+                    rv.getPatientEmail(),
+                    nomPatient,
+                    medNom,
+                    causeMessage,
+                    nd,
+                    nh
+                )).start();
             }
         }
     }

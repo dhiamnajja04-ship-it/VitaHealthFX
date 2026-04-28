@@ -133,6 +133,7 @@ public class MainController implements Initializable {
         try {
             String fxmlFile;
             if (isViewOnly) {
+                // Mode Vue : toujours la fiche unifiée
                 fxmlFile = "/consultation-fiche.fxml";
             } else {
                 fxmlFile = switch (type.toUpperCase()) {
@@ -146,31 +147,44 @@ public class MainController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            
+
             URL css = getClass().getResource("/css/style.css");
             if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
             Stage stage = new Stage();
-            stage.setTitle("VitalHealth - " + (isViewOnly ? "Détails " : "Édition ") + type);
+            stage.setTitle("VitalHealth — " + (isViewOnly ? "Consultation" : "Édition"));
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
             stage.setScene(scene);
 
             Object ctrl = loader.getController();
-            if (isViewOnly && ctrl instanceof ConsultationFicheController c) {
-                c.setData(data);
+
+            if (isViewOnly) {
+                // Fiche de lecture seule
+                if (ctrl instanceof ConsultationFicheController c) {
+                    c.setData(data);
+                }
             } else {
-                if (ctrl instanceof MedecinFormController c) {
-                    c.setMainController(this);
-                    c.setMedecin((models.Medecin) data);
-                } else if (ctrl instanceof RdvFormController c) {
-                    c.setMainController(this);
-                    c.setRendezVous((models.RendezVous) data);
-                } else if (ctrl instanceof ReponseFormController c) {
-                    c.setMainController(this);
-                    if (data instanceof models.ReponseRendezVous rep) {
-                        c.setReponse(rep);
-                    } else if (data instanceof models.RendezVous rdv) {
-                        c.setRendezVous(rdv);
+                // Formulaires d'édition / création
+                switch (type.toUpperCase()) {
+                    case "MEDECIN" -> {
+                        if (ctrl instanceof MedecinFormController c) {
+                            c.setMainController(this);
+                            c.setMedecin(data instanceof models.Medecin m ? m : null);
+                        }
+                    }
+                    case "RDV" -> {
+                        if (ctrl instanceof RdvFormController c) {
+                            c.setMainController(this);
+                            c.setRendezVous(data instanceof models.RendezVous rv ? rv : null);
+                        }
+                    }
+                    case "REPONSE" -> {
+                        if (ctrl instanceof ReponseFormController c) {
+                            c.setMainController(this);
+                            if (data instanceof models.ReponseRendezVous rep) c.setReponse(rep);
+                            else if (data instanceof models.RendezVous rdv)   c.setRendezVous(rdv);
+                        }
                     }
                 }
             }
@@ -178,6 +192,7 @@ public class MainController implements Initializable {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+            utils.NotificationUtils.showError("Erreur", "Impossible d'ouvrir le formulaire : " + e.getMessage());
         }
     }
 }

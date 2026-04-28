@@ -22,6 +22,9 @@ public class ReponseFormController implements Initializable {
     @FXML private ComboBox<String> cbRepType;
     @FXML private Label lblRepDate, lblRepErreur;
     @FXML private Button btnAjouter, btnModifier;
+    @FXML private DatePicker dpNouvelleDate;
+    @FXML private TextField tfNouvelleHeure;
+    @FXML private Label lblNouvelleDateText, lblNouvelleHeureText;
 
     private ReponseRendezVousService service;
     private RendezVousService rdvService;
@@ -42,6 +45,26 @@ public class ReponseFormController implements Initializable {
 
             listTypes.setAll("accepte", "refuse", "reporte");
             cbRepType.setValue("accepte");
+            
+            cbRepType.valueProperty().addListener((obs, oldVal, newVal) -> {
+                boolean isReport = "reporte".equals(newVal) || "refuse".equals(newVal);
+                if (dpNouvelleDate != null) {
+                    dpNouvelleDate.setVisible(isReport);
+                    dpNouvelleDate.setManaged(isReport);
+                }
+                if (tfNouvelleHeure != null) {
+                    tfNouvelleHeure.setVisible(isReport);
+                    tfNouvelleHeure.setManaged(isReport);
+                }
+                if (lblNouvelleDateText != null) {
+                    lblNouvelleDateText.setVisible(isReport);
+                    lblNouvelleDateText.setManaged(isReport);
+                }
+                if (lblNouvelleHeureText != null) {
+                    lblNouvelleHeureText.setVisible(isReport);
+                    lblNouvelleHeureText.setManaged(isReport);
+                }
+            });
             
             chargerRendezVousEnAttente();
         } catch (SQLException e) {
@@ -92,9 +115,11 @@ public class ReponseFormController implements Initializable {
         try {
             service.ajouter(construireReponse());
             if (mainController != null) mainController.rafraichirListes();
+            utils.NotificationUtils.showSuccess("Succès", "La réponse a été envoyée avec succès et l'email a été expédié !");
             handleFermer();
         } catch (Exception e) {
             afficherErreur(e.getMessage());
+            utils.NotificationUtils.showError("Erreur", "Une erreur est survenue : " + e.getMessage());
         }
     }
 
@@ -106,9 +131,11 @@ public class ReponseFormController implements Initializable {
             r.setId(repSelectionnee.getId());
             service.modifier(r);
             if (mainController != null) mainController.rafraichirListes();
+            utils.NotificationUtils.showSuccess("Modifié", "La réponse a été mise à jour.");
             handleFermer();
         } catch (Exception e) {
             afficherErreur(e.getMessage());
+            utils.NotificationUtils.showError("Erreur", "Modification échouée : " + e.getMessage());
         }
     }
 
@@ -116,6 +143,8 @@ public class ReponseFormController implements Initializable {
     private void handleRepVider() {
         cbRepRdv.setValue(null); taRepMessage.clear();
         cbRepType.setValue("accepte"); lblRepDate.setText("-");
+        if (dpNouvelleDate != null) dpNouvelleDate.setValue(null);
+        if (tfNouvelleHeure != null) tfNouvelleHeure.clear();
         lblRepErreur.setText("");
     }
 
@@ -141,6 +170,18 @@ public class ReponseFormController implements Initializable {
         r.setMessage(taRepMessage.getText().trim());
         r.setTypeReponse(cbRepType.getValue());
         
+        String type = r.getTypeReponse();
+        String message = r.getMessage();
+        if (("reporte".equals(type) || "refuse".equals(type)) && dpNouvelleDate != null && dpNouvelleDate.getValue() != null && tfNouvelleHeure != null && !tfNouvelleHeure.getText().trim().isEmpty()) {
+            try {
+                java.time.LocalTime.parse(tfNouvelleHeure.getText().trim());
+            } catch (java.time.format.DateTimeParseException e) {
+                throw new IllegalArgumentException("Nouvelle heure invalide (HH:mm).");
+            }
+            message += "\n[Proposition d'une autre date : le " + dpNouvelleDate.getValue() + " à " + tfNouvelleHeure.getText().trim() + "]";
+            r.setMessage(message);
+        }
+        
         if (r.getMessage().isEmpty()) throw new IllegalArgumentException("Le message est requis.");
         
         return r;
@@ -150,6 +191,8 @@ public class ReponseFormController implements Initializable {
         cbRepRdv.setDisable(true);
         taRepMessage.setDisable(true);
         cbRepType.setDisable(true);
+        if (dpNouvelleDate != null) dpNouvelleDate.setDisable(true);
+        if (tfNouvelleHeure != null) tfNouvelleHeure.setDisable(true);
         btnAjouter.setVisible(false);
         btnAjouter.setManaged(false);
         btnModifier.setVisible(false);
