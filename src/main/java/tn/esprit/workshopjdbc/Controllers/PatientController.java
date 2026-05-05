@@ -12,7 +12,9 @@ import tn.esprit.workshopjdbc.Entities.HealthProfile;
 import tn.esprit.workshopjdbc.Entities.ParaMedical;
 import tn.esprit.workshopjdbc.Entities.Prescription;
 import tn.esprit.workshopjdbc.Entities.User;
+import tn.esprit.workshopjdbc.Utils.NotificationManager;
 import tn.esprit.workshopjdbc.Utils.SessionManager;
+import tn.esprit.workshopjdbc.Utils.ThemeManager;
 import javafx.animation.ScaleTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +25,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -38,6 +41,7 @@ public class PatientController {
 
     @FXML private Label userLabel;
     @FXML private Button logoutBtn;
+    @FXML private Button themeToggleBtn;
 
     @FXML private TableView<Appointment> appointmentsTable;
     @FXML private TableColumn<Appointment, LocalDateTime> colDate;
@@ -47,6 +51,9 @@ public class PatientController {
     @FXML private TableColumn<Appointment, Void> colActions;
     @FXML private Button newAppointmentBtn;
     @FXML private Button refreshAppointmentsBtn;
+    @FXML private TextField appointmentSearchField;
+    @FXML private ComboBox<String> appointmentStatusFilter;
+    @FXML private Pagination appointmentPagination;
 
     @FXML private TextField heightField;
     @FXML private TextField weightField;
@@ -82,12 +89,14 @@ public class PatientController {
     @FXML private TableColumn<Prescription, String> colMedicaments;
     @FXML private TableColumn<Prescription, String> colDuree;
     @FXML private TableColumn<Prescription, String> colInstructions;
+    @FXML private Button refreshPrescriptionsBtn;
 
     @FXML private MenuItem changerVersMedecin;
     @FXML private MenuItem quitter;
     @FXML private MenuItem aPropos;
     @FXML private FlowPane workshopGrid;
     @FXML private TextField searchWorkshopField;
+    @FXML private StackPane forumContainer;
 
     // Your specific services
     private final tn.esprit.workshopjdbc.Services.EventService eventService = new tn.esprit.workshopjdbc.Services.EventService();
@@ -100,10 +109,12 @@ public class PatientController {
 
     private User currentUser;
     private ObservableList<Appointment> appointmentsList;
+    private List<Appointment> currentAppointmentPageSource = List.of();
     private ObservableList<ParaMedical> parametresList;
     private ObservableList<Prescription> prescriptionsList;
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final int PATIENT_ROWS_PER_PAGE = 8;
 
     @FXML
     public void initialize() {
@@ -133,9 +144,17 @@ public class PatientController {
         setupButtons();
 
         newAppointmentBtn.setOnAction(e -> openNewAppointmentDialog());
-        refreshAppointmentsBtn.setOnAction(e -> loadAppointments());
+        refreshAppointmentsBtn.setOnAction(e -> {
+            if (appointmentSearchField != null) appointmentSearchField.clear();
+            if (appointmentStatusFilter != null) appointmentStatusFilter.setValue("Tous");
+            loadAppointments();
+        });
         saveHealthBtn.setOnAction(e -> saveHealthProfile());
         refreshHealthBtn.setOnAction(e -> loadHealthProfile());
+        if (refreshPrescriptionsBtn != null) refreshPrescriptionsBtn.setOnAction(e -> loadPrescriptions());
+        if (appointmentSearchField != null) appointmentSearchField.textProperty().addListener((obs, old, val) -> applyAppointmentFilters());
+        if (appointmentStatusFilter != null) appointmentStatusFilter.valueProperty().addListener((obs, old, val) -> applyAppointmentFilters());
+        if (appointmentPagination != null) appointmentPagination.currentPageIndexProperty().addListener((obs, old, val) -> updateAppointmentPage());
 
         ajouterParametreBtn.setOnAction(e -> ajouterParametre());
         modifierParametreBtn.setOnAction(e -> modifierParametre());
@@ -148,10 +167,15 @@ public class PatientController {
         if (aPropos != null) aPropos.setOnAction(e -> showAlert("À propos", "VitaHealthFX - Version 1.0\nEspace Patient", Alert.AlertType.INFORMATION));
         // Inside initialize() at the bottom
         loadExternalEventSystem();
+        loadForumModule();
 
     }
 
     private void setupAppointmentsTable() {
+        if (appointmentStatusFilter != null) {
+            appointmentStatusFilter.setItems(FXCollections.observableArrayList("Tous", "SCHEDULED", "CONFIRMED", "COMPLETED", "CANCELLED"));
+            appointmentStatusFilter.setValue("Tous");
+        }
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colDate.setCellFactory(column -> new TableCell<Appointment, LocalDateTime>() {
             @Override
@@ -283,7 +307,54 @@ public class PatientController {
 
     private void loadAppointments() {
         appointmentsList = FXCollections.observableArrayList(appointmentDAO.getAppointmentsByPatient(currentUser.getId()));
-        appointmentsTable.setItems(appointmentsList);
+        applyAppointmentFilters();
+    }
+
+    private void applyAppointmentFilters() {
+        if (appointmentsList == null) {
+            currentAppointmentPageSource = List.of();
+            updateAppointmentPagination();
+            return;
+        }
+
+        String keyword = appointmentSearchField == null ? "" : appointmentSearchField.getText().trim().toLowerCase();
+        String status = appointmentStatusFilter == null ? "Tous" : appointmentStatusFilter.getValue();
+
+        List<Appointment> filtered = appointmentsList.stream()
+                .filter(a -> keyword.isEmpty()
+                        || contains(a.getDoctorName(), keyword)
+                        || contains(a.getReason(), keyword)
+                        || contains(a.getStatus(), keyword))
+                .filter(a -> status == null || "Tous".equals(status) || status.equalsIgnoreCase(a.getStatus()))
+                .toList();
+
+        currentAppointmentPageSource = filtered;
+        updateAppointmentPagination();
+    }
+
+    private void updateAppointmentPagination() {
+        if (appointmentPagination == null) {
+            if (appointmentsTable != null) appointmentsTable.setItems(FXCollections.observableArrayList(currentAppointmentPageSource));
+            return;
+        }
+        int pageCount = Math.max(1, (int) Math.ceil(currentAppointmentPageSource.size() / (double) PATIENT_ROWS_PER_PAGE));
+        appointmentPagination.setPageCount(pageCount);
+        if (appointmentPagination.getCurrentPageIndex() >= pageCount) {
+            appointmentPagination.setCurrentPageIndex(0);
+        }
+        updateAppointmentPage();
+    }
+
+    private void updateAppointmentPage() {
+        if (appointmentsTable == null) return;
+        int page = appointmentPagination == null ? 0 : appointmentPagination.getCurrentPageIndex();
+        int from = Math.min(page * PATIENT_ROWS_PER_PAGE, currentAppointmentPageSource.size());
+        int to = Math.min(from + PATIENT_ROWS_PER_PAGE, currentAppointmentPageSource.size());
+        appointmentsTable.setItems(FXCollections.observableArrayList(currentAppointmentPageSource.subList(from, to)));
+    }
+
+    private boolean contains(String value, String keyword) {
+        return value != null && value.toLowerCase().contains(keyword);
     }
 
     private void loadHealthProfile() {
@@ -520,12 +591,15 @@ public class PatientController {
         stage.show();
     }
 
+    @FXML
+    private void toggleTheme() {
+        Scene scene = logoutBtn != null ? logoutBtn.getScene() : null;
+        ThemeManager.toggle(scene);
+        if (themeToggleBtn != null) themeToggleBtn.setText(ThemeManager.toggleText());
+    }
+
     private void showAlert(String title, String msg, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+        NotificationManager.showAlert(title, msg, type);
     }
     private void loadExternalEventSystem() {
         try {
@@ -541,6 +615,18 @@ public class PatientController {
             workshopGrid.setRowValignment(VPos.TOP);
         } catch (IOException e) {
             System.err.println("❌ Could not load modular event system: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void loadForumModule() {
+        if (forumContainer == null) return;
+
+        try {
+            Parent forumView = FXMLLoader.load(getClass().getResource("/fxml/forum/ForumView.fxml"));
+            forumContainer.getChildren().setAll(forumView);
+        } catch (IOException e) {
+            System.err.println("Could not load forum module: " + e.getMessage());
             e.printStackTrace();
         }
     }

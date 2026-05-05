@@ -6,22 +6,25 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.PatientController">
-    <top>
+    <center>
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
                 <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="🏥 VitaHealthFX" />
                 <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Patient" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Patient" />
+                <Button fx:id="themeToggleBtn" onAction="#toggleTheme" styleClass="theme-toggle" text="Dark mode" />
                 <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
             </HBox>
 
-            <TabPane>
+            <TabPane side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
                 <Tab closable="false" text="📅 Mes rendez-vous">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
-                        <HBox spacing="15.0">
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
                             <Button fx:id="newAppointmentBtn" text="➕ Nouveau rendez-vous" />
                             <Button fx:id="refreshAppointmentsBtn" text="🔄 Actualiser" />
+                            <TextField fx:id="appointmentSearchField" promptText="Rechercher medecin, motif, statut..." HBox.hgrow="ALWAYS" />
+                            <ComboBox fx:id="appointmentStatusFilter" prefWidth="160" promptText="Statut" />
                         </HBox>
                         <TableView fx:id="appointmentsTable" prefHeight="550.0">
                             <columns>
@@ -32,6 +35,7 @@
                                 <TableColumn fx:id="colActions" prefWidth="100" text="Actions" />
                             </columns>
                         </TableView>
+                        <Pagination fx:id="appointmentPagination" maxPageIndicatorCount="7" />
                     </VBox>
                 </Tab>
 
@@ -165,7 +169,11 @@
                         </children>
                     </VBox>
                 </Tab>
+
+                <Tab closable="false" text="Forum Santé">
+                    <StackPane fx:id="forumContainer" style="-fx-background-color: #f8fafc;" />
+                </Tab>
             </TabPane>
         </VBox>
-    </top>
+    </center>
 </BorderPane>

@@ -19,6 +19,8 @@ import tn.esprit.workshopjdbc.Entities.Appointment;
 import tn.esprit.workshopjdbc.Entities.User;
 import tn.esprit.workshopjdbc.Utils.QRCodeGenerator;
 import tn.esprit.workshopjdbc.Utils.SessionManager;
+import tn.esprit.workshopjdbc.Utils.ThemeManager;
+import tn.esprit.workshopjdbc.Utils.NotificationManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -51,6 +53,7 @@ public class AdminDashboardController {
 
     @FXML private Label userLabel;
     @FXML private Button logoutBtn;
+    @FXML private Button themeToggleBtn;
 
     // Dashboard Stats Labels
     @FXML private Label totalUsersLabel;
@@ -65,6 +68,7 @@ public class AdminDashboardController {
     // Users Tab
     @FXML private TextField searchField;
     @FXML private TableView<User> userTable;
+    @FXML private Pagination userPagination;
     @FXML private ComboBox<String> sortFieldCombo;
     @FXML private ComboBox<String> sortOrderCombo;
     @FXML private TableColumn<User, String> colPhone;
@@ -72,12 +76,14 @@ public class AdminDashboardController {
     // Appointments Tab
     @FXML private TextField appointmentSearchField;
     @FXML private TableView<Appointment> appointmentTable;
+    @FXML private Pagination appointmentPagination;
 
     // Stats Container
     @FXML private HBox statsContainer;
     
     // Dashboard Charts Container
     @FXML private VBox chartsContainer;
+    @FXML private StackPane forumModerationContainer;
 
     // Variables pour les graphiques dynamiques
     private PieChart rolePieChart;
@@ -89,8 +95,11 @@ public class AdminDashboardController {
     private final UserManagementService userManagementService = new UserManagementService();
     private ObservableList<User> usersList = FXCollections.observableArrayList();
     private ObservableList<Appointment> appointmentsList = FXCollections.observableArrayList();
+    private List<User> currentUserPageSource = List.of();
+    private List<Appointment> currentAppointmentPageSource = List.of();
     private final User currentUser;
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final int ADMIN_ROWS_PER_PAGE = 8;
 
     // Tri state
     private String currentSortField = "id";
@@ -115,6 +124,7 @@ public class AdminDashboardController {
             setupSortingListeners();
             setupStatsContainer();  // ← CRÉER LES CARTES STATS
             setupDashboardCharts();  // Initialise les graphiques
+            loadForumModerationModule();
             refreshAll();            // Charge les données et met à jour tout
 
             Scene scene = new Scene(root, 1300, 750);
@@ -124,6 +134,18 @@ public class AdminDashboardController {
             System.err.println("FATAL: Could not load FXML file.");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void loadForumModerationModule() {
+        if (forumModerationContainer == null) return;
+
+        try {
+            Parent forumModerationView = FXMLLoader.load(getClass().getResource("/fxml/forum/ForumModerationView.fxml"));
+            forumModerationContainer.getChildren().setAll(forumModerationView);
+        } catch (IOException e) {
+            System.err.println("Could not load forum moderation module: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -439,9 +461,8 @@ public class AdminDashboardController {
         vbox.setPadding(new Insets(25));
         vbox.setStyle("-fx-background-color: white; -fx-background-radius: 15;");
         
-        Image qrImage = QRCodeGenerator.generateUserQRCode(
-            user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getRole()
-        );
+        String qrPayload = QRCodeGenerator.buildUserPayload(user);
+        Image qrImage = QRCodeGenerator.generateQRCode(qrPayload);
         
         if (qrImage != null) {
             ImageView imageView = new ImageView(qrImage);
@@ -456,6 +477,13 @@ public class AdminDashboardController {
             
             Label scanLabel = new Label("Scanner ce code pour identifier l'utilisateur");
             scanLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-size: 12px;");
+
+            TextArea payloadPreview = new TextArea(qrPayload);
+            payloadPreview.setEditable(false);
+            payloadPreview.setWrapText(true);
+            payloadPreview.setPrefRowCount(6);
+            payloadPreview.setMaxWidth(310);
+            payloadPreview.getStyleClass().add("qr-payload-preview");
             
             Button closeBtn = new Button("Fermer");
             closeBtn.setStyle("-fx-background-color: #2c3e66; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;");
@@ -468,14 +496,15 @@ public class AdminDashboardController {
             HBox buttonBox = new HBox(10, saveBtn, closeBtn);
             buttonBox.setAlignment(Pos.CENTER);
             
-            vbox.getChildren().addAll(titleLabel, imageView, infoLabel, scanLabel, buttonBox);
+            vbox.getChildren().addAll(titleLabel, imageView, infoLabel, scanLabel, payloadPreview, buttonBox);
         } else {
             Label errorLabel = new Label("❌ Erreur lors de la génération du QR Code");
             errorLabel.setStyle("-fx-text-fill: #e74c3c;");
             vbox.getChildren().add(errorLabel);
         }
         
-        Scene scene = new Scene(vbox, 350, 480);
+        Scene scene = new Scene(vbox, 390, 640);
+        ThemeManager.apply(scene);
         dialog.setScene(scene);
         dialog.showAndWait();
     }
@@ -584,6 +613,18 @@ public class AdminDashboardController {
                 searchUsers();
             });
         }
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, old, val) -> searchUsers());
+        }
+        if (appointmentSearchField != null) {
+            appointmentSearchField.textProperty().addListener((obs, old, val) -> searchAppointments());
+        }
+        if (userPagination != null) {
+            userPagination.currentPageIndexProperty().addListener((obs, old, val) -> updateUserPage());
+        }
+        if (appointmentPagination != null) {
+            appointmentPagination.currentPageIndexProperty().addListener((obs, old, val) -> updateAppointmentPage());
+        }
     }
 
     private void updateSortField(String field) {
@@ -613,9 +654,29 @@ public class AdminDashboardController {
         
         filtered = applySorting(filtered);
         
-        if (userTable != null) {
-            userTable.setItems(FXCollections.observableArrayList(filtered));
+        currentUserPageSource = filtered;
+        updateUserPagination();
+    }
+
+    private void updateUserPagination() {
+        if (userPagination == null) {
+            if (userTable != null) userTable.setItems(FXCollections.observableArrayList(currentUserPageSource));
+            return;
         }
+        int pageCount = Math.max(1, (int) Math.ceil(currentUserPageSource.size() / (double) ADMIN_ROWS_PER_PAGE));
+        userPagination.setPageCount(pageCount);
+        if (userPagination.getCurrentPageIndex() >= pageCount) {
+            userPagination.setCurrentPageIndex(0);
+        }
+        updateUserPage();
+    }
+
+    private void updateUserPage() {
+        if (userTable == null) return;
+        int page = userPagination == null ? 0 : userPagination.getCurrentPageIndex();
+        int from = Math.min(page * ADMIN_ROWS_PER_PAGE, currentUserPageSource.size());
+        int to = Math.min(from + ADMIN_ROWS_PER_PAGE, currentUserPageSource.size());
+        userTable.setItems(FXCollections.observableArrayList(currentUserPageSource.subList(from, to)));
     }
 
     private List<User> applySorting(List<User> users) {
@@ -836,24 +897,46 @@ public class AdminDashboardController {
         try {
             List<Appointment> apps = appointmentDAO.getAllAppointments();
             appointmentsList.setAll(apps);
-            if (appointmentTable != null) appointmentTable.setItems(appointmentsList);
+            searchAppointments();
             System.out.println("✅ " + appointmentsList.size() + " rendez-vous chargés");
         } catch (Exception e) {
             System.err.println("Erreur chargement rendez-vous: " + e.getMessage());
         }
     }
 
+    @FXML
     private void searchAppointments() {
         String kw = appointmentSearchField != null ? appointmentSearchField.getText().trim().toLowerCase() : "";
         if (kw.isEmpty()) {
-            appointmentTable.setItems(appointmentsList);
+            currentAppointmentPageSource = appointmentsList;
         } else {
-            List<Appointment> filtered = appointmentsList.stream()
+            currentAppointmentPageSource = appointmentsList.stream()
                     .filter(a -> (a.getPatientName() != null && a.getPatientName().toLowerCase().contains(kw))
                             || (a.getDoctorName() != null && a.getDoctorName().toLowerCase().contains(kw)))
                     .collect(Collectors.toList());
-            appointmentTable.setItems(FXCollections.observableArrayList(filtered));
         }
+        updateAppointmentPagination();
+    }
+
+    private void updateAppointmentPagination() {
+        if (appointmentPagination == null) {
+            if (appointmentTable != null) appointmentTable.setItems(FXCollections.observableArrayList(currentAppointmentPageSource));
+            return;
+        }
+        int pageCount = Math.max(1, (int) Math.ceil(currentAppointmentPageSource.size() / (double) ADMIN_ROWS_PER_PAGE));
+        appointmentPagination.setPageCount(pageCount);
+        if (appointmentPagination.getCurrentPageIndex() >= pageCount) {
+            appointmentPagination.setCurrentPageIndex(0);
+        }
+        updateAppointmentPage();
+    }
+
+    private void updateAppointmentPage() {
+        if (appointmentTable == null) return;
+        int page = appointmentPagination == null ? 0 : appointmentPagination.getCurrentPageIndex();
+        int from = Math.min(page * ADMIN_ROWS_PER_PAGE, currentAppointmentPageSource.size());
+        int to = Math.min(from + ADMIN_ROWS_PER_PAGE, currentAppointmentPageSource.size());
+        appointmentTable.setItems(FXCollections.observableArrayList(currentAppointmentPageSource.subList(from, to)));
     }
 
     private void cancelAppointment(Appointment appointment) {
@@ -934,29 +1017,8 @@ public class AdminDashboardController {
     // ==================== TOAST ====================
     
     private void showToast(String message) {
-        Stage toastStage = new Stage();
-        toastStage.initModality(Modality.NONE);
-        toastStage.setOpacity(0);
-        
-        VBox toast = new VBox();
-        toast.setAlignment(Pos.CENTER);
-        toast.setPadding(new Insets(10, 20, 10, 20));
-        toast.setStyle("-fx-background-color: #27ae60; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);");
-        
-        Label messageLabel = new Label(message);
-        messageLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
-        
-        toast.getChildren().add(messageLabel);
-        
-        Scene scene = new Scene(toast);
-        scene.setFill(null);
-        
-        toastStage.setScene(scene);
-        toastStage.show();
-        
-        PauseTransition delay = new PauseTransition(Duration.seconds(2));
-        delay.setOnFinished(e -> toastStage.close());
-        delay.play();
+        NotificationManager.showToast(logoutBtn != null ? logoutBtn.getScene() : null,
+                "VitaHealthFX", message, NotificationManager.Type.SUCCESS);
     }
 
     // ==================== STATS AVANCÉES ====================
@@ -1020,13 +1082,13 @@ public class AdminDashboardController {
     
     @FXML
     private void refreshAll() {
+        if (searchField != null) searchField.clear();
+        if (appointmentSearchField != null) appointmentSearchField.clear();
         loadDashboardStats();
         loadAllUsers();
         loadAllAppointments();
         updateDashboardCards();
         updateCharts();
-        if (searchField != null) searchField.clear();
-        if (appointmentSearchField != null) appointmentSearchField.clear();
         System.out.println("✅ Tout a été rafraîchi !");
     }
 
@@ -1034,6 +1096,17 @@ public class AdminDashboardController {
     public void logout() {
         try {
             SessionManager.getInstance().logout();
+            if (logoutBtn != null) {
+                LoginController loginController = new LoginController();
+                Scene scene = loginController.getScene();
+                Stage stage = (Stage) logoutBtn.getScene().getWindow();
+                stage.setScene(scene);
+                stage.setTitle("VitaHealthFX - Connexion");
+                stage.centerOnScreen();
+                stage.show();
+                System.out.println("âœ… DÃ©connexion rÃ©ussie");
+                return;
+            }
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
             Parent loginRoot = loader.load();
             Stage stage = (Stage) logoutBtn.getScene().getWindow();
@@ -1048,11 +1121,14 @@ public class AdminDashboardController {
         }
     }
 
+    @FXML
+    private void toggleTheme() {
+        Scene scene = logoutBtn != null ? logoutBtn.getScene() : null;
+        ThemeManager.toggle(scene);
+        if (themeToggleBtn != null) themeToggleBtn.setText(ThemeManager.toggleText());
+    }
+
     private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        NotificationManager.showAlert(title, message, type);
     }
 }

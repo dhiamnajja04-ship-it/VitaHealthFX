@@ -430,3 +430,393 @@
     -fx-border-color: #cccccc;
     -fx-text-fill: #333;
 }
+
+/* ==================== VITAHEALTH ADVANCED PRODUCT UI ==================== */
+.root {
+    -fx-background-color: #eef2f7;
+    -fx-font-family: "Segoe UI", "Inter", "Arial", sans-serif;
+}
+
+.border-pane, .anchor-pane, .stack-pane {
+    -fx-background-color: #eef2f7;
+}
+
+.tab-pane .tab-header-area {
+    -fx-padding: 10 18 0 18;
+}
+
+.tab-pane .tab {
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 20;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #1f7662;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #dbe5ee;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0, 0, 5);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-cell-size: 46px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #ecfdf5;
+}
+
+.text-field, .password-field, .combo-box, .date-picker, .text-area {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .date-picker:focused, .text-area:focused {
+    -fx-border-color: #10b981;
+    -fx-effect: dropshadow(gaussian, rgba(16,185,129,0.20), 8, 0, 0, 0);
+}
+
+.button {
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-opacity: 0.92;
+}
+
+.split-pane {
+    -fx-background-color: transparent;
+}
+
+.split-pane-divider {
+    -fx-background-color: #dbe5ee;
+    -fx-padding: 0 1;
+}
+
+.list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #dbe5ee;
+    -fx-border-radius: 12;
+}
+
+.list-cell {
+    -fx-padding: 12;
+    -fx-background-color: transparent;
+}
+
+.list-cell:hover {
+    -fx-background-color: #f0fdf4;
+}
+
+.list-cell:selected {
+    -fx-background-color: #d1fae5;
+    -fx-text-fill: #064e3b;
+}
+
+/* ==================== FINAL SOUTENANCE DESKTOP UI ==================== */
+.tab-pane:left {
+    -fx-background-color: #f6f9fc;
+    -fx-tab-min-width: 190px;
+    -fx-tab-max-width: 190px;
+}
+
+.tab-pane:left .tab-header-area {
+    -fx-background-color: #092945;
+    -fx-padding: 22 14 22 14;
+}
+
+.tab-pane:left .headers-region {
+    -fx-background-color: #092945;
+}
+
+.tab-pane:left .tab-header-background {
+    -fx-background-color: #092945;
+}
+
+.tab-pane:left .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12;
+    -fx-padding: 14 16;
+    -fx-cursor: hand;
+}
+
+.tab-pane:left .tab:hover {
+    -fx-background-color: rgba(255,255,255,0.08);
+}
+
+.tab-pane:left .tab:selected {
+    -fx-background-color: linear-gradient(to right, #8b2cf5, #18b5e8);
+}
+
+.tab-pane:left .tab .tab-label {
+    -fx-text-fill: #c8d6e5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.tab-pane:left .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.tab-pane:left .tab-content-area {
+    -fx-background-color: #f6f9fc;
+    -fx-padding: 18;
+}
+
+.chart, .default-color0.chart-series-line, .default-color1.chart-series-line {
+    -fx-stroke-width: 4px;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.pagination .pagination-control .button,
+.pagination .pagination-control .number-button {
+    -fx-background-radius: 999;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+}
+
+.pagination .pagination-control .number-button:selected {
+    -fx-background-color: #8b2cf5;
+    -fx-text-fill: white;
+}
+
+/* Sidebar corrigee: navigation verticale lisible, stable et moderne */
+.modern-sidebar-tabs {
+    -fx-background-color: #f6f9fc;
+    /* JavaFX rotates LEFT tabs internally. Swapping dimensions keeps the final
+       sidebar items wide, short, and readable instead of tall vertical labels. */
+    -fx-tab-min-width: 48px;
+    -fx-tab-max-width: 48px;
+    -fx-tab-min-height: 210px;
+    -fx-tab-max-height: 210px;
+}
+
+.modern-sidebar-tabs:left .tab-header-area {
+    -fx-background-color: #082947;
+    -fx-padding: 18 12 18 12;
+}
+
+.modern-sidebar-tabs:left .tab-header-background,
+.modern-sidebar-tabs:left .headers-region {
+    -fx-background-color: #082947;
+}
+
+.modern-sidebar-tabs:left .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12;
+    -fx-padding: 0 14;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.modern-sidebar-tabs:left .tab:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+}
+
+.modern-sidebar-tabs:left .tab:selected {
+    -fx-background-color: linear-gradient(to right, #8b2cf5, #06b6d4);
+}
+
+.modern-sidebar-tabs:left .tab .tab-label {
+    -fx-text-fill: #d6e4ef;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-rotate: 90;
+    -fx-pref-width: 178px;
+    -fx-max-width: 178px;
+}
+
+.modern-sidebar-tabs:left .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.modern-sidebar-tabs:left .tab-content-area {
+    -fx-background-color: #f6f9fc;
+    -fx-padding: 18;
+}
+
+.modern-sidebar-tabs .focus-indicator {
+    -fx-border-color: transparent;
+}
+
+/* Final sidebar override: compact Office-style menu, no giant selected cards. */
+.modern-sidebar-tabs {
+    -fx-tab-min-width: 190px;
+    -fx-tab-max-width: 190px;
+    -fx-tab-min-height: 42px;
+    -fx-tab-max-height: 42px;
+}
+
+.modern-sidebar-tabs:left .tab-header-area {
+    -fx-padding: 18 8 18 8;
+}
+
+.modern-sidebar-tabs:left .tab {
+    -fx-background-radius: 6;
+    -fx-padding: 0 12;
+}
+
+.modern-sidebar-tabs:left .tab:selected {
+    -fx-background-color: #2f66b3;
+}
+
+.modern-sidebar-tabs:left .tab .tab-label {
+    -fx-rotate: 90;
+    -fx-pref-width: 158px;
+    -fx-max-width: 158px;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Horizontal navbar used by the main dashboards. */
+.modern-top-tabs {
+    -fx-background-color: #f6f9fc;
+    -fx-tab-min-height: 44px;
+    -fx-tab-max-height: 44px;
+}
+
+.modern-top-tabs .tab-header-area {
+    -fx-background-color: #082947;
+    -fx-padding: 8 18 0 18;
+}
+
+.modern-top-tabs .tab-header-background {
+    -fx-background-color: #082947;
+}
+
+.modern-top-tabs .headers-region {
+    -fx-background-color: #082947;
+}
+
+.modern-top-tabs .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+}
+
+.modern-top-tabs .tab:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+}
+
+.modern-top-tabs .tab:selected {
+    -fx-background-color: linear-gradient(to right, #8b2cf5, #06b6d4);
+}
+
+.modern-top-tabs .tab .tab-label {
+    -fx-text-fill: #d6e4ef;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.modern-top-tabs .tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.modern-top-tabs .tab-content-area {
+    -fx-background-color: #f6f9fc;
+    -fx-padding: 18;
+}
+
+/* ==================== NOTIFICATIONS & POPUPS ==================== */
+.app-toast {
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.24), 24, 0, 0, 10);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+}
+
+.app-toast-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.app-toast-message {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255,255,255,0.92);
+}
+
+.app-toast-success {
+    -fx-background-color: linear-gradient(to right, #16a34a, #10b981);
+    -fx-border-color: rgba(187,247,208,0.4);
+}
+
+.app-toast-info {
+    -fx-background-color: linear-gradient(to right, #2563eb, #06b6d4);
+    -fx-border-color: rgba(191,219,254,0.4);
+}
+
+.app-toast-warning {
+    -fx-background-color: linear-gradient(to right, #d97706, #f59e0b);
+    -fx-border-color: rgba(254,240,138,0.45);
+}
+
+.app-toast-error {
+    -fx-background-color: linear-gradient(to right, #dc2626, #f43f5e);
+    -fx-border-color: rgba(254,202,202,0.45);
+}
+
+.dialog-pane, .app-dialog {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.18), 26, 0, 0, 12);
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: linear-gradient(to right, #082947, #0f766e);
+    -fx-background-radius: 18 18 0 0;
+    -fx-padding: 18;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane .content {
+    -fx-font-size: 13px;
+    -fx-text-fill: #334155;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-background-radius: 10;
+    -fx-padding: 9 18;
+}
+
+.qr-payload-preview {
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 11px;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+}

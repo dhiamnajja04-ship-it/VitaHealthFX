@@ -240,6 +240,52 @@
     -fx-scale-y: 1.02;
 }
 
+/* ==================== ADVANCED RESPONSIVE ADMIN POLISH ==================== */
+.root {
+    -fx-background-color: #eef2f7;
+}
+
+.tab-pane .tab-header-area {
+    -fx-padding: 8 16 0 16;
+}
+
+.tab-pane .tab {
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 18;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #1f7662;
+}
+
+.text-field, .combo-box, .date-picker {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.text-field:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #10b981;
+    -fx-effect: dropshadow(gaussian, rgba(16,185,129,0.22), 8, 0, 0, 0);
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #dbe5ee;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0, 0, 5);
+}
+
+.table-row-cell {
+    -fx-cell-size: 46px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #ecfdf5;
+}
+
 /* Bouton Violet */
 .button-purple {
     -fx-background-color: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);

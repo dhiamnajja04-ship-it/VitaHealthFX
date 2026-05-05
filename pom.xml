@@ -40,6 +40,13 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- Modern JavaFX theme collection: Primer light/dark, advanced control styling -->
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!-- MySQL Database -->
         <dependency>
             <groupId>com.mysql</groupId>
