@@ -1,0 +1,21 @@
+services:
+  vitahealth-mysql:
+    image: mysql:8.4
+    container_name: vitahealthfx-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: vitahealth
+    ports:
+      - "3306:3306"
+    volumes:
+      - vitahealth_mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  vitahealth_mysql_data:

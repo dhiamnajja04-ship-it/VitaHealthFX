@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.UserManagementController">
+    <padding>
+        <Insets bottom="15" left="15" right="15" top="15" />
+    </padding>
+
+    <!-- TITRE -->
+    <Label text="📊 Gestion des Utilisateurs" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;">
+        <VBox.margin>
+            <Insets bottom="10" />
+        </VBox.margin>
+    </Label>
+
+    <!-- STATISTIQUES - DESIGN CARTES -->
+    <GridPane hgap="10" vgap="10">
+        <GridPane.margin>
+            <Insets bottom="15" />
+        </GridPane.margin>
+        
+        <!-- Carte Total -->
+        <VBox GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-background-color: #3498db; -fx-background-radius: 10; -fx-padding: 8 15 8 15;">
+            <Label text="👥 TOTAL" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+            <Label fx:id="lblTotal" text="0" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+        </VBox>
+        
+        <!-- Carte Patients -->
+        <VBox GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-background-color: #2ecc71; -fx-background-radius: 10; -fx-padding: 8 15 8 15;">
+            <Label text="🩺 PATIENTS" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+            <Label fx:id="lblPatients" text="0" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+        </VBox>
+        
+        <!-- Carte Médecins -->
+        <VBox GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-background-color: #9b59b6; -fx-background-radius: 10; -fx-padding: 8 15 8 15;">
+            <Label text="👨‍⚕️ MÉDECINS" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+            <Label fx:id="lblDoctors" text="0" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+        </VBox>
+        
+        <!-- Carte Admins -->
+        <VBox GridPane.rowIndex="0" GridPane.columnIndex="3" style="-fx-background-color: #e74c3c; -fx-background-radius: 10; -fx-padding: 8 15 8 15;">
+            <Label text="👑 ADMINS" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+            <Label fx:id="lblAdmins" text="0" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+        </VBox>
+        
+        <!-- Carte Vérifiés -->
+        <VBox GridPane.rowIndex="0" GridPane.columnIndex="4" style="-fx-background-color: #f39c12; -fx-background-radius: 10; -fx-padding: 8 15 8 15;">
+            <Label text="✅ VÉRIFIÉS" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+            <Label fx:id="lblVerified" text="0" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+        </VBox>
+    </GridPane>
+
+    <!-- SÉPARATEUR -->
+    <Separator>
+        <VBox.margin>
+            <Insets bottom="5" top="5" />
+        </VBox.margin>
+    </Separator>
+
+    <!-- BARRE DE RECHERCHE AVANCÉE -->
+    <HBox spacing="10">
+        <TextField fx:id="searchField" promptText="🔍 Rechercher par nom, email, téléphone..." HBox.hgrow="ALWAYS" style="-fx-background-radius: 20; -fx-padding: 8 15;" />
+        
+        <ComboBox fx:id="roleFilterCombo" promptText="Filtrer par rôle" prefWidth="130" style="-fx-background-radius: 20;" />
+        
+        <ComboBox fx:id="sortFieldCombo" promptText="Trier par" prefWidth="110" style="-fx-background-radius: 20;" />
+        
+        <ComboBox fx:id="sortOrderCombo" promptText="Ordre" prefWidth="90" style="-fx-background-radius: 20;" />
+        
+        <Button text="🔄 Rafraîchir" onAction="#handleRefresh" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15;" />
+    </HBox>
+
+    <!-- TABLEAU DES UTILISATEURS -->
+    <TableView fx:id="userTable" VBox.vgrow="ALWAYS" style="-fx-border-color: #ddd; -fx-border-radius: 10;">
+        <placeholder>
+            <Label text="📭 Aucun utilisateur trouvé" style="-fx-font-size: 16px; -fx-text-fill: #999;" />
+        </placeholder>
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60" style="-fx-alignment: CENTER;" />
+            <TableColumn fx:id="colFirstName" text="Prénom" prefWidth="120" />
+            <TableColumn fx:id="colLastName" text="Nom" prefWidth="120" />
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200" />
+            <TableColumn fx:id="colRole" text="Rôle" prefWidth="100">
+                <cellFactory>
+                    <TableColumnHeader>
+                        <Label text="Rôle" />
+                    </TableColumnHeader>
+                </cellFactory>
+            </TableColumn>
+            <TableColumn fx:id="colPhone" text="Téléphone" prefWidth="120" />
+            <TableColumn fx:id="colSpecialite" text="Spécialité" prefWidth="130" />
+        </columns>
+        <rowFactory>
+            <TableRow>
+                <style>
+                    -fx-background-color: transparent;
+                </style>
+            </TableRow>
+        </rowFactory>
+    </TableView>
+
+    <!-- BOUTONS D'ACTIONS -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="⭐ Promouvoir DOCTEUR" onAction="#handlePromoteToDoctor" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15;" />
+        <Button text="👑 Promouvoir ADMIN" onAction="#handlePromoteToAdmin" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15;" />
+        <Button text="⬇️ Rétrograder PATIENT" onAction="#handleDemoteToPatient" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15;" />
+        <Button text="🔍 Recherche avancée" onAction="#handleAdvancedSearch" style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15;" />
+        <Button text="❌ Supprimer" onAction="#handleDeleteUser" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15;" />
+    </HBox>
+</VBox>

@@ -1,0 +1,35 @@
+/* General Root Styles */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-background-color: #f1f5f9;
+}
+
+/* Fix for invisible text in input fields */
+.text-field, .text-area {
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #38bdf8;
+    -fx-background-color: #ffffff;
+}
+
+/* THE CRITICAL FIX: Force all labels to be dark navy */
+.label {
+    -fx-text-fill: #1e293b !important;
+}
+
+/* Secondary text (descriptions) */
+.text-muted {
+    -fx-text-fill: #64748b !important;
+}
+
+/* Button hover effects */
+.button:hover {
+    -fx-opacity: 0.9;
+}

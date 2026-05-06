@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.ForumController">
+    <top>
+        <VBox spacing="12.0" style="-fx-padding: 20 24 12 24;">
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <VBox>
+                    <Label text="Forum Sante VitaHealth" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
+                    <Label text="Questions, experiences et conseils entre patients, medecins et administrateurs." style="-fx-text-fill: #64748b;" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <ComboBox fx:id="categoryFilterCombo" prefWidth="190.0" promptText="Categorie" />
+                <TextField fx:id="searchField" prefWidth="260.0" promptText="Rechercher..." />
+                <Button fx:id="searchBtn" text="Rechercher" styleClass="btn-secondary" />
+                <Button fx:id="refreshBtn" text="Actualiser" styleClass="btn-outline" />
+            </HBox>
+            <Separator />
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.33" style="-fx-background-color: transparent;">
+            <items>
+                <VBox spacing="10.0" style="-fx-padding: 0 12 18 24;">
+                    <Label text="Discussions recentes" style="-fx-font-weight: bold; -fx-text-fill: #334155;" />
+                    <ListView fx:id="postsListView" VBox.vgrow="ALWAYS" />
+                </VBox>
+
+                <VBox spacing="12.0" style="-fx-padding: 0 24 18 12;">
+                    <VBox spacing="6.0" styleClass="card">
+                        <Label fx:id="selectedTitleLabel" text="Selectionnez une discussion" wrapText="true" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
+                        <Label fx:id="selectedMetaLabel" text="" wrapText="true" style="-fx-text-fill: #64748b;" />
+                        <TextArea fx:id="selectedContentArea" editable="false" wrapText="true" prefHeight="150.0" />
+                        <HBox spacing="10.0">
+                            <Button fx:id="usefulBtn" text="Utile" styleClass="btn-primary" />
+                            <Button fx:id="reportBtn" text="Signaler" styleClass="btn-danger" />
+                            <Button fx:id="translateBtn" text="Traduire" styleClass="btn-outline" />
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+                        <Label text="Commentaires" style="-fx-font-weight: bold; -fx-text-fill: #334155;" />
+                        <ListView fx:id="commentsListView" prefHeight="170.0" VBox.vgrow="ALWAYS" />
+                        <TextArea fx:id="commentArea" promptText="Ajouter une reponse..." prefHeight="70.0" wrapText="true" />
+                        <Button fx:id="addCommentBtn" text="Commenter" styleClass="btn-secondary" />
+                    </VBox>
+                </VBox>
+            </items>
+        </SplitPane>
+    </center>
+
+    <bottom>
+        <VBox fx:id="createPostBox" spacing="10.0" style="-fx-padding: 14 24 22 24; -fx-background-color: #eef6f3;">
+            <Label text="Nouvelle discussion" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
+            <GridPane hgap="12.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="18" />
+                    <ColumnConstraints percentWidth="42" />
+                    <ColumnConstraints percentWidth="12" />
+                    <ColumnConstraints percentWidth="28" />
+                </columnConstraints>
+                <Label text="Categorie" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="createCategoryCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label text="Langue" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <ComboBox fx:id="languageCombo" maxWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                <Label text="Titre" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="titleField" promptText="Ex: Comment gerer ma glycemie le matin ?" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+            </GridPane>
+            <TextArea fx:id="contentArea" promptText="Partagez votre question ou experience..." prefHeight="85.0" wrapText="true" />
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <Button fx:id="publishBtn" text="Publier" styleClass="btn-primary" />
+                <Label fx:id="messageLabel" text="" style="-fx-text-fill: #475569;" />
+            </HBox>
+        </VBox>
+    </bottom>
+</BorderPane>

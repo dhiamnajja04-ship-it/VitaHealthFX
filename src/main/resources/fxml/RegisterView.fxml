@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<StackPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #eef2f7;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.RegisterController">
+    <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <content>
+            <StackPane style="-fx-padding: 25;">
+                <Button fx:id="themeToggleButton" text="Dark mode" StackPane.alignment="TOP_RIGHT" styleClass="theme-toggle" />
+                <VBox alignment="CENTER" spacing="14.0" maxWidth="620.0" styleClass="auth-card">
+                    <padding>
+                        <Insets bottom="32.0" left="36.0" right="36.0" top="32.0" />
+                    </padding>
+
+                    <VBox alignment="CENTER" spacing="5.0">
+                        <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Inscription" />
+                        <Text style="-fx-font-size: 13px; -fx-fill: #7f8c8d;" text="Creez votre compte VitaHealth selon votre profil" />
+                    </VBox>
+
+                    <Separator prefWidth="360.0" />
+
+                    <GridPane hgap="12.0" vgap="12.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50" />
+                            <ColumnConstraints percentWidth="50" />
+                        </columnConstraints>
+                        <TextField fx:id="firstNameField" promptText="Prenom" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="lastNameField" promptText="Nom" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <TextField fx:id="emailField" promptText="Email" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                        <PasswordField fx:id="passwordField" promptText="Mot de passe" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <PasswordField fx:id="confirmPasswordField" promptText="Confirmer mot de passe" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="phoneField" promptText="Telephone" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextField fx:id="cinField" promptText="CIN" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    </GridPane>
+
+                    <HBox spacing="30.0" alignment="CENTER">
+                        <RadioButton fx:id="patientRadio" text="Patient" selected="true">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="roleGroup" />
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="doctorRadio" text="Medecin" toggleGroup="$roleGroup" />
+                    </HBox>
+
+                    <VBox fx:id="patientFieldsBox" spacing="10.0" maxWidth="Infinity" style="-fx-background-color: #f8fafc; -fx-border-color: #dbe7f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14;">
+                        <Label text="Informations patient" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                        <GridPane hgap="12.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="50" />
+                                <ColumnConstraints percentWidth="50" />
+                            </columnConstraints>
+                            <TextField fx:id="poidsField" promptText="Poids kg (optionnel)" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="tailleField" promptText="Taille m (ex: 1.75)" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            <TextField fx:id="glycemieField" promptText="Glycemie g/L" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextField fx:id="tensionField" promptText="Tension (ex: 120/80)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <TextField fx:id="maladieField" promptText="Maladie chronique / antecedent" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                        </GridPane>
+                    </VBox>
+
+                    <VBox fx:id="doctorFieldsBox" spacing="10.0" maxWidth="Infinity" managed="false" visible="false" style="-fx-background-color: #f8fafc; -fx-border-color: #dbe7f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14;">
+                        <Label text="Informations medecin" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                        <GridPane hgap="12.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="50" />
+                                <ColumnConstraints percentWidth="50" />
+                            </columnConstraints>
+                            <TextField fx:id="specialiteField" promptText="Specialite" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="diplomeField" promptText="Diplome" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        </GridPane>
+                    </VBox>
+
+                    <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px; -fx-font-weight: bold;" text="" wrapText="true" />
+                    <Label fx:id="successLabel" style="-fx-text-fill: #27ae60; -fx-font-size: 12px; -fx-font-weight: bold;" text="" wrapText="true" />
+
+                    <Button fx:id="registerButton" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 12; -fx-cursor: hand;" text="S'INSCRIRE" maxWidth="Infinity" />
+                    <Button fx:id="loginButton" style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-font-size: 13px; -fx-cursor: hand; -fx-underline: true; -fx-font-weight: bold;" text="Deja un compte ? Se connecter" maxWidth="Infinity" />
+                </VBox>
+            </StackPane>
+        </content>
+    </ScrollPane>
+</StackPane>

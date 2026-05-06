@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.ParticipationController">
+    <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
+    <children>
+        <HBox alignment="CENTER_LEFT">
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Event Participation Logs" textFill="#1e293b" />
+        </HBox>
+
+        <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10;">
+            <items>
+                <VBox spacing="10.0">
+                    <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
+                    <Label text="Active Events" style="-fx-font-weight: bold; -fx-text-fill: #64748b;" />
+                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                        <VBox fx:id="eventListContainer" />
+                    </ScrollPane>
+                </VBox>
+
+                <VBox spacing="10.0">
+                    <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
+                    <Label fx:id="selectedEventLabel" text="Select an event to view attendees" style="-fx-font-weight: bold; -fx-font-size: 16px;" textFill="#3b82f6" />
+
+                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #f1f5f9;">
+                        <VBox fx:id="participationListContainer" spacing="0" />
+                    </ScrollPane>
+                </VBox>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>

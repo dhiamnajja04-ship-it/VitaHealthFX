@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="700.0" prefWidth="1000.0" spacing="0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.UserEventController">
+   <children>
+      <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 30 40 30 40; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+         <children>
+            <Label text="Upcoming Health Events" textFill="#1e293b">
+               <font>
+                  <Font name="System Bold" size="28.0" />
+               </font>
+            </Label>
+            <Label text="Discover and join health workshops and seminars near you." textFill="#64748b" />
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-padding: 10 0 0 0;">
+               <children>
+                  <TextField fx:id="searchBar" prefHeight="40.0" prefWidth="400.0" promptText="🔍 Search for events..." style="-fx-background-radius: 20; -fx-padding: 0 20 0 20; -fx-text-fill: #1e293b;" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+         <content>
+            <FlowPane fx:id="eventGrid" hgap="25.0" vgap="25.0" style="-fx-padding: 30;">
+               <children>
+               </children>
+            </FlowPane>
+         </content>
+      </ScrollPane>
+   </children>
+</VBox>

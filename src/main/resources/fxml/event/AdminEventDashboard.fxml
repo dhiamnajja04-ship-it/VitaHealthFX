@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<HBox prefHeight="700.0" prefWidth="1100.0" spacing="25.0" style="-fx-background-color: #f1f5f9;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.AdminEventController">
+    <children>
+        <VBox prefWidth="350.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 5);">
+            <padding><Insets bottom="25.0" left="25.0" right="25.0" top="25.0" /></padding>
+            <children>
+                <Label text="Workshop Details" textFill="#0f172a">
+                    <font><Font name="System Bold" size="22.0" /></font>
+                </Label>
+                <Label text="Fill in the information to manage your event." textFill="#64748b" wrapText="true" />
+
+                <Separator />
+
+                <Label text="Title" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                <TextField fx:id="titleField" promptText="Enter event title" style="-fx-background-radius: 8; -fx-padding: 8;" />
+
+                <Label text="Description" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                <TextArea fx:id="descField" prefHeight="100.0" promptText="Describe the workshop..." style="-fx-background-radius: 8;" wrapText="true" />
+
+                <Label text="Date &amp; Time" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                <DatePicker fx:id="datePicker" maxWidth="Infinity" style="-fx-background-radius: 8;" />
+
+                <HBox spacing="10.0">
+                    <children>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Lat" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                            <TextField fx:id="latField" promptText="0.0" style="-fx-background-radius: 8;" />
+                        </VBox>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Lng" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                            <TextField fx:id="lngField" promptText="0.0" style="-fx-background-radius: 8;" />
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <VBox spacing="10.0">
+                    <HBox spacing="10.0">
+                        <Button onAction="#handleAdd" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 8; -fx-cursor: hand;" text="Add Workshop" />
+                        <Button onAction="#handleClear" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 10; -fx-cursor: hand;" text="↺" />
+                    </HBox>
+                    <Button onAction="#handleUpdate" maxWidth="Infinity" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 8; -fx-cursor: hand;" text="Update Workshop" />
+                    <Button onAction="#handleDelete" maxWidth="Infinity" style="-fx-background-color: #fee2e2; -fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 8; -fx-cursor: hand;" text="Delete Permanently" />
+                </VBox>
+            </children>
+        </VBox>
+
+        <VBox HBox.hgrow="ALWAYS" spacing="20.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <TextField fx:id="searchBar" HBox.hgrow="ALWAYS" promptText="🔍 Search by title or location..." style="-fx-background-radius: 25; -fx-padding: 12; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);" />
+                    </children>
+                </HBox>
+
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="eventContainer" spacing="15.0" style="-fx-padding: 5; -fx-background-color: transparent;">
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

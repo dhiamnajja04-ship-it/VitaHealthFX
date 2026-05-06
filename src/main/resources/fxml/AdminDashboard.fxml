@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane prefHeight="750.0" prefWidth="1300.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+
+    <center>
+        <VBox>
+            <!-- HEADER -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e66; -fx-padding: 15 25;">
+                <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="🏥 VitaHealthFX" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Administration" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Admin" />
+                <Button fx:id="themeToggleBtn" onAction="#toggleTheme" styleClass="theme-toggle" text="Dark mode" />
+                <Button fx:id="logoutBtn" onAction="#logout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
+            </HBox>
+
+            <!-- TAB PANE -->
+            <TabPane fx:id="mainTabPane" side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+
+                <!-- ==================== TAB DASHBOARD ==================== -->
+                <Tab text="📊 Dashboard">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+                        <VBox spacing="25.0" style="-fx-padding: 25;">
+                            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e66;" text="Tableau de bord" />
+
+                            <!-- LIGNE 1 - STATS CARTES -->
+                            <HBox fx:id="statsContainer" spacing="20" alignment="CENTER" />
+
+                            <!-- LIGNE 2 - STATISTIQUES SUPPLÉMENTAIRES -->
+                            <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #34495e; -fx-padding: 10 0 0 0;" text="📈 Indicateurs santé" />
+                            <HBox spacing="20.0">
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e66;" text="⚖️ Poids moyen" />
+                                    <Label fx:id="avgPoidsLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #27ae60;" text="0 kg" />
+                                </VBox>
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e66;" text="📏 IMC moyen" />
+                                    <Label fx:id="avgBmiLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #3498db;" text="0" />
+                                </VBox>
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e66;" text="✅ Taux vérification" />
+                                    <Label fx:id="newUsersLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #f39c12;" text="0%" />
+                                </VBox>
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #2c3e66;" text="📅 RDV ce mois" />
+                                    <Label fx:id="monthAppointmentsLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" text="0" />
+                                </VBox>
+                            </HBox>
+
+                            <!-- LIGNE 3 - BOUTONS D'ACTION -->
+                            <HBox spacing="15" alignment="CENTER_RIGHT">
+                                <Button onAction="#showAdvancedStats" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-cursor: hand;" text="📊 Stats avancées" />
+                                <Button onAction="#showMedicalAlerts" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-cursor: hand;" text="🚨 Alertes médicales" />
+                                <Button onAction="#exportUsersToCSV" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-cursor: hand;" text="📎 Export CSV" />
+                            </HBox>
+                        </VBox>
+                    </ScrollPane>
+                </Tab>
+
+                <!-- ==================== TAB UTILISATEURS ==================== -->
+                <Tab text="👥 Utilisateurs">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0">
+                            <TextField fx:id="searchField" promptText="🔍 Rechercher par email, nom, prénom..." HBox.hgrow="ALWAYS" style="-fx-background-radius: 25; -fx-padding: 10 15;" />
+                            <ComboBox fx:id="sortFieldCombo" prefWidth="110" promptText="Trier par" style="-fx-background-radius: 25;" />
+                            <ComboBox fx:id="sortOrderCombo" prefWidth="80" promptText="Ordre" style="-fx-background-radius: 25;" />
+                            <Button onAction="#searchUsers" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;" text="🔍 Rechercher" />
+                            <Button onAction="#openAddUserDialog" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;" text="➕ Nouveau" />
+                            <Button onAction="#exportUsersToCSV" style="-fx-background-color: #2c3e66; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;" text="📎 Export" />
+                            <Button onAction="#refreshAll" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;" text="🔄 Rafraîchir" />
+                        </HBox>
+
+                        <TableView fx:id="userTable" prefHeight="550.0" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colId" text="ID" prefWidth="60" />
+                                <TableColumn fx:id="colFirstName" text="Prénom" prefWidth="120" />
+                                <TableColumn fx:id="colLastName" text="Nom" prefWidth="120" />
+                                <TableColumn fx:id="colEmail" text="Email" prefWidth="200" />
+                                <TableColumn fx:id="colRole" text="Rôle" prefWidth="100" />
+                                <TableColumn fx:id="colPhone" text="Téléphone" prefWidth="120" />
+                                <TableColumn text="Actions" prefWidth="320" />
+                            </columns>
+                        </TableView>
+                        <Pagination fx:id="userPagination" maxPageIndicatorCount="7" />
+                    </VBox>
+                </Tab>
+
+                <!-- ==================== TAB RENDEZ-VOUS ==================== -->
+                <Tab text="📅 Rendez-vous">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0">
+                            <TextField fx:id="appointmentSearchField" promptText="🔍 Rechercher par patient ou médecin..." HBox.hgrow="ALWAYS" style="-fx-background-radius: 25; -fx-padding: 10 15;" />
+                            <Button onAction="#searchAppointments" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="🔍 Rechercher" />
+                            <Button onAction="#refreshAll" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;" text="🔄 Rafraîchir" />
+                        </HBox>
+                        <TableView fx:id="appointmentTable" prefHeight="550.0" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn text="ID" prefWidth="60" />
+                                <TableColumn text="Patient" prefWidth="180" />
+                                <TableColumn text="Médecin" prefWidth="180" />
+                                <TableColumn text="Date" prefWidth="150" />
+                                <TableColumn text="Motif" prefWidth="200" />
+                                <TableColumn text="Statut" prefWidth="100" />
+                                <TableColumn text="Actions" prefWidth="100" />
+                            </columns>
+                        </TableView>
+                        <Pagination fx:id="appointmentPagination" maxPageIndicatorCount="7" />
+                    </VBox>
+                </Tab>
+
+                <!-- ==================== TAB ATELIERS ==================== -->
+                <Tab text="🎭 Ateliers/Events">
+                    <fx:include source="event/AdminEventDashboard.fxml" />
+                </Tab>
+
+                <!-- ==================== TAB PARTICIPATIONS ==================== -->
+                <Tab text="🤝 Participations">
+                    <fx:include source="event/AdminParticipation.fxml" />
+                </Tab>
+
+                <Tab text="Forum">
+                    <StackPane fx:id="forumModerationContainer" style="-fx-background-color: #f8fafc;" />
+                </Tab>
+
+            </TabPane>
+        </VBox>
+    </center>
+</BorderPane>
