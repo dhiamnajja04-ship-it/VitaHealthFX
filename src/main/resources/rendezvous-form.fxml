@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="10" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.RdvFormController">
+    <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+
+    <ScrollPane fx:id="scrollPane" fitToWidth="true" prefHeight="550.0" prefWidth="680.0" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+        <VBox alignment="CENTER" spacing="0" style="-fx-padding: 0 10 0 0;">
+            <VBox styleClass="card" spacing="20" prefWidth="650" style="-fx-max-width: 650;">
+                
+                <VBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Demande de Rendez-vous" styleClass="title-label" />
+                    <Label text="Veuillez renseigner les informations détaillées pour la consultation." style="-fx-font-size: 13px; -fx-text-fill: #64748b;" />
+                </VBox>
+
+                <Separator />
+
+                <GridPane hgap="20" vgap="20">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+
+                    <!-- Date & Heure -->
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="Date du rendez-vous" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <DatePicker fx:id="dpRdvDate" maxWidth="Infinity" promptText="Sélectionner..." />
+                        <Label fx:id="lblWeather" style="-fx-font-size: 12px; -fx-text-fill: #0ea5e9; -fx-font-weight: bold;" wrapText="true" />
+                    </VBox>
+                    
+                    <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="Heure de passage" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <TextField fx:id="tfRdvHeure" maxWidth="Infinity" promptText="ex: 14:30" />
+                    </VBox>
+
+                    <!-- Médecin -->
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                        <Label text="Médecin Spécialiste" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <ComboBox fx:id="cbRdvMedecin" maxWidth="Infinity" promptText="Attribuer à un praticien..." />
+                    </VBox>
+
+                    <!-- Priorité -->
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                        <Label text="Niveau d'urgence" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <ComboBox fx:id="cbRdvPriorite" maxWidth="Infinity" />
+                    </VBox>
+
+                    <!-- Patient Info -->
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                        <Label text="Nom du Patient" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <TextField fx:id="tfRdvPatientNom" maxWidth="Infinity" promptText="Nom..." />
+                    </VBox>
+
+                    <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Label text="Prénom du Patient" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <TextField fx:id="tfRdvPatientPrenom" maxWidth="Infinity" promptText="Prénom..." />
+                    </VBox>
+
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="1">
+                        <Label text="Coordonnées (Téléphone)" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <TextField fx:id="tfRdvPatientTel" maxWidth="Infinity" promptText="ex: 55123456" />
+                    </VBox>
+
+                    <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="1">
+                        <Label text="Adresse Email" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <TextField fx:id="tfRdvPatientEmail" maxWidth="Infinity" promptText="ex: email@domaine.com" />
+                    </VBox>
+
+                    <!-- Motif -->
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2">
+                        <Label text="Symptômes ou Motif" style="-fx-font-weight: 700; -fx-text-fill: #1e293b;" />
+                        <TextArea fx:id="taRdvMotif" maxWidth="Infinity" prefHeight="100" promptText="Décrivez brièvement la situation..." wrapText="true" />
+                    </VBox>
+                </GridPane>
+
+                <VBox spacing="15">
+                    <Label fx:id="lblRdvErreur" wrapText="true" />
+                    
+                    <HBox spacing="15" alignment="CENTER_RIGHT">
+                        <Button text="Annuler" onAction="#handleFermer" styleClass="btn-secondary" prefHeight="45" prefWidth="100" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button text="Réinitialiser" onAction="#handleRdvVider" styleClass="btn-secondary" prefHeight="45" />
+                        <Button text="Enregistrer" fx:id="btnAjouter" onAction="#handleRdvAjouter" styleClass="btn-primary" prefHeight="45" prefWidth="150" />
+                        <Button text="Mettre à jour" fx:id="btnModifier" onAction="#handleRdvModifier" styleClass="btn-success" prefHeight="45" prefWidth="150" />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</VBox>
+

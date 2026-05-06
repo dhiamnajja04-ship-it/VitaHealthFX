@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.MedecinFormController" styleClass="card-vbox">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    
+    <Label text="Informations du Médecin" styleClass="title-label" />
+    
+    <GridPane hgap="15" vgap="15">
+        <Label text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="tfMedNom" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="250" />
+
+        <Label text="Prénom:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <TextField fx:id="tfMedPrenom" GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="250" />
+
+        <Label text="Spécialité:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="tfMedSpecialite" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Téléphone:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="tfMedTelephone" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+        <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="tfMedEmail" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+    </GridPane>
+    
+    <Label fx:id="lblMedErreur" />
+    
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Ajouter" fx:id="btnAjouter" onAction="#handleMedAjouter" styleClass="btn-success" />
+        <Button text="Modifier" fx:id="btnModifier" onAction="#handleMedModifier" styleClass="btn-info" />
+        <Button text="Vider" onAction="#handleMedVider" />
+        <Button text="Fermer" onAction="#handleFermer" styleClass="btn-secondary" />
+    </HBox>
+</VBox>
