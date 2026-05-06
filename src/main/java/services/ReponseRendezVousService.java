@@ -12,8 +12,7 @@ import models.Medecin;
 
 public class ReponseRendezVousService {
 
-    // On ne stocke plus 'cnx' pour éviter les erreurs de "connection closed" après un timeout.
-    // On appelle MyConnection.getInstance().getConnection() à chaque besoin.
+
 
     public ReponseRendezVousService() throws SQLException {
         // Le constructeur reste vide ou vérifie juste la connexion
