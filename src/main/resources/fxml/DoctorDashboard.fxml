@@ -84,7 +84,6 @@
                                     style="-fx-background-color: #95a5a6; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
                                     text="🔄 Rafraîchir" />
-                            <!-- ✅ Ouvre le formulaire dialog -->
                             <Button fx:id="ouvrirFormPrescriptionBtn"
                                     style="-fx-background-color: #27ae60; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
@@ -106,13 +105,15 @@
                     </VBox>
                 </Tab>
 
-                <!-- 🩺 Paramètres Médicaux -->
+                <!-- 🩺 Paramètres Médicaux (avec filtre par maladie) -->
                 <Tab text="🩺 Paramètres Médicaux" closable="false">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <!-- Ligne : Filtre maladie + choix patient + boutons -->
                         <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Label text="Filtrer par maladie :" style="-fx-font-weight: bold;" />
+                            <ComboBox fx:id="maladieFilterCombo" prefWidth="200" promptText="Toutes les maladies" />
                             <Label text="Patient :" style="-fx-font-weight: bold;" />
-                            <ComboBox fx:id="patientParamCombo" prefWidth="250"
-                                      promptText="Sélectionner un patient" />
+                            <ComboBox fx:id="patientParamCombo" prefWidth="250" promptText="Sélectionner un patient" />
                             <Button fx:id="refreshParamListBtn"
                                     style="-fx-background-color: #95a5a6; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"

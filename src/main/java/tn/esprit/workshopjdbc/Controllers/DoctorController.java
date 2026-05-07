@@ -83,7 +83,7 @@ public class DoctorController {
     @FXML private TableColumn<Prescription, String> colDuree;
     @FXML private TableColumn<Prescription, String> colInstructions;
     @FXML private Button ouvrirFormPrescriptionBtn;
-    @FXML private Button modifierPrescriptionBtn;   // peut être null si absent du FXML
+    @FXML private Button modifierPrescriptionBtn;
     @FXML private Button supprimerPrescriptionBtn;
     @FXML private Button viderPrescChampsBtn;
     @FXML private Button genererPdfBtn;
@@ -106,6 +106,9 @@ public class DoctorController {
     @FXML private TableColumn<ParaMedical, String> colAlerte;
     @FXML private TableColumn<ParaMedical, String> colNiveauActivite;
 
+    // Nouveau : filtre par maladie
+    @FXML private ComboBox<String> maladieFilterCombo;
+
     @FXML private StackPane forumContainer;
 
     private UserDAO userDAO;
@@ -115,6 +118,7 @@ public class DoctorController {
     private SeuilDAO seuilDAO;
     private User currentUser;
     private ObservableList<User> allPatients;
+    private ObservableList<User> allPatientsMaster;   // liste originale non filtrée
     private ObservableList<Appointment> doctorAppointments;
     private Map<String, Map<String, Double>> seuils;
     private int currentPatientId = -1;
@@ -139,7 +143,7 @@ public class DoctorController {
         setupPrescriptionTable();
         setupParametreTable();
         loadDoctorAppointments();
-        loadAllPatients();
+        loadAllPatients();          // initialise allPatients et allPatientsMaster
 
         // Agenda
         if (dateFilter != null) dateFilter.valueProperty().addListener((obs, old, val) -> loadDoctorAppointments());
@@ -147,7 +151,7 @@ public class DoctorController {
         if (refreshBtn != null) refreshBtn.setOnAction(e -> loadDoctorAppointments());
         if (searchPatientField != null) searchPatientField.textProperty().addListener((obs, old, val) -> filterPatients());
 
-        // Prescriptions : chargement automatique à la sélection du patient
+        // Prescriptions
         if (patientPrescCombo != null) {
             patientPrescCombo.valueProperty().addListener((obs, old, newPatient) -> {
                 System.out.println("PatientCombo changed: " + (newPatient != null ? newPatient.getFullName() : "null"));
@@ -156,7 +160,6 @@ public class DoctorController {
         }
         if (refreshPrescListBtn != null) refreshPrescListBtn.setOnAction(e -> loadPrescriptionsForPatient());
 
-        // ✅ CORRECTION 1 : tous les boutons prescription protégés par null-check
         if (ouvrirFormPrescriptionBtn != null) ouvrirFormPrescriptionBtn.setOnAction(e -> ouvrirDialogPrescription());
         if (modifierPrescriptionBtn != null) modifierPrescriptionBtn.setOnAction(e -> ajouterOuModifierPrescription());
         if (supprimerPrescriptionBtn != null) supprimerPrescriptionBtn.setOnAction(e -> supprimerPrescription());
@@ -178,7 +181,7 @@ public class DoctorController {
             });
         }
 
-        // Paramètres médicaux – chargement automatique
+        // Paramètres médicaux
         if (patientParamCombo != null) {
             patientParamCombo.valueProperty().addListener((obs, old, newPatient) -> {
                 if (newPatient != null) loadParametresForPatient();
@@ -186,6 +189,25 @@ public class DoctorController {
         }
         if (refreshParamListBtn != null) refreshParamListBtn.setOnAction(e -> loadParametresForPatient());
         if (showTrendsBtn != null)       showTrendsBtn.setOnAction(e -> showTrendsForSelectedPatient());
+
+        // Filtre par maladie
+        loadMaladieFilter();
+        if (maladieFilterCombo != null) {
+            maladieFilterCombo.valueProperty().addListener((obs, old, maladie) -> {
+                filterPatientsByMaladie();
+                // Si le patient sélectionné n'est plus dans la liste, on réinitialise
+                if (patientParamCombo != null && patientParamCombo.getValue() != null
+                        && !patientParamCombo.getItems().contains(patientParamCombo.getValue())) {
+                    patientParamCombo.getSelectionModel().clearSelection();
+                    parametreTable.setItems(FXCollections.observableArrayList());
+                }
+                if (patientPrescCombo != null && patientPrescCombo.getValue() != null
+                        && !patientPrescCombo.getItems().contains(patientPrescCombo.getValue())) {
+                    patientPrescCombo.getSelectionModel().clearSelection();
+                    prescriptionTable.setItems(FXCollections.observableArrayList());
+                }
+            });
+        }
 
         if (logoutBtn != null)      logoutBtn.setOnAction(e -> logout());
         if (themeToggleBtn != null) themeToggleBtn.setOnAction(e -> toggleTheme());
@@ -235,6 +257,7 @@ public class DoctorController {
             @Override protected void updateItem(Void item, boolean empty) { setGraphic(empty ? null : box); }
         });
     }
+
     private void ouvrirDialogPrescription() {
         User patient = patientPrescCombo != null ? patientPrescCombo.getValue() : null;
         if (patient == null) {
@@ -252,7 +275,6 @@ public class DoctorController {
             Parent form = loader.load();
             NouvellePreescriptionController formCtrl = loader.getController();
 
-            // ✅ Utiliser un Stage au lieu d'un Dialog — fermeture fiable
             Stage formStage = new Stage();
             formStage.setTitle("Nouvelle Prescription — " + patient.getFullName());
             formStage.setScene(new Scene(form, 700, 750));
@@ -260,7 +282,6 @@ public class DoctorController {
             formStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
             formStage.setResizable(false);
 
-            // ✅ Retour = simplement fermer la fenêtre
             formCtrl.setOnAnnuler(formStage::close);
 
             formCtrl.setOnValider((med, dur, ins) -> {
@@ -274,7 +295,6 @@ public class DoctorController {
                 } else {
                     showAlert("Erreur", "Échec de l'ajout de la prescription.", Alert.AlertType.ERROR);
                 }
-                // ✅ Ferme le stage après validation aussi
                 formStage.close();
             });
 
@@ -304,7 +324,6 @@ public class DoctorController {
         });
     }
 
-    // ✅ CORRECTION 2 : loadDoctorAppointments protégée contre l'exception SQL
     private void loadDoctorAppointments() {
         if (currentUser == null || appointmentsTable == null) return;
         try {
@@ -318,8 +337,6 @@ public class DoctorController {
             appointmentsTable.setItems(doctorAppointments);
         } catch (Exception e) {
             System.err.println("Erreur chargement rendez-vous : " + e.getMessage());
-            // ⚠️ Vérifiez que la table s'appelle bien 'appointments' dans votre BDD
-            // SHOW TABLES FROM vitahealth;
             doctorAppointments = FXCollections.observableArrayList();
             appointmentsTable.setItems(doctorAppointments);
         }
@@ -339,23 +356,68 @@ public class DoctorController {
     private void loadAllPatients() {
         try {
             List<User> patients = userDAO.findByRole("PATIENT");
-            allPatients = FXCollections.observableArrayList(patients);
+            allPatientsMaster = FXCollections.observableArrayList(patients);
+            allPatients = allPatientsMaster; // pour compatibilité
             if (patientPrescCombo != null) patientPrescCombo.setItems(allPatients);
             if (patientParamCombo != null) patientParamCombo.setItems(allPatients);
             if (patientsTable != null)     patientsTable.setItems(allPatients);
         } catch (Exception e) { e.printStackTrace(); }
     }
 
+    private void loadMaladieFilter() {
+        List<String> maladies = new ArrayList<>();
+        maladies.add("Tous");
+        maladies.add("Diabète");
+        maladies.add("Tension");
+        maladies.add("Asthme");
+        maladieFilterCombo.setItems(FXCollections.observableArrayList(maladies));
+        maladieFilterCombo.getSelectionModel().selectFirst();
+    }
+
+    private void filterPatientsByMaladie() {
+        if (allPatientsMaster == null || maladieFilterCombo == null) return;
+        String selected = maladieFilterCombo.getValue();
+        ObservableList<User> filtered;
+        if (selected == null || selected.equals("Tous")) {
+            filtered = allPatientsMaster;
+        } else {
+            filtered = FXCollections.observableArrayList(
+                    allPatientsMaster.stream()
+                            .filter(p -> p.getMaladie() != null && p.getMaladie().equalsIgnoreCase(selected))
+                            .collect(Collectors.toList())
+            );
+        }
+        // Appliquer aux combos et à la table "Mes Patients"
+        if (patientParamCombo != null) patientParamCombo.setItems(filtered);
+        if (patientPrescCombo != null) patientPrescCombo.setItems(filtered);
+        if (patientsTable != null) patientsTable.setItems(filtered);
+    }
+
     private void filterPatients() {
-        if (allPatients == null) return;
+        if (allPatientsMaster == null) return;
         String keyword = searchPatientField.getText().trim().toLowerCase();
+        String maladieFiltre = maladieFilterCombo != null ? maladieFilterCombo.getValue() : "Tous";
+
+        // Filtrer d'abord par maladie
+        ObservableList<User> maladeFiltre;
+        if (maladieFiltre == null || maladieFiltre.equals("Tous")) {
+            maladeFiltre = allPatientsMaster;
+        } else {
+            maladeFiltre = FXCollections.observableArrayList(
+                    allPatientsMaster.stream()
+                            .filter(p -> p.getMaladie() != null && p.getMaladie().equalsIgnoreCase(maladieFiltre))
+                            .collect(Collectors.toList())
+            );
+        }
+
+        // Puis par texte de recherche
         if (keyword.isEmpty()) {
-            patientsTable.setItems(allPatients);
-            if (patientPrescCombo != null) patientPrescCombo.setItems(allPatients);
-            if (patientParamCombo != null) patientParamCombo.setItems(allPatients);
+            patientsTable.setItems(maladeFiltre);
+            if (patientPrescCombo != null) patientPrescCombo.setItems(maladeFiltre);
+            if (patientParamCombo != null) patientParamCombo.setItems(maladeFiltre);
             return;
         }
-        List<User> filtered = allPatients.stream()
+        List<User> filtered = maladeFiltre.stream()
                 .filter(p -> contains(p.getFirstName(), keyword) || contains(p.getLastName(), keyword)
                         || contains(p.getEmail(), keyword) || contains(p.getMaladie(), keyword))
                 .collect(Collectors.toList());
@@ -371,8 +433,6 @@ public class DoctorController {
 
     private void setupPrescriptionTable() {
         if (prescriptionTable == null) return;
-
-        // ✅ Activer l'édition sur le tableau
         prescriptionTable.setEditable(true);
 
         colPrescDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
@@ -383,18 +443,14 @@ public class DoctorController {
             }
         });
 
-        // ✅ Colonne Médicaments — éditable au clic
         colMedicaments.setCellValueFactory(new PropertyValueFactory<>("medicationList"));
         colMedicaments.setCellFactory(col -> {
             TableCell<Prescription, String> cell = new TableCell<>() {
                 private final TextArea textArea = new TextArea();
-                private final Label label = new Label();
                 {
                     textArea.setWrapText(true);
                     textArea.setPrefRowCount(3);
                     textArea.setStyle("-fx-font-size: 12px;");
-
-                    // Valider en appuyant sur Ctrl+Enter ou en perdant le focus
                     textArea.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                         if (!isNowFocused && getIndex() >= 0 && getIndex() < getTableView().getItems().size()) {
                             commitEdit(textArea.getText());
@@ -443,7 +499,6 @@ public class DoctorController {
                     else { setText(item); setGraphic(null); }
                 }
             };
-            // ✅ Double-clic pour éditer
             cell.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2 && !cell.isEmpty()) cell.startEdit();
             });
@@ -451,7 +506,6 @@ public class DoctorController {
         });
         colMedicaments.setOnEditCommit(e -> {});
 
-        // ✅ Colonne Durée — éditable au clic
         colDuree.setCellValueFactory(new PropertyValueFactory<>("duration"));
         colDuree.setCellFactory(col -> {
             TableCell<Prescription, String> cell = new TableCell<>() {
@@ -514,7 +568,6 @@ public class DoctorController {
         });
         colDuree.setOnEditCommit(e -> {});
 
-        // ✅ Colonne Instructions — éditable au clic
         colInstructions.setCellValueFactory(new PropertyValueFactory<>("instructions"));
         colInstructions.setCellFactory(col -> {
             TableCell<Prescription, String> cell = new TableCell<>() {
