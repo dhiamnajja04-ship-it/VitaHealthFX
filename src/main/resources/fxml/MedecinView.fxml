@@ -1,98 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<BorderPane prefHeight="750.0" prefWidth="1200.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.DoctorController">
+<BorderPane prefHeight="800.0" prefWidth="1300.0" style="-fx-background-color: #f4f6f9;"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.workshopjdbc.Controllers.DoctorController">
 
-    <top>
+    <center>
         <VBox>
-            <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
-                <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="VitaHealthFX" />
-                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Medecin" />
+            <!-- Top Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0"
+                  style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
+                <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;"
+                       text="🏥 VitaHealthFX" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Médecin" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Medecin" />
-                <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="Deconnexion" />
+                <Button fx:id="themeToggleBtn" onAction="#toggleTheme"
+                        styleClass="theme-toggle" text="Dark mode" />
+                <Label fx:id="userLabel"
+                       style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Médecin" />
+                <Button fx:id="logoutBtn"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                               -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;"
+                        text="🚪 Déconnexion" />
             </HBox>
 
-            <!-- Barre de recherche par maladie -->
-            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15 20 0 20;">
-                <Label text="Recherche par maladie :" style="-fx-font-weight: bold;" />
-                <TextField fx:id="searchMaladieField" promptText="Ex: Diabete, Hypertension..." prefWidth="250" />
-                <Button fx:id="searchMaladieBtn" text="Filtrer" />
-                <Button fx:id="resetMaladieBtn" text="Reinitialiser" />
-            </HBox>
+            <TabPane side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
 
-            <TabPane>
-                <!-- ONGLET PRESCRIPTIONS -->
-                <Tab text="Prescriptions" closable="false">
-                    <VBox spacing="15" style="-fx-padding: 20;">
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <Label text="Patient :" style="-fx-font-weight: bold;" />
-                            <ComboBox fx:id="patientPrescCombo" prefWidth="300" promptText="Choisir un patient" />
-                            <Button fx:id="loadPatientPrescBtn" text="Charger" />
-                            <Button fx:id="refreshPrescListBtn" text="Rafraichir" />
+                <!-- 📅 Mon Agenda -->
+                <Tab text="📅 Mon Agenda" closable="false">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0">
+                            <DatePicker fx:id="dateFilter" promptText="Filtrer par date"
+                                        style="-fx-background-radius: 25;" />
+                            <Button fx:id="clearFilterBtn"
+                                    style="-fx-background-color: #95a5a6; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
+                                    text="Effacer filtre" />
+                            <Button fx:id="refreshBtn"
+                                    style="-fx-background-color: #27ae60; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;"
+                                    text="🔄 Rafraîchir" />
                         </HBox>
-
-                        <Separator />
-
-                        <GridPane hgap="15" vgap="10">
-                            <Label style="-fx-font-weight: bold;" text="Medicaments :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                            <TextArea fx:id="medicamentsArea" prefHeight="80" prefWidth="400" promptText="Ex: Paracetamol 500mg&#10;Amoxicilline 1g" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                            <Label style="-fx-font-weight: bold;" text="Duree :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                            <TextField fx:id="dureeField" promptText="ex: 7 jours" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                            <Label style="-fx-font-weight: bold;" text="Instructions :" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                            <TextArea fx:id="instructionsArea" prefHeight="60" promptText="Prendre matin et soir apres les repas" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        </GridPane>
-
-                        <HBox alignment="CENTER" spacing="10">
-                            <Button fx:id="ajouterPrescriptionBtn" text="Ajouter" />
-                            <Button fx:id="modifierPrescriptionBtn" text="Modifier" />
-                            <Button fx:id="supprimerPrescriptionBtn" text="Supprimer" />
-                            <Button fx:id="viderPrescChampsBtn" text="Vider" />
-                        </HBox>
-
-                        <TableView fx:id="prescriptionTable" prefHeight="300">
+                        <TableView fx:id="appointmentsTable" prefHeight="600.0">
                             <columns>
-                                <TableColumn fx:id="colPrescDate" text="Date" prefWidth="150" />
-                                <TableColumn fx:id="colMedicaments" text="Medicaments" prefWidth="300" />
-                                <TableColumn fx:id="colDuree" text="Duree" prefWidth="120" />
+                                <TableColumn fx:id="colTime"    text="Heure"   prefWidth="100" />
+                                <TableColumn fx:id="colPatient" text="Patient" prefWidth="250" />
+                                <TableColumn fx:id="colReason"  text="Motif"   prefWidth="350" />
+                                <TableColumn fx:id="colStatus"  text="Statut"  prefWidth="120" />
+                                <TableColumn fx:id="colActions" text="Actions" prefWidth="250" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </Tab>
+
+                <!-- 👥 Mes Patients -->
+                <Tab text="👥 Mes Patients" closable="false">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <TextField fx:id="searchPatientField"
+                                   promptText="🔍 Rechercher un patient..."
+                                   style="-fx-background-radius: 25; -fx-padding: 10 15;" />
+                        <TableView fx:id="patientsTable" prefHeight="600.0">
+                            <columns>
+                                <TableColumn fx:id="patColName"            text="Nom du patient" prefWidth="250" />
+                                <TableColumn fx:id="patColEmail"           text="Email"           prefWidth="300" />
+                                <TableColumn fx:id="patColLastAppointment" text="Dernier RDV"     prefWidth="200" />
+                                <TableColumn fx:id="patColActions"         text="Actions"         prefWidth="150" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </Tab>
+
+                <!-- 📋 Prescriptions -->
+                <Tab text="📋 Prescriptions" closable="false">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Label text="Patient :" style="-fx-font-weight: bold;" />
+                            <ComboBox fx:id="patientPrescCombo" prefWidth="250"
+                                      promptText="Sélectionner un patient" />
+                            <Button fx:id="refreshPrescListBtn"
+                                    style="-fx-background-color: #95a5a6; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
+                                    text="🔄 Rafraîchir" />
+                            <!-- ✅ Ouvre le formulaire dialog -->
+                            <Button fx:id="ouvrirFormPrescriptionBtn"
+                                    style="-fx-background-color: #27ae60; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
+                                    text="➕ Nouvelle prescription" />
+                            <Button fx:id="supprimerPrescriptionBtn"
+                                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
+                                    text="🗑 Supprimer" />
+                            <Button fx:id="genererPdfBtn"
+                                    style="-fx-background-color: #8e44ad; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
+                                    text="📄 PDF" />
+                        </HBox>
+
+                        <TableView fx:id="prescriptionTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colPrescDate"    text="Date"         prefWidth="150" />
+                                <TableColumn fx:id="colMedicaments"  text="Médicaments"  prefWidth="300" />
+                                <TableColumn fx:id="colDuree"        text="Durée"        prefWidth="100" />
                                 <TableColumn fx:id="colInstructions" text="Instructions" prefWidth="350" />
                             </columns>
                         </TableView>
                     </VBox>
                 </Tab>
 
-                <!-- ONGLET PARAMETRES MEDICAUX -->
-                <Tab text="Parametres medicaux" closable="false">
-                    <VBox spacing="15" style="-fx-padding: 20;">
-                        <HBox spacing="10" alignment="CENTER_LEFT">
+                <!-- 🩺 Paramètres Médicaux -->
+                <Tab text="🩺 Paramètres Médicaux" closable="false">
+                    <VBox spacing="15.0" style="-fx-padding: 20;">
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
                             <Label text="Patient :" style="-fx-font-weight: bold;" />
-                            <ComboBox fx:id="patientParamCombo" prefWidth="300" promptText="Choisir un patient" />
-                            <Button fx:id="loadPatientParamBtn" text="Charger" />
-                            <Button fx:id="refreshParamListBtn" text="Rafraichir" />
+                            <ComboBox fx:id="patientParamCombo" prefWidth="250"
+                                      promptText="Sélectionner un patient" />
+                            <Button fx:id="refreshParamListBtn"
+                                    style="-fx-background-color: #95a5a6; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
+                                    text="🔄 Rafraîchir" />
+                            <Button fx:id="showTrendsBtn" text="📈 Voir tendances"
+                                    style="-fx-background-color: #2980b9; -fx-text-fill: white;
+                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;" />
                         </HBox>
-
-                        <Separator />
-
-                        <Label text="Historique des parametres medicaux" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-                        <TableView fx:id="parametreTable" prefHeight="500">
+                        <TableView fx:id="parametreTable" prefHeight="550.0">
                             <columns>
-                                <TableColumn fx:id="colParamDate" text="Date" prefWidth="150" />
-                                <TableColumn fx:id="colPoids" text="Poids (kg)" prefWidth="100" />
-                                <TableColumn fx:id="colTaille" text="Taille (m)" prefWidth="100" />
-                                <TableColumn fx:id="colGlycemie" text="Glycemie" prefWidth="100" />
-                                <TableColumn fx:id="colTension" text="Tension" prefWidth="100" />
-                                <TableColumn fx:id="colImc" text="IMC" prefWidth="80" />
-                                <TableColumn fx:id="colInterpretation" text="Interpretation" prefWidth="200" />
+                                <TableColumn fx:id="colParamDate"      text="Date"              prefWidth="150" />
+                                <TableColumn fx:id="colPoids"          text="Poids (kg)"        prefWidth="100" />
+                                <TableColumn fx:id="colTaille"         text="Taille (m)"        prefWidth="100" />
+                                <TableColumn fx:id="colGlycemie"       text="Glycémie"          prefWidth="100" />
+                                <TableColumn fx:id="colTension"        text="Tension"           prefWidth="120" />
+                                <TableColumn fx:id="colImc"            text="IMC"               prefWidth="100" />
+                                <TableColumn fx:id="colInterpretation" text="Interprétation"    prefWidth="200" />
+                                <TableColumn fx:id="colAlerte"         text="Alerte"            prefWidth="200" />
+                                <TableColumn fx:id="colNiveauActivite" text="Niveau d'activité" prefWidth="200" />
                             </columns>
                         </TableView>
                     </VBox>
                 </Tab>
+
+                <!-- 💬 Forum Santé -->
+                <Tab text="💬 Forum Santé" closable="false">
+                    <StackPane fx:id="forumContainer"
+                               style="-fx-background-color: #f8fafc;" />
+                </Tab>
+
             </TabPane>
         </VBox>
-    </top>
+    </center>
 </BorderPane>

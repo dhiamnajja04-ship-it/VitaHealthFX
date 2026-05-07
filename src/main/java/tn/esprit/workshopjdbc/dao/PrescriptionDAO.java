@@ -1,6 +1,7 @@
 package tn.esprit.workshopjdbc.dao;
 
 import tn.esprit.workshopjdbc.Entities.Prescription;
+import tn.esprit.workshopjdbc.Entities.User;
 import com.vitahealth.config.DatabaseConnection;
 
 import java.sql.*;
@@ -71,6 +72,27 @@ public class PrescriptionDAO {
             e.printStackTrace();
         }
         return list;
+    }
+    public User getDoctorByPrescriptionId(int prescriptionId) {
+        String sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.role FROM user u " +
+                "JOIN prescriptions p ON u.id = p.medecin_id WHERE p.id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, prescriptionId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                User doctor = new User();
+                doctor.setId(rs.getInt("id"));
+                doctor.setFirstName(rs.getString("first_name"));
+                doctor.setLastName(rs.getString("last_name"));
+                doctor.setEmail(rs.getString("email"));
+                doctor.setRole(rs.getString("role"));
+                return doctor;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public boolean modifier(Prescription p) {

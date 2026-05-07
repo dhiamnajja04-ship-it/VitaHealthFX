@@ -18,6 +18,7 @@
             </HBox>
 
             <TabPane side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
+                <!-- 📅 Mes rendez-vous -->
                 <Tab closable="false" text="📅 Mes rendez-vous">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <HBox spacing="12.0" alignment="CENTER_LEFT">
@@ -39,6 +40,7 @@
                     </VBox>
                 </Tab>
 
+                <!-- 🩺 Mon profil santé -->
                 <Tab closable="false" text="🩺 Mon profil santé">
                     <ScrollPane fitToWidth="true">
                         <VBox spacing="20.0" style="-fx-padding: 20;">
@@ -69,7 +71,6 @@
                                 <Label style="-fx-font-weight: bold;" text="🏥 Maladies chroniques" />
                                 <TextArea fx:id="diseasesArea" prefHeight="60" promptText="Diabète, hypertension, etc." />
                             </VBox>
-
                             <HBox spacing="20.0">
                                 <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                                     <Label style="-fx-font-weight: bold;" text="👤 Contact d'urgence" />
@@ -80,7 +81,6 @@
                                     <TextField fx:id="emergencyPhoneField" promptText="Numéro de téléphone" />
                                 </VBox>
                             </HBox>
-
                             <HBox spacing="15.0">
                                 <Button fx:id="saveHealthBtn" text="💾 Enregistrer" />
                                 <Button fx:id="refreshHealthBtn" text="🔄 Actualiser" />
@@ -89,21 +89,18 @@
                     </ScrollPane>
                 </Tab>
 
+                <!-- 📊 Paramètres médicaux (avec alerte, niveau activité, tendances) -->
                 <Tab closable="false" text="📊 Paramètres médicaux">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <GridPane hgap="15.0" vgap="10.0">
                             <Label text="Poids (kg):" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                             <TextField fx:id="poidsField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
                             <Label text="Taille (m):" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                             <TextField fx:id="tailleField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
                             <Label text="Glycémie:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                             <TextField fx:id="glycemieField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
                             <Label text="Tension:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                             <TextField fx:id="tensionField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
                             <Label style="-fx-font-weight: bold;" text="IMC Calculé:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                             <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                 <Label fx:id="imcCalculLabel" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;" text="0.0" />
@@ -113,9 +110,9 @@
 
                         <HBox spacing="15.0">
                             <Button fx:id="ajouterParametreBtn" text="Ajouter" />
-                            <Button fx:id="modifierParametreBtn" text="Modifier" />
                             <Button fx:id="supprimerParametreBtn" text="Supprimer" />
                             <Button fx:id="rafraichirParametresBtn" text="🔄 Actualiser" />
+                            <Button fx:id="showTrendsBtn" text="📈 Voir tendances" />
                         </HBox>
 
                         <TableView fx:id="parametreTable" prefHeight="350">
@@ -126,11 +123,15 @@
                                 <TableColumn fx:id="colParamImc" prefWidth="80" text="IMC" />
                                 <TableColumn fx:id="colParamGlycemie" prefWidth="100" text="Glycémie" />
                                 <TableColumn fx:id="colParamTension" prefWidth="100" text="Tension" />
+                                <TableColumn fx:id="colAlerte" prefWidth="200" text="Alerte" />
                             </columns>
                         </TableView>
+
+                        <Label fx:id="niveauActiviteLabel" style="-fx-font-size: 14px; -fx-padding: 10 0 0 0;" />
                     </VBox>
                 </Tab>
 
+                <!-- 📋 Mes prescriptions (avec bouton PDF) -->
                 <Tab closable="false" text="📋 Mes prescriptions">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <HBox spacing="15.0">
@@ -142,34 +143,33 @@
                                 <TableColumn fx:id="colMedicaments" prefWidth="250" text="Médicaments" />
                                 <TableColumn fx:id="colInstructions" prefWidth="250" text="Instructions" />
                                 <TableColumn fx:id="colDuree" prefWidth="100" text="Durée" />
+                                <TableColumn fx:id="colActionsPresc" prefWidth="100" text="Actions" />
                             </columns>
                         </TableView>
                     </VBox>
                 </Tab>
 
+                <!-- 🎓 Ateliers & Événements -->
                 <Tab closable="false" text="🎓 Ateliers &amp; Événements">
                     <VBox spacing="20.0" style="-fx-padding: 25; -fx-background-color: #f8fafc;">
-                        <children>
-                            <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                <children>
-                                    <VBox>
-                                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Catalogue des Ateliers" />
-                                        <Label style="-fx-text-fill: #64748b;" text="Inscrivez-vous aux sessions de sensibilisation santé." />
-                                    </VBox>
-                                    <Region HBox.hgrow="ALWAYS" />
-                                    <TextField fx:id="searchWorkshopField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Rechercher un événement..." style="-fx-background-radius: 20; -fx-padding: 0 20;" />
-                                </children>
-                            </HBox>
-                            <Separator />
-                            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-                                <content>
-                                    <FlowPane fx:id="workshopGrid" hgap="25.0" style="-fx-padding: 10;" vgap="25.0" />
-                                </content>
-                            </ScrollPane>
-                        </children>
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <VBox>
+                                <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Catalogue des Ateliers" />
+                                <Label style="-fx-text-fill: #64748b;" text="Inscrivez-vous aux sessions de sensibilisation santé." />
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <TextField fx:id="searchWorkshopField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Rechercher un événement..." style="-fx-background-radius: 20; -fx-padding: 0 20;" />
+                        </HBox>
+                        <Separator />
+                        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                            <content>
+                                <FlowPane fx:id="workshopGrid" hgap="25.0" style="-fx-padding: 10;" vgap="25.0" />
+                            </content>
+                        </ScrollPane>
                     </VBox>
                 </Tab>
 
+                <!-- Forum Santé -->
                 <Tab closable="false" text="Forum Santé">
                     <StackPane fx:id="forumContainer" style="-fx-background-color: #f8fafc;" />
                 </Tab>
