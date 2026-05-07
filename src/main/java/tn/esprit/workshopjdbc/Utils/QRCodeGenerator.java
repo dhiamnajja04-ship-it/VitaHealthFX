@@ -1,10 +1,12 @@
 package tn.esprit.workshopjdbc.Utils;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import tn.esprit.workshopjdbc.Entities.User;
@@ -12,17 +14,23 @@ import tn.esprit.workshopjdbc.Entities.User;
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class QRCodeGenerator {
     
-    private static final int WIDTH = 250;
-    private static final int HEIGHT = 250;
+    private static final int WIDTH = 420;
+    private static final int HEIGHT = 420;
     
     public static Image generateQRCode(String text) {
         try {
             String safeText = text == null || text.isBlank() ? "VitaHealthFX\nDonnees non disponibles" : text;
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(safeText, BarcodeFormat.QR_CODE, WIDTH, HEIGHT);
+            Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+            hints.put(EncodeHintType.MARGIN, 2);
+            BitMatrix bitMatrix = qrCodeWriter.encode(safeText, BarcodeFormat.QR_CODE, WIDTH, HEIGHT, hints);
             BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
             return SwingFXUtils.toFXImage(bufferedImage, null);
         } catch (WriterException e) {
@@ -52,34 +60,47 @@ public class QRCodeGenerator {
     public static String buildUserPayload(User user) {
         if (user == null) return "VitaHealthFX\nUtilisateur non disponible";
 
-        StringBuilder payload = new StringBuilder();
-        payload.append("VITAHEALTHFX USER CARD\n");
-        payload.append("ID: ").append(user.getId()).append('\n');
-        payload.append("Name: ").append(safe(user.getFullName())).append('\n');
-        payload.append("Role: ").append(safe(user.getRole())).append('\n');
-        payload.append("Email: ").append(safe(user.getEmail())).append('\n');
-        payload.append("Phone: ").append(safe(user.getPhone())).append('\n');
-        payload.append("CIN: ").append(safe(user.getCin())).append('\n');
-        payload.append("Verified: ").append(user.isVerified() ? "Yes" : "No").append('\n');
+        StringBuilder note = new StringBuilder();
+        note.append("VitaHealthFX ID=").append(user.getId());
+        note.append("; Role=").append(safe(user.getRole()));
+        note.append("; CIN=").append(safe(user.getCin()));
+        note.append("; Verified=").append(user.isVerified() ? "Yes" : "No");
 
         if ("PATIENT".equalsIgnoreCase(user.getRole())) {
-            payload.append("Medical Profile:\n");
-            payload.append("- Weight: ").append(format(user.getPoids(), " kg")).append('\n');
-            payload.append("- Height: ").append(format(user.getTaille(), " m")).append('\n');
-            payload.append("- Glycemia: ").append(format(user.getGlycemie(), " g/L")).append('\n');
-            payload.append("- Blood pressure: ").append(safe(user.getTension())).append('\n');
-            payload.append("- Chronic disease: ").append(safe(user.getMaladie())).append('\n');
+            note.append("; Weight=").append(format(user.getPoids(), " kg"));
+            note.append("; Height=").append(format(user.getTaille(), " m"));
+            note.append("; Glycemia=").append(format(user.getGlycemie(), " g/L"));
+            note.append("; BloodPressure=").append(safe(user.getTension()));
+            note.append("; Disease=").append(safe(user.getMaladie()));
         } else if ("DOCTOR".equalsIgnoreCase(user.getRole())) {
-            payload.append("Professional Profile:\n");
-            payload.append("- Specialty: ").append(safe(user.getSpecialite())).append('\n');
-            payload.append("- Diploma: ").append(safe(user.getDiplome())).append('\n');
+            note.append("; Specialty=").append(safe(user.getSpecialite()));
+            note.append("; Diploma=").append(safe(user.getDiplome()));
         }
 
-        payload.append("Generated: ")
-                .append(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .append('\n');
-        payload.append("Source: VitaHealthFX");
-        return payload.toString();
+        note.append("; Generated=")
+                .append(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        return """
+                BEGIN:VCARD
+                VERSION:3.0
+                PRODID:-//VitaHealthFX//User QR//FR
+                FN:%s
+                N:%s;%s;;;
+                ORG:VitaHealthFX
+                TITLE:%s
+                EMAIL:%s
+                TEL:%s
+                NOTE:%s
+                END:VCARD
+                """.formatted(
+                escapeVCard(safe(user.getFullName())),
+                escapeVCard(safe(user.getLastName())),
+                escapeVCard(safe(user.getFirstName())),
+                escapeVCard(safe(user.getRole())),
+                escapeVCard(safe(user.getEmail())),
+                escapeVCard(safe(user.getPhone())),
+                escapeVCard(note.toString())
+        );
     }
 
     private static String safe(String value) {
@@ -88,5 +109,14 @@ public class QRCodeGenerator {
 
     private static String format(Double value, String unit) {
         return value == null ? "N/A" : value + unit;
+    }
+
+    private static String escapeVCard(String value) {
+        return safe(value)
+                .replace("\\", "\\\\")
+                .replace(";", "\\;")
+                .replace(",", "\\,")
+                .replace("\n", "\\n")
+                .replace("\r", "");
     }
 }

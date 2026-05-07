@@ -466,8 +466,8 @@ public class AdminDashboardController {
         
         if (qrImage != null) {
             ImageView imageView = new ImageView(qrImage);
-            imageView.setFitWidth(250);
-            imageView.setFitHeight(250);
+            imageView.setFitWidth(320);
+            imageView.setFitHeight(320);
             
             Label titleLabel = new Label("📱 QR Code - " + user.getFullName());
             titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e66;");
@@ -481,8 +481,8 @@ public class AdminDashboardController {
             TextArea payloadPreview = new TextArea(qrPayload);
             payloadPreview.setEditable(false);
             payloadPreview.setWrapText(true);
-            payloadPreview.setPrefRowCount(6);
-            payloadPreview.setMaxWidth(310);
+            payloadPreview.setPrefRowCount(7);
+            payloadPreview.setMaxWidth(360);
             payloadPreview.getStyleClass().add("qr-payload-preview");
             
             Button closeBtn = new Button("Fermer");
@@ -503,7 +503,7 @@ public class AdminDashboardController {
             vbox.getChildren().add(errorLabel);
         }
         
-        Scene scene = new Scene(vbox, 390, 640);
+        Scene scene = new Scene(vbox, 440, 720);
         ThemeManager.apply(scene);
         dialog.setScene(scene);
         dialog.showAndWait();
