@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane prefHeight="620.0" prefWidth="760.0" styleClass="dialog-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.CreatePostDialogController" stylesheets="@../css/community-feed.css">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="dialog-header">
+            <Circle fx:id="userAvatarCircle" radius="24.0" styleClass="avatar-doctor"/>
+            <VBox spacing="2.0">
+                <Label fx:id="userNameLabel" text="Dr. Hanna" styleClass="dialog-title"/>
+                <Label fx:id="userRoleLabel" text="Validated community profile" styleClass="muted-label"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="closeBtn" text="X" styleClass="ghost-icon-button" onAction="#closeDialog"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="18.0" styleClass="dialog-content">
+            <HBox spacing="18.0">
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                    <Label text="CLINICAL HEADLINE" styleClass="section-kicker"/>
+                    <TextField fx:id="headlineField" promptText="Enter a clear title for this entry..." styleClass="soft-input"/>
+                </VBox>
+                <VBox spacing="8.0" prefWidth="230.0">
+                    <Label text="MEDICAL CATEGORY" styleClass="section-kicker"/>
+                    <ComboBox fx:id="categoryCombo" maxWidth="Infinity" promptText="Nutrition &amp; Dietetics" styleClass="soft-combo"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="CLINICAL INSIGHTS" styleClass="section-kicker"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Autosave ready" styleClass="micro-label"/>
+                </HBox>
+                <HBox spacing="4.0" styleClass="editor-toolbar">
+                    <Button text="B" styleClass="toolbar-button" onAction="#formatBold"/>
+                    <Button text="I" styleClass="toolbar-button" onAction="#formatItalic"/>
+                    <Button text="U" styleClass="toolbar-button" onAction="#formatUnderline"/>
+                    <Separator orientation="VERTICAL"/>
+                    <Button text="List" styleClass="toolbar-button" onAction="#formatBullet"/>
+                    <Button text="1." styleClass="toolbar-button" onAction="#formatNumber"/>
+                    <Button text="Code" styleClass="toolbar-button" onAction="#formatCode"/>
+                    <Button text="Link" styleClass="toolbar-button" onAction="#insertLink"/>
+                    <Button text="Image" styleClass="toolbar-button" onAction="#insertImage"/>
+                    <Button text="Video" styleClass="toolbar-button" onAction="#insertVideo"/>
+                </HBox>
+                <TextArea fx:id="contentArea" prefHeight="230.0" wrapText="true" promptText="Share clinical observations, patient questions, case summaries, or evidence-based inquiries with the community..." styleClass="editor-area"/>
+            </VBox>
+
+            <VBox spacing="10.0">
+                <Label text="SUPPORTING MATERIALS" styleClass="section-kicker"/>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Button text="Attach image" styleClass="outline-pill-button" onAction="#browseImage"/>
+                    <Button text="Attach video" styleClass="outline-pill-button" onAction="#browseVideo"/>
+                    <Label fx:id="attachedFilesLabel" text="" styleClass="muted-label"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="8.0">
+                <Label text="TAG" styleClass="section-kicker"/>
+                <TextField fx:id="tagField" promptText="RESEARCH, CASE STUDY, QUESTION..." styleClass="soft-input"/>
+            </VBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="dialog-footer">
+            <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="compliance-badge">
+                <Label text="+" styleClass="badge-icon"/>
+                <Label text="CLINICAL COMPLIANCE REVIEW ACTIVE" styleClass="badge-text"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="saveDraftBtn" text="Save as Draft" styleClass="ghost-button" onAction="#saveDraft"/>
+            <Button fx:id="publishBtn" text="PUBLISH ENTRY" styleClass="primary-action-button" onAction="#publishPost"/>
+        </HBox>
+    </bottom>
+</BorderPane>

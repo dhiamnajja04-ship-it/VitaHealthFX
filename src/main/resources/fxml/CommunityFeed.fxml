@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane prefHeight="900.0" prefWidth="1400.0" styleClass="forum-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.CommunityFeedController" stylesheets="@../css/community-feed.css">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="18.0" styleClass="topbar">
+            <VBox spacing="0.0">
+                <Label text="VitaHealth" styleClass="brand-title"/>
+                <Label text="CLINICAL SANCTUARY" styleClass="brand-subtitle"/>
+            </VBox>
+            <TextField fx:id="searchField" promptText="Search clinical insights, experts, or library..." styleClass="search-field" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="notificationsBtn" text="!" styleClass="icon-button"/>
+            <Button fx:id="messagesBtn" text="..." styleClass="icon-button"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="profile-chip">
+                <Circle fx:id="userAvatarCircle" radius="18.0" styleClass="avatar-doctor"/>
+                <VBox spacing="1.0">
+                    <Label fx:id="userNameLabel" text="Dr. Fatma Tounsi" styleClass="profile-name"/>
+                    <Label fx:id="userRoleLabel" text="Medecin" styleClass="profile-role"/>
+                </VBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox prefWidth="270.0" spacing="6.0" styleClass="left-rail">
+            <padding>
+                <Insets top="18.0" right="18.0" bottom="18.0" left="18.0"/>
+            </padding>
+            <Label text="NAVIGATION" styleClass="nav-section-label"/>
+            <Button fx:id="dashboardBtn" text="Dashboard" styleClass="nav-button" onAction="#showDashboard"/>
+            <Button fx:id="communityFeedBtn" text="Forum" styleClass="nav-button, active-nav" onAction="#showCommunityFeed"/>
+            <Button fx:id="appointmentsBtn" text="Rendez-vous et soins" styleClass="nav-button" onAction="#showCareSpace"/>
+            <Button fx:id="eventsBtn" text="Ateliers et evenements" styleClass="nav-button" onAction="#showEvents"/>
+            <Button fx:id="usersBtn" text="Gestion utilisateurs" styleClass="nav-button" onAction="#showUsers"/>
+            <Button fx:id="moderationBtn" text="Moderation forum" styleClass="nav-button" onAction="#showForumModeration"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button fx:id="newClinicalEntryBtn" text="+ New Clinical Entry" maxWidth="Infinity" styleClass="primary-action-button" onAction="#openCreatePostDialog"/>
+            <Button fx:id="logoutBtn" text="Logout" styleClass="logout-button" onAction="#handleLogout"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox fx:id="contentContainer" styleClass="feed-center">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll">
+                <VBox spacing="16.0" styleClass="feed-stack">
+                    <HBox spacing="12.0" styleClass="stories-strip">
+                        <VBox alignment="CENTER" spacing="8.0" styleClass="story-card create-story">
+                            <StackPane>
+                                <Circle radius="30.0" styleClass="story-avatar-create"/>
+                                <Label text="+" styleClass="story-plus"/>
+                            </StackPane>
+                            <Label text="Create Story" styleClass="story-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="8.0" styleClass="story-card">
+                            <Circle radius="30.0" styleClass="avatar-blue"/>
+                            <Label text="Dr. Marcus" styleClass="story-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="8.0" styleClass="story-card">
+                            <Circle radius="30.0" styleClass="avatar-green"/>
+                            <Label text="Pharm USA" styleClass="story-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="8.0" styleClass="story-card">
+                            <Circle radius="30.0" styleClass="avatar-gold"/>
+                            <Label text="Lab Connect" styleClass="story-label"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="8.0" styleClass="story-card">
+                            <Circle radius="30.0" styleClass="avatar-navy"/>
+                            <Label text="Cardiology Unit" styleClass="story-label"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox fx:id="postsContainer" spacing="15.0"/>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+
+    <right>
+        <VBox prefWidth="315.0" spacing="16.0" styleClass="right-rail">
+            <padding>
+                <Insets top="18.0" right="18.0" bottom="18.0" left="18.0"/>
+            </padding>
+
+            <!-- Chatbot Section -->
+            <VBox spacing="10.0" styleClass="side-card" minHeight="300">
+                <Label text="💬 VITAHEALTH ASSISTANT" styleClass="section-kicker"/>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS" minHeight="180">
+                    <VBox fx:id="chatHistoryBox" spacing="8.0" style="-fx-padding: 8;"/>
+                </ScrollPane>
+                <HBox spacing="8.0" alignment="CENTER">
+                    <TextField fx:id="chatInputField" promptText="Ask a question..." HBox.hgrow="ALWAYS" style="-fx-padding: 8; -fx-border-radius: 8;"/>
+                    <Button fx:id="sendChatBtn" text="Send" styleClass="primary-button" style="-fx-padding: 8 16;"/>
+                </HBox>
+                <Button fx:id="clearChatBtn" text="Clear Chat" styleClass="secondary-button" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="10.0" styleClass="side-card">
+                <Label text="SPONSORED INSIGHTS" styleClass="section-kicker"/>
+                <VBox spacing="6.0" styleClass="insight-media-card">
+                    <Region prefHeight="94.0" styleClass="media-surgical"/>
+                    <Label text="Precision Surgical Tools 2024" styleClass="side-title"/>
+                    <Label text="Experience the next generation of robotic-assisted interface tools." wrapText="true" styleClass="muted-label"/>
+                </VBox>
+                <VBox spacing="6.0" styleClass="insight-media-card">
+                    <Region prefHeight="90.0" styleClass="media-summit"/>
+                    <Label text="Medical Excellence Summit" styleClass="side-title"/>
+                    <Label text="Join 5,000 clinical experts in early digital care." wrapText="true" styleClass="muted-label"/>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="8.0" styleClass="premium-card">
+                <Label text="PREMIUM INSIGHTS" styleClass="section-kicker"/>
+                <Label text="Clinicians using VitaHealth analytics save an average 8 min per decision." wrapText="true" styleClass="side-title"/>
+                <Button text="View Dashboard" styleClass="ghost-button"/>
+            </VBox>
+
+            <VBox spacing="12.0" styleClass="side-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="SUGGESTED EXPERTS" styleClass="section-kicker"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="See All" styleClass="link-label"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Circle radius="22.0" styleClass="avatar-green"/>
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label text="Dr. Elena Volkov" styleClass="profile-name"/>
+                        <Label text="Cardiologist" styleClass="muted-label"/>
+                    </VBox>
+                    <Button text="Follow" styleClass="follow-button"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Circle radius="22.0" styleClass="avatar-blue"/>
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label text="Dr. Simon Ng" styleClass="profile-name"/>
+                        <Label text="Neurologist" styleClass="muted-label"/>
+                    </VBox>
+                    <Button text="Follow" styleClass="follow-button"/>
+                </HBox>
+                <Button text="Discover More" styleClass="secondary-button"/>
+            </VBox>
+        </VBox>
+    </right>
+</BorderPane>

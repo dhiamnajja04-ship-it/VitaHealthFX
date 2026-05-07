@@ -1,52 +1,152 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
 
-<BorderPane prefHeight="650.0" prefWidth="1100.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.ForumModerationController">
+<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.ForumModerationController" stylesheets="@../../css/community-feed.css">
+
+    <!-- Top Bar -->
     <top>
-        <VBox spacing="10.0" style="-fx-padding: 20 24 10 24;">
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <VBox>
-                    <Label text="Moderation du Forum" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
-                    <Label text="Validez les contenus sensibles, traitez les signalements et gardez le forum sain." style="-fx-text-fill: #64748b;" />
-                </VBox>
-                <Region HBox.hgrow="ALWAYS" />
-                <Button fx:id="refreshBtn" text="Actualiser" styleClass="btn-secondary" />
+        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #ffffff; -fx-padding: 12 25; -fx-border-color: #e4e6eb; -fx-border-width: 0 0 1 0;">
+            <Label text="VitaHealth" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+            <TextField promptText="Search moderation queue..." styleClass="search-field" prefWidth="400" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox spacing="15.0" alignment="CENTER">
+                <Button text="🔔" styleClass="icon-button"/>
+                <Button text="💬" styleClass="icon-button"/>
+                <HBox spacing="10.0" alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 5 12; -fx-background-radius: 25;">
+                    <Circle radius="18.0" style="-fx-fill: linear-gradient(#667eea, #764ba2);"/>
+                    <VBox spacing="1.0">
+                        <Label text="Dr. Admin" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Label text="Moderator" style="-fx-font-size: 10px; -fx-text-fill: #65676b;"/>
+                    </VBox>
+                </HBox>
             </HBox>
-            <Separator />
-        </VBox>
+        </HBox>
     </top>
 
+    <!-- Center Content -->
     <center>
-        <SplitPane dividerPositions="0.55" style="-fx-background-color: transparent;">
-            <items>
-                <VBox spacing="10.0" style="-fx-padding: 0 12 20 24;">
-                    <TableView fx:id="moderationTable" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colTitle" text="Titre" prefWidth="230" />
-                            <TableColumn fx:id="colCategory" text="Categorie" prefWidth="120" />
-                            <TableColumn fx:id="colAuthor" text="Auteur" prefWidth="130" />
-                            <TableColumn fx:id="colStatus" text="Statut" prefWidth="115" />
-                            <TableColumn fx:id="colReports" text="Signalements" prefWidth="95" />
-                            <TableColumn fx:id="colDate" text="Date" prefWidth="130" />
-                        </columns>
-                    </TableView>
-                    <Label fx:id="messageLabel" text="" style="-fx-text-fill: #475569;" />
-                </VBox>
-
-                <VBox spacing="12.0" style="-fx-padding: 0 24 20 12;">
-                    <Label text="Detail publication" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
-                    <Label fx:id="metaLabel" text="" wrapText="true" style="-fx-text-fill: #64748b;" />
-                    <TextArea fx:id="contentArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
-                    <HBox spacing="10.0">
-                        <Button fx:id="publishBtn" text="Publier" styleClass="btn-primary" />
-                        <Button fx:id="hideBtn" text="Masquer" styleClass="btn-secondary" />
-                        <Button fx:id="lockBtn" text="Verrouiller" styleClass="btn-outline" />
-                        <Button fx:id="deleteBtn" text="Supprimer" styleClass="btn-danger" />
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <VBox spacing="0.0">
+                <!-- Header -->
+                <VBox spacing="15.0" style="-fx-padding: 20 25;">
+                    <HBox alignment="CENTER_LEFT" spacing="15.0">
+                        <VBox spacing="5.0">
+                            <Label text="Forum Moderation Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                            <Label text="Review reported content, moderate posts, and maintain a healthy community." style="-fx-text-fill: #65676b; -fx-font-size: 13px;"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="refreshBtn" text="🔄 Refresh" styleClass="secondary-button"/>
                     </HBox>
                 </VBox>
-            </items>
-        </SplitPane>
+
+                <Separator style="-fx-padding: 0;"/>
+
+            <!-- Stats Row -->
+            <HBox spacing="15.0" style="-fx-padding: 20 25;">
+                <VBox style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                    <Label text="TOTAL POSTS" style="-fx-font-size: 11px; -fx-text-fill: #90949c;"/>
+                    <Label fx:id="totalPostsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                    <Label text="TOTAL COMMENTS" style="-fx-font-size: 11px; -fx-text-fill: #90949c;"/>
+                    <Label fx:id="totalCommentsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                    <Label text="PENDING REVIEWS" style="-fx-font-size: 11px; -fx-text-fill: #90949c;"/>
+                    <Label fx:id="pendingReviewsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                    <Label text="REPORTED POSTS" style="-fx-font-size: 11px; -fx-text-fill: #90949c;"/>
+                    <Label fx:id="reportedPostsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Charts Row -->
+            <HBox spacing="15.0" style="-fx-padding: 0 25 20 25;">
+                <!-- Post Status Distribution Chart -->
+                <VBox spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                    <Label text="Post Status Distribution" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                    <javafx.scene.chart.PieChart fx:id="statusPieChart" prefHeight="250.0" legendVisible="true"/>
+                </VBox>
+
+                <!-- Posts Over Time Chart -->
+                <VBox spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                    <Label text="Posts &amp; Comments Activity" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                    <javafx.scene.chart.BarChart fx:id="activityBarChart" prefHeight="250.0" legendVisible="true">
+                        <xAxis>
+                            <javafx.scene.chart.CategoryAxis side="BOTTOM" />
+                        </xAxis>
+                        <yAxis>
+                            <javafx.scene.chart.NumberAxis side="LEFT" />
+                        </yAxis>
+                    </javafx.scene.chart.BarChart>
+                </VBox>
+            </HBox>
+
+            <!-- Main Content -->
+            <HBox spacing="20.0" style="-fx-padding: 20 25;" VBox.vgrow="ALWAYS">
+                <!-- Left: Moderation Queue -->
+                <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="All Posts" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="filterCombo" promptText="Filter by status" style="-fx-padding: 6 10; -fx-background-radius: 6;" prefWidth="150"/>
+                    </HBox>
+                    
+                    <VBox style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="moderationTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colTitle" text="Title" prefWidth="220"/>
+                                <TableColumn fx:id="colCategory" text="Category" prefWidth="100"/>
+                                <TableColumn fx:id="colAuthor" text="Author" prefWidth="120"/>
+                                <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                                <TableColumn fx:id="colComments" text="Comments" prefWidth="80"/>
+                                <TableColumn fx:id="colReports" text="Reports" prefWidth="80"/>
+                                <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <Label fx:id="messageLabel" text="" style="-fx-text-fill: #475569; -fx-font-size: 12px;"/>
+                </VBox>
+
+                <!-- Right: Post Details & Actions -->
+                <VBox spacing="15.0" prefWidth="400.0" HBox.hgrow="ALWAYS">
+                    <Label text="Review Details" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+
+                    <VBox spacing="12.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" VBox.vgrow="ALWAYS">
+                        <Label fx:id="metaLabel" text="Select a post to review" wrapText="true" style="-fx-text-fill: #65676b; -fx-font-size: 12px;"/>
+                        <Separator/>
+                        <Label text="Content" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <TextArea fx:id="contentArea" editable="false" wrapText="true" prefHeight="180.0" style="-fx-font-size: 12px; -fx-padding: 10; -fx-control-inner-background: #f8fafc;"/>
+                        <VBox spacing="8.0">
+                            <Label text="Violation Reasons" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                            <CheckBox text="Abusive Language" selected="false"/>
+                            <CheckBox text="Spam/Advertising" selected="false"/>
+                            <CheckBox text="Medical Misinformation" selected="false"/>
+                            <CheckBox text="Harassment" selected="false"/>
+                        </VBox>
+                    </VBox>
+                    
+                    <!-- Action Buttons -->
+                    <VBox spacing="8.0">
+                        <Button fx:id="editBtn" text="✏️ EDIT POST" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 13px; -fx-cursor: hand;">
+                            <VBox.margin>
+                                <Insets top="5.0"/>
+                            </VBox.margin>
+                        </Button>
+                        <Button fx:id="publishBtn" text="✓ APPROVE / PUBLISH" styleClass="primary-action-button" style="-fx-font-size: 13px; -fx-padding: 12 20;"/>
+                        <Button fx:id="hideBtn" text="👁️ HIDE POST" style="-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-font-weight: bold; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                        <Button fx:id="lockBtn" text="🔒 LOCK THREAD" style="-fx-background-color: #f0f2f5; -fx-text-fill: #050505; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                        <Button fx:id="deleteBtn" text="🗑️ DELETE POST" style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

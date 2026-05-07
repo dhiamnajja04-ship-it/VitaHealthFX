@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane prefHeight="900.0" prefWidth="1400.0" styleClass="admin-shell" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.AnalyticsController" stylesheets="@../../css/community-feed.css">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="18.0" styleClass="admin-topbar">
+            <VBox spacing="0.0">
+                <Label text="VitaHealth" styleClass="brand-title dark-brand"/>
+                <Label text="CLINICAL SANCTUARY" styleClass="brand-subtitle"/>
+            </VBox>
+            <TextField promptText="Search system logs, users, records..." styleClass="admin-search" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="!" styleClass="admin-icon-button"/>
+            <Button text="..." styleClass="admin-icon-button"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="profile-chip">
+                <Circle radius="18.0" styleClass="avatar-doctor"/>
+                <VBox spacing="1.0">
+                    <Label text="Dr. Juliane Smith" styleClass="profile-name"/>
+                    <Label text="Chief Administrator" styleClass="profile-role"/>
+                </VBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox prefWidth="255.0" spacing="7.0" styleClass="admin-rail">
+            <padding>
+                <Insets top="22.0" right="16.0" bottom="18.0" left="16.0"/>
+            </padding>
+            <Label text="VitaHealth" styleClass="rail-brand"/>
+            <Label text="CLINICAL SANCTUARY" styleClass="rail-subtitle"/>
+            <Separator/>
+            <Button text="Dashboard" styleClass="admin-nav-button" onAction="#showDashboard"/>
+            <Button text="Clinical Analytics" styleClass="admin-nav-button, active-admin-nav" onAction="#showAnalytics"/>
+            <Button text="Gestion utilisateurs" styleClass="admin-nav-button" onAction="#showUsers"/>
+            <Button text="Moderation forum" styleClass="admin-nav-button" onAction="#showForumModeration"/>
+            <Button text="Ateliers et evenements" styleClass="admin-nav-button" onAction="#showEvents"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button text="+ New Administrative Task" styleClass="admin-primary-button"/>
+            <Button text="Logout" styleClass="admin-nav-button" onAction="#handleLogout"/>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll">
+            <VBox spacing="18.0" styleClass="admin-content">
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="4.0">
+                        <Label text="System Oversight Dashboard" styleClass="admin-page-title"/>
+                        <Label text="Real-time supervision and clinical integrity monitoring" styleClass="muted-label"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Export Logs" styleClass="ghost-button"/>
+                    <Button text="Refresh Feed" styleClass="dark-button"/>
+                </HBox>
+
+                <HBox spacing="14.0">
+                    <VBox spacing="6.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                        <Label text="TOTAL USERS" styleClass="section-kicker"/>
+                        <Label text="12,482" styleClass="metric-value"/>
+                        <Label text="+12.4% vs last month" styleClass="positive-label"/>
+                    </VBox>
+                    <VBox spacing="6.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                        <Label text="ACTIVE USERS" styleClass="section-kicker"/>
+                        <Label text="8,921" styleClass="metric-value"/>
+                        <Label text="71% engagement rate" styleClass="muted-label"/>
+                    </VBox>
+                    <VBox spacing="6.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                        <Label text="PENDING REVIEWS" styleClass="section-kicker"/>
+                        <Label text="43" styleClass="metric-value danger-text"/>
+                        <Label text="1 critical - 12 posts" styleClass="danger-label"/>
+                    </VBox>
+                    <VBox spacing="6.0" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                        <Label text="SYSTEM HEALTH" styleClass="section-kicker"/>
+                        <Label text="99.9%" styleClass="metric-value success-text"/>
+                        <Label text="All nodes operational" styleClass="positive-label"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="18.0" VBox.vgrow="ALWAYS">
+                    <VBox spacing="12.0" styleClass="admin-card" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="User Management" styleClass="panel-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Filters" styleClass="ghost-button"/>
+                            <Button text="Bulk Actions" styleClass="ghost-button"/>
+                        </HBox>
+                        <TableView fx:id="activitiesTable" prefHeight="220.0">
+                            <columns>
+                                <TableColumn fx:id="colAction" text="Activity" prefWidth="250"/>
+                                <TableColumn fx:id="colUser" text="User" prefWidth="180"/>
+                                <TableColumn fx:id="colDate" text="Last Active" prefWidth="160"/>
+                                <TableColumn fx:id="colStatus" text="Status" prefWidth="130"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <VBox spacing="14.0" prefWidth="330.0">
+                        <VBox spacing="10.0" styleClass="admin-card">
+                            <Label text="Clinical Taxonomy" styleClass="panel-title"/>
+                            <FlowPane hgap="8.0" vgap="8.0">
+                                <Label text="Cardiology" styleClass="taxonomy-pill"/>
+                                <Label text="Neurology" styleClass="taxonomy-pill"/>
+                                <Label text="Nutrition" styleClass="taxonomy-pill"/>
+                                <Label text="Pediatrics" styleClass="taxonomy-pill"/>
+                            </FlowPane>
+                            <HBox spacing="8.0">
+                                <TextField promptText="Enter category name..." styleClass="soft-input" HBox.hgrow="ALWAYS"/>
+                                <Button text="+" styleClass="primary-square-button"/>
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="8.0" styleClass="intelligence-card">
+                            <Label text="System Intelligence" styleClass="panel-title"/>
+                            <Label text="Analytics suggest a 14% spike in dermatology discussions. Consider adjusting moderation resource allocation." wrapText="true" styleClass="side-title"/>
+                            <Button text="Full Intelligence Report" styleClass="ghost-button"/>
+                        </VBox>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="18.0" VBox.vgrow="ALWAYS">
+                    <VBox spacing="10.0" styleClass="admin-card" HBox.hgrow="ALWAYS">
+                        <Label text="User Engagement Trends" styleClass="panel-title"/>
+                        <LineChart fx:id="engagementChart" legendVisible="false" animated="false" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="Month"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Users"/>
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+                    <VBox spacing="10.0" prefWidth="360.0" styleClass="admin-card">
+                        <Label text="Content Distribution" styleClass="panel-title"/>
+                        <PieChart fx:id="contentPieChart" legendVisible="true" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

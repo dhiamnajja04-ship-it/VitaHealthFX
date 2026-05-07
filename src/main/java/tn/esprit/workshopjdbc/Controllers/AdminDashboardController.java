@@ -54,6 +54,7 @@ public class AdminDashboardController {
     @FXML private Label userLabel;
     @FXML private Button logoutBtn;
     @FXML private Button themeToggleBtn;
+    @FXML private TabPane mainTabPane;
 
     // Dashboard Stats Labels
     @FXML private Label totalUsersLabel;
@@ -1130,5 +1131,11 @@ public class AdminDashboardController {
 
     private void showAlert(String title, String message, Alert.AlertType type) {
         NotificationManager.showAlert(title, message, type);
+    }
+
+    public void selectTab(int index) {
+        if (mainTabPane == null) return;
+        if (index < 0 || index >= mainTabPane.getTabs().size()) return;
+        mainTabPane.getSelectionModel().select(index);
     }
 }

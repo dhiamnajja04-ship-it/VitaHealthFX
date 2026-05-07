@@ -3,77 +3,157 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.ForumController">
+<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.ForumController" stylesheets="@../../css/community-feed.css">
+
+    <!-- Top Bar -->
     <top>
-        <VBox spacing="12.0" style="-fx-padding: 20 24 12 24;">
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <VBox>
-                    <Label text="Forum Sante VitaHealth" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
-                    <Label text="Questions, experiences et conseils entre patients, medecins et administrateurs." style="-fx-text-fill: #64748b;" />
-                </VBox>
-                <Region HBox.hgrow="ALWAYS" />
-                <ComboBox fx:id="categoryFilterCombo" prefWidth="190.0" promptText="Categorie" />
-                <TextField fx:id="searchField" prefWidth="260.0" promptText="Rechercher..." />
-                <Button fx:id="searchBtn" text="Rechercher" styleClass="btn-secondary" />
-                <Button fx:id="refreshBtn" text="Actualiser" styleClass="btn-outline" />
+        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #ffffff; -fx-padding: 12 25; -fx-border-color: #e4e6eb; -fx-border-width: 0 0 1 0;">
+            <Label text="VitaHealth" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+            <TextField fx:id="searchField" promptText="Search discussions, topics..." styleClass="search-field" prefWidth="400" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox spacing="15.0" alignment="CENTER">
+                <Button text="🔔" styleClass="icon-button"/>
+                <Button text="💬" styleClass="icon-button"/>
+                <HBox spacing="10.0" alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 5 12; -fx-background-radius: 25;">
+                    <Circle radius="18.0" style="-fx-fill: linear-gradient(#667eea, #764ba2);"/>
+                    <VBox spacing="1.0">
+                        <Label text="Dr. Fatma Tounsi" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Label text="Médecin" style="-fx-font-size: 10px; -fx-text-fill: #65676b;"/>
+                    </VBox>
+                </HBox>
             </HBox>
-            <Separator />
-        </VBox>
+        </HBox>
     </top>
 
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="280.0" style="-fx-background-color: #ffffff; -fx-border-color: #e4e6eb; -fx-border-width: 0 1 0 0;" spacing="5.0">
+            <padding>
+                <Insets top="20.0" left="20.0" right="20.0" bottom="20.0"/>
+            </padding>
+            <Label text="MAIN" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #90949c;"/>
+            <Button text="📢 Community Feed" styleClass="nav-button" onAction="#showCommunityFeed"/>
+            <Button text="🏥 Patient Care" styleClass="nav-button" onAction="#showPatientCare"/>
+            <Button text="📚 Medical Library" styleClass="nav-button" onAction="#showMedicalLibrary"/>
+            <Button text="📊 Analytics" styleClass="nav-button" onAction="#showAnalytics"/>
+            <Button text="⚙️ Settings" styleClass="nav-button" onAction="#showSettings"/>
+            <Separator style="-fx-padding: 15 0;"/>
+            <Label text="CATEGORIES" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #90949c;"/>
+            <Button text="💬 All Discussions" styleClass="nav-button, active-nav"/>
+            <Button text="❓ General Questions" styleClass="nav-button"/>
+            <Button text="📖 Case Studies" styleClass="nav-button"/>
+            <Button text="🔬 Research" styleClass="nav-button"/>
+            <Button text="⚕️ Medical News" styleClass="nav-button"/>
+        </VBox>
+    </left>
+
+    <!-- Center Content -->
     <center>
-        <SplitPane dividerPositions="0.33" style="-fx-background-color: transparent;">
-            <items>
-                <VBox spacing="10.0" style="-fx-padding: 0 12 18 24;">
-                    <Label text="Discussions recentes" style="-fx-font-weight: bold; -fx-text-fill: #334155;" />
-                    <ListView fx:id="postsListView" VBox.vgrow="ALWAYS" />
+        <VBox spacing="0.0">
+            <!-- Header Section -->
+            <VBox spacing="15.0" style="-fx-padding: 20 25;">
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <VBox spacing="5.0">
+                        <Label text="Forum Santé VitaHealth" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Label text="Questions, experiences et conseils entre patients, médecins et administrateurs." style="-fx-text-fill: #65676b; -fx-font-size: 13px;"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <VBox spacing="8.0" alignment="CENTER_RIGHT">
+                        <HBox spacing="10.0" alignment="CENTER">
+                            <ComboBox fx:id="categoryFilterCombo" promptText="Filter by category" style="-fx-padding: 8 12; -fx-background-radius: 8; prefWidth: 180;"/>
+                            <Button fx:id="searchBtn" text="🔍 Search" styleClass="secondary-button"/>
+                            <Button fx:id="refreshBtn" text="🔄 Refresh" styleClass="secondary-button"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <Separator style="-fx-padding: 0;"/>
+
+            <!-- Main Content -->
+            <HBox spacing="20.0" style="-fx-padding: 20 25;" VBox.vgrow="ALWAYS">
+
+                <!-- Left: Discussion List -->
+                <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="Recent Discussions" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="↓ Latest" style="-fx-background-color: #f0f2f5; -fx-text-fill: #050505; -fx-padding: 6 12; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+                    </HBox>
+                    <ListView fx:id="postsListView" VBox.vgrow="ALWAYS" style="-fx-padding: 0; -fx-background-color: transparent;"/>
                 </VBox>
 
-                <VBox spacing="12.0" style="-fx-padding: 0 24 18 12;">
-                    <VBox spacing="6.0" styleClass="card">
-                        <Label fx:id="selectedTitleLabel" text="Selectionnez une discussion" wrapText="true" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
-                        <Label fx:id="selectedMetaLabel" text="" wrapText="true" style="-fx-text-fill: #64748b;" />
-                        <TextArea fx:id="selectedContentArea" editable="false" wrapText="true" prefHeight="150.0" />
-                        <HBox spacing="10.0">
-                            <Button fx:id="usefulBtn" text="Utile" styleClass="btn-primary" />
-                            <Button fx:id="reportBtn" text="Signaler" styleClass="btn-danger" />
-                            <Button fx:id="translateBtn" text="Traduire" styleClass="btn-outline" />
+                <!-- Right: Discussion Detail -->
+                <VBox spacing="15.0" prefWidth="450.0" HBox.hgrow="ALWAYS">
+
+                    <!-- Selected Post Card -->
+                    <VBox spacing="12.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" VBox.vgrow="ALWAYS">
+                        <Label fx:id="selectedTitleLabel" text="Select a discussion to view details" wrapText="true" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Label fx:id="selectedMetaLabel" text="" wrapText="true" style="-fx-text-fill: #65676b; -fx-font-size: 12px;"/>
+                        <Separator/>
+                        <TextArea fx:id="selectedContentArea" editable="false" wrapText="true" prefHeight="150.0" style="-fx-font-size: 13px; -fx-padding: 10;"/>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Button fx:id="usefulBtn" text="👍 Useful" styleClass="interaction-button"/>
+                            <Button fx:id="reportBtn" text="⚠️ Report" styleClass="interaction-button"/>
+                            <Button fx:id="translateBtn" text="🌐 Translate" styleClass="interaction-button"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <HBox fx:id="postActionBox" spacing="8.0" alignment="CENTER_RIGHT">
+                                <Button fx:id="editPostBtn" text="✏️ Edit" styleClass="interaction-button"/>
+                                <Button fx:id="deletePostBtn" text="🗑️ Delete" styleClass="interaction-button"/>
+                            </HBox>
                         </HBox>
                     </VBox>
 
-                    <VBox spacing="8.0" VBox.vgrow="ALWAYS">
-                        <Label text="Commentaires" style="-fx-font-weight: bold; -fx-text-fill: #334155;" />
-                        <ListView fx:id="commentsListView" prefHeight="170.0" VBox.vgrow="ALWAYS" />
-                        <TextArea fx:id="commentArea" promptText="Ajouter une reponse..." prefHeight="70.0" wrapText="true" />
-                        <Button fx:id="addCommentBtn" text="Commenter" styleClass="btn-secondary" />
+                    <!-- Comments Section -->
+                    <VBox spacing="12.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Comments" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="15 comments" style="-fx-font-size: 12px; -fx-text-fill: #65676b;"/>
+                        </HBox>
+                        <ListView fx:id="commentsListView" prefHeight="120.0" VBox.vgrow="ALWAYS" style="-fx-padding: 0; -fx-background-color: transparent;"/>
+                        <HBox spacing="8.0" alignment="CENTER_LEFT">
+                            <Button text="✏️ Edit" styleClass="secondary-button" onAction="#editComment"/>
+                            <Button text="🗑️ Delete" styleClass="secondary-button" onAction="#deleteComment"/>
+                        </HBox>
+                        <TextArea fx:id="commentArea" promptText="Add a response..." prefHeight="70.0" wrapText="true" style="-fx-font-size: 12px; -fx-padding: 10;"/>
+                        <Button fx:id="addCommentBtn" text="Post Comment" styleClass="primary-button" alignment="CENTER_RIGHT"/>
                     </VBox>
                 </VBox>
-            </items>
-        </SplitPane>
+            </HBox>
+        </VBox>
     </center>
 
+    <!-- Bottom: Create Post Section -->
     <bottom>
-        <VBox fx:id="createPostBox" spacing="10.0" style="-fx-padding: 14 24 22 24; -fx-background-color: #eef6f3;">
-            <Label text="Nouvelle discussion" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
-            <GridPane hgap="12.0" vgap="10.0">
+        <VBox fx:id="createPostBox" spacing="12.0" style="-fx-padding: 20 25; -fx-background-color: #ffffff; -fx-border-color: #e4e6eb; -fx-border-width: 1 0 0 0;">
+            <Label text="Start a New Discussion" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+            <GridPane hgap="15.0" vgap="12.0">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="18" />
-                    <ColumnConstraints percentWidth="42" />
-                    <ColumnConstraints percentWidth="12" />
-                    <ColumnConstraints percentWidth="28" />
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="40"/>
+                    <ColumnConstraints percentWidth="15"/>
+                    <ColumnConstraints percentWidth="25"/>
                 </columnConstraints>
-                <Label text="Categorie" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <ComboBox fx:id="createCategoryCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <Label text="Langue" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                <ComboBox fx:id="languageCombo" maxWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-                <Label text="Titre" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <TextField fx:id="titleField" promptText="Ex: Comment gerer ma glycemie le matin ?" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+                <Label text="Category" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="createCategoryCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-padding: 8 12; -fx-background-radius: 8;"/>
+                <Label text="Language" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="languageCombo" maxWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0" style="-fx-padding: 8 12; -fx-background-radius: 8;"/>
+
+                <Label text="Title" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <TextField fx:id="titleField" promptText="Ex: How to manage my blood sugar in the morning?" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1" style="-fx-padding: 8 12; -fx-background-radius: 8;"/>
             </GridPane>
-            <TextArea fx:id="contentArea" promptText="Partagez votre question ou experience..." prefHeight="85.0" wrapText="true" />
+            <TextArea fx:id="contentArea" promptText="Share your question or experience..." prefHeight="80.0" wrapText="true" style="-fx-font-size: 12px; -fx-padding: 10;"/>
             <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <Button fx:id="publishBtn" text="Publier" styleClass="btn-primary" />
-                <Label fx:id="messageLabel" text="" style="-fx-text-fill: #475569;" />
+                <Button fx:id="uploadImageBtn" text="🖼️ Upload Image" styleClass="secondary-button"/>
+                <Button fx:id="uploadVideoBtn" text="🎥 Upload Video" styleClass="secondary-button"/>
+                <Label fx:id="uploadStatusLabel" text="" style="-fx-text-fill: #00aa00; -fx-font-size: 11px;"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <Button fx:id="publishBtn" text="Publish Discussion" styleClass="primary-action-button"/>
+                <Label fx:id="messageLabel" text="" style="-fx-text-fill: #475569; -fx-font-size: 12px;"/>
             </HBox>
         </VBox>
     </bottom>
