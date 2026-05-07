@@ -8,6 +8,7 @@ import tn.esprit.workshopjdbc.Entities.Appointment;
 import tn.esprit.workshopjdbc.Entities.ParaMedical;
 import tn.esprit.workshopjdbc.Entities.Prescription;
 import tn.esprit.workshopjdbc.Entities.User;
+import tn.esprit.workshopjdbc.Services.WhatsAppReminderService;
 import tn.esprit.workshopjdbc.Utils.NotificationManager;
 import tn.esprit.workshopjdbc.Utils.SessionManager;
 import tn.esprit.workshopjdbc.Utils.ThemeManager;
@@ -90,6 +91,7 @@ public class DoctorController {
     private AppointmentDAO appointmentDAO;
     private PrescriptionDAO prescriptionDAO;
     private ParaMedicalDAO paraMedicalDAO;
+    private WhatsAppReminderService whatsAppReminderService;
     private User currentUser;
     private ObservableList<User> allPatients;
     private ObservableList<Appointment> doctorAppointments;
@@ -102,6 +104,7 @@ public class DoctorController {
         appointmentDAO = new AppointmentDAO();
         prescriptionDAO = new PrescriptionDAO();
         paraMedicalDAO = new ParaMedicalDAO();
+        whatsAppReminderService = new WhatsAppReminderService();
 
         currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -173,11 +176,13 @@ public class DoctorController {
             private final Button confirmBtn = new Button("Confirmer");
             private final Button doneBtn = new Button("Terminer");
             private final Button cancelBtn = new Button("Annuler");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(5, confirmBtn, doneBtn, cancelBtn);
+            private final Button whatsAppBtn = new Button("WhatsApp");
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(5, confirmBtn, doneBtn, cancelBtn, whatsAppBtn);
             {
                 confirmBtn.setOnAction(e -> updateAppointmentStatus("CONFIRMED"));
                 doneBtn.setOnAction(e -> updateAppointmentStatus("COMPLETED"));
                 cancelBtn.setOnAction(e -> updateAppointmentStatus("CANCELLED"));
+                whatsAppBtn.setOnAction(e -> sendWhatsAppReminder());
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -187,6 +192,22 @@ public class DoctorController {
                 Appointment app = getTableView().getItems().get(getIndex());
                 if (appointmentDAO.updateAppointmentStatus(app.getId(), status)) {
                     loadDoctorAppointments();
+                }
+            }
+
+            private void sendWhatsAppReminder() {
+                Appointment app = getTableView().getItems().get(getIndex());
+                try {
+                    User patient = userDAO.findById(app.getPatientId());
+                    WhatsAppReminderService.ReminderResult result = whatsAppReminderService.sendAppointmentReminder(app, patient, currentUser);
+                    NotificationManager.Type type = result.sent()
+                            ? NotificationManager.Type.SUCCESS
+                            : result.dryRun() ? NotificationManager.Type.INFO : NotificationManager.Type.ERROR;
+                    NotificationManager.showToast(logoutBtn != null ? logoutBtn.getScene() : null,
+                            "Rappel WhatsApp", result.message(), type);
+                } catch (Exception ex) {
+                    NotificationManager.showToast(logoutBtn != null ? logoutBtn.getScene() : null,
+                            "Rappel WhatsApp", "Impossible de charger le patient: " + ex.getMessage(), NotificationManager.Type.ERROR);
                 }
             }
         });
