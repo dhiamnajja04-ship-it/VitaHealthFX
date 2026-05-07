@@ -3,6 +3,7 @@ package tn.esprit.workshopjdbc.Controllers;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -15,6 +16,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.workshopjdbc.Entities.User;
 import tn.esprit.workshopjdbc.Services.ServiceVitaHealth;
+import tn.esprit.workshopjdbc.Services.SocialAuthService;
+import tn.esprit.workshopjdbc.Utils.NotificationManager;
 import tn.esprit.workshopjdbc.Utils.SessionManager;
 import tn.esprit.workshopjdbc.Utils.ThemeManager;
 
@@ -24,9 +27,11 @@ import java.sql.SQLException;
 public class LoginController {
 
     private final ServiceVitaHealth service = new ServiceVitaHealth();
+    private final SocialAuthService socialAuthService = new SocialAuthService();
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
+    private CheckBox robotCheckBox;
 
     public Scene getScene() {
         HBox root = new HBox();
@@ -75,6 +80,9 @@ public class LoginController {
         passwordField.getStyleClass().add("auth-field");
         passwordField.setOnAction(e -> handleLogin());
 
+        robotCheckBox = new CheckBox("Je ne suis pas un robot");
+        robotCheckBox.getStyleClass().add("robot-check");
+
         messageLabel = new Label();
         messageLabel.getStyleClass().add("auth-message");
 
@@ -82,6 +90,22 @@ public class LoginController {
         loginBtn.getStyleClass().add("auth-primary-button");
         loginBtn.setMaxWidth(Double.MAX_VALUE);
         loginBtn.setOnAction(e -> handleLogin());
+
+        Label socialLabel = new Label("Connexion rapide");
+        socialLabel.getStyleClass().add("auth-divider-label");
+
+        Button googleBtn = new Button("Continuer avec Google");
+        googleBtn.getStyleClass().addAll("social-button", "google-button");
+        googleBtn.setMaxWidth(Double.MAX_VALUE);
+        googleBtn.setOnAction(e -> startSocialAuth(SocialAuthService.Provider.GOOGLE, "login"));
+
+        Button facebookBtn = new Button("Continuer avec Facebook");
+        facebookBtn.getStyleClass().addAll("social-button", "facebook-button");
+        facebookBtn.setMaxWidth(Double.MAX_VALUE);
+        facebookBtn.setOnAction(e -> startSocialAuth(SocialAuthService.Provider.FACEBOOK, "login"));
+
+        VBox socialBox = new VBox(10, socialLabel, googleBtn, facebookBtn);
+        socialBox.setFillWidth(true);
 
         Button forgotPasswordBtn = new Button("Mot de passe oublie ?");
         forgotPasswordBtn.getStyleClass().add("auth-link-button");
@@ -94,7 +118,8 @@ public class LoginController {
         HBox links = new HBox(14, forgotPasswordBtn, registerLink);
         links.setAlignment(Pos.CENTER);
 
-        card.getChildren().addAll(title, subtitle, emailField, passwordField, messageLabel, loginBtn, links);
+        card.getChildren().addAll(title, subtitle, emailField, passwordField, robotCheckBox,
+                messageLabel, loginBtn, socialBox, links);
         rightPane.getChildren().addAll(themeBtn, card);
         root.getChildren().addAll(brandPanel, rightPane);
 
@@ -129,6 +154,12 @@ public class LoginController {
             showError("Veuillez remplir tous les champs");
             return;
         }
+        if (robotCheckBox == null || !robotCheckBox.isSelected()) {
+            showError("Confirmez d'abord: Je ne suis pas un robot.");
+            NotificationManager.showToast(emailField.getScene(), "Verification requise",
+                    "Cochez la verification anti-robot avant la connexion.", NotificationManager.Type.WARNING);
+            return;
+        }
 
         try {
             User user = service.login(email, password);
@@ -146,6 +177,40 @@ public class LoginController {
             }
         } catch (SQLException e) {
             showError("Erreur de connexion : " + e.getMessage());
+        }
+    }
+
+    private void startSocialAuth(SocialAuthService.Provider provider, String context) {
+        NotificationManager.showToast(emailField.getScene(), "Connexion sociale",
+                "Ouverture de " + provider.label() + " dans votre navigateur...", NotificationManager.Type.INFO);
+        socialAuthService.authenticateAsync(provider, context).thenAccept(result ->
+                Platform.runLater(() -> handleSocialAuthResult(result)));
+    }
+
+    private void handleSocialAuthResult(SocialAuthService.AuthResult result) {
+        if (!result.success()) {
+            NotificationManager.showAlert("Connexion " + result.provider().label(), result.message(), Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            User user = service.getUserByEmail(result.user().email());
+            if (user != null) {
+                SessionManager.getInstance().setCurrentUser(user);
+                messageLabel.getStyleClass().remove("auth-error");
+                if (!messageLabel.getStyleClass().contains("auth-success")) {
+                    messageLabel.getStyleClass().add("auth-success");
+                }
+                messageLabel.setText("Connexion " + result.provider().label() + " reussie.");
+                redirectByRole(user);
+            } else {
+                NotificationManager.showToast(emailField.getScene(), "Compte a completer",
+                        "Profil " + result.provider().label() + " valide. Completez telephone, role et OTP.",
+                        NotificationManager.Type.INFO);
+                openRegister(result.user());
+            }
+        } catch (SQLException e) {
+            NotificationManager.showAlert("Connexion sociale", "Erreur base de donnees: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -227,6 +292,25 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Impossible d'ouvrir la page d'inscription");
+        }
+    }
+
+    private void openRegister(SocialAuthService.OAuthUser profile) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RegisterView.fxml"));
+            Parent root = loader.load();
+            RegisterController controller = loader.getController();
+            controller.prefillFromSocial(profile);
+            Scene scene = new Scene(root, 1200, 800);
+            ThemeManager.apply(scene);
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Inscription");
+            stage.centerOnScreen();
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Impossible d'ouvrir l'inscription sociale");
         }
     }
 

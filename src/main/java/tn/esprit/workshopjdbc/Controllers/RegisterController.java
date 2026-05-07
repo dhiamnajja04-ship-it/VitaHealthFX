@@ -3,6 +3,7 @@ package tn.esprit.workshopjdbc.Controllers;
 import javafx.animation.PauseTransition;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +15,9 @@ import javafx.util.Duration;
 import org.mindrot.jbcrypt.BCrypt;
 import tn.esprit.workshopjdbc.Entities.Role;
 import tn.esprit.workshopjdbc.Entities.User;
+import tn.esprit.workshopjdbc.Services.OtpVerificationService;
+import tn.esprit.workshopjdbc.Services.SocialAuthService;
+import tn.esprit.workshopjdbc.Utils.NotificationManager;
 import tn.esprit.workshopjdbc.Utils.ThemeManager;
 import tn.esprit.workshopjdbc.dao.UserDAO;
 
@@ -46,11 +50,20 @@ public class RegisterController {
 
     @FXML private Button registerButton;
     @FXML private Button loginButton;
+    @FXML private Button sendOtpButton;
+    @FXML private Button verifyOtpButton;
+    @FXML private Button googleRegisterButton;
+    @FXML private Button facebookRegisterButton;
     @FXML private Button themeToggleButton;
+    @FXML private CheckBox robotCheckBox;
+    @FXML private TextField otpCodeField;
     @FXML private Label errorLabel;
     @FXML private Label successLabel;
 
     private UserDAO userDAO;
+    private OtpVerificationService otpService;
+    private SocialAuthService socialAuthService;
+    private boolean phoneVerified;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern NAME_PATTERN = Pattern.compile("^[\\p{L}\\s]{2,50}$");
@@ -60,6 +73,8 @@ public class RegisterController {
     @FXML
     public void initialize() {
         userDAO = new UserDAO();
+        otpService = new OtpVerificationService();
+        socialAuthService = new SocialAuthService();
 
         if (roleGroup == null) {
             roleGroup = new ToggleGroup();
@@ -71,6 +86,10 @@ public class RegisterController {
 
         registerButton.setOnAction(e -> handleRegister());
         loginButton.setOnAction(e -> openLogin());
+        if (sendOtpButton != null) sendOtpButton.setOnAction(e -> handleSendOtp());
+        if (verifyOtpButton != null) verifyOtpButton.setOnAction(e -> handleVerifyOtp());
+        if (googleRegisterButton != null) googleRegisterButton.setOnAction(e -> startSocialAuth(SocialAuthService.Provider.GOOGLE));
+        if (facebookRegisterButton != null) facebookRegisterButton.setOnAction(e -> startSocialAuth(SocialAuthService.Provider.FACEBOOK));
         if (themeToggleButton != null) {
             themeToggleButton.setText(ThemeManager.toggleText());
             themeToggleButton.setOnAction(e -> {
@@ -86,7 +105,11 @@ public class RegisterController {
         emailField.textProperty().addListener((obs, old, val) -> validateEmail());
         passwordField.textProperty().addListener((obs, old, val) -> validatePassword());
         confirmPasswordField.textProperty().addListener((obs, old, val) -> validateConfirmPassword());
-        phoneField.textProperty().addListener((obs, old, val) -> validatePhone());
+        phoneField.textProperty().addListener((obs, old, val) -> {
+            phoneVerified = false;
+            if (otpCodeField != null) otpCodeField.clear();
+            validatePhone();
+        });
 
         setupTooltips();
     }
@@ -253,7 +276,76 @@ public class RegisterController {
         ok &= validateCommonBusinessFields();
         ok &= validatePatientFields();
         ok &= validateDoctorFields();
+        if (!phoneVerified) {
+            showError("Veuillez verifier votre numero telephone avec le code OTP.");
+            ok = false;
+        }
+        if (robotCheckBox == null || !robotCheckBox.isSelected()) {
+            showError("Confirmez d'abord: Je ne suis pas un robot.");
+            ok = false;
+        }
         return ok;
+    }
+
+    private void handleSendOtp() {
+        if (!validatePhone()) return;
+        OtpVerificationService.OtpResult result = otpService.sendCode(phoneField.getText().trim(), "l'inscription");
+        NotificationManager.Type type = result.sent()
+                ? NotificationManager.Type.SUCCESS
+                : result.dryRun() ? NotificationManager.Type.INFO : NotificationManager.Type.ERROR;
+        NotificationManager.showToast(registerButton.getScene(), "Verification telephone", result.message(), type);
+        if (result.sent() || result.dryRun()) {
+            successLabel.setText(result.message());
+            errorLabel.setText("");
+        } else {
+            showError(result.message());
+        }
+    }
+
+    private void handleVerifyOtp() {
+        String code = otpCodeField == null ? "" : otpCodeField.getText().trim();
+        phoneVerified = otpService.verify(phoneField.getText().trim(), code);
+        if (phoneVerified) {
+            successLabel.setText("Numero telephone verifie.");
+            errorLabel.setText("");
+            NotificationManager.showToast(registerButton.getScene(), "Verification telephone", "Code OTP valide.", NotificationManager.Type.SUCCESS);
+        } else {
+            showError("Code OTP incorrect ou expire.");
+        }
+    }
+
+    private void startSocialAuth(SocialAuthService.Provider provider) {
+        NotificationManager.showToast(registerButton != null ? registerButton.getScene() : null,
+                "Inscription sociale",
+                "Ouverture de " + provider.label() + " dans votre navigateur...", NotificationManager.Type.INFO);
+        socialAuthService.authenticateAsync(provider, "register").thenAccept(result ->
+                Platform.runLater(() -> handleSocialAuthResult(result)));
+    }
+
+    private void handleSocialAuthResult(SocialAuthService.AuthResult result) {
+        if (!result.success()) {
+            NotificationManager.showAlert("Inscription " + result.provider().label(), result.message(), Alert.AlertType.WARNING);
+            return;
+        }
+        prefillFromSocial(result.user());
+        NotificationManager.showToast(registerButton != null ? registerButton.getScene() : null,
+                "Inscription sociale",
+                "Profil " + result.provider().label() + " valide. Completez telephone, OTP et role.",
+                NotificationManager.Type.SUCCESS);
+    }
+
+    public void prefillFromSocial(SocialAuthService.OAuthUser profile) {
+        if (profile == null) return;
+        if (emailField != null) emailField.setText(profile.email());
+        if (firstNameField != null && profile.firstName() != null && !profile.firstName().isBlank()) {
+            firstNameField.setText(profile.firstName());
+        }
+        if (lastNameField != null && profile.lastName() != null && !profile.lastName().isBlank()) {
+            lastNameField.setText(profile.lastName());
+        }
+        if (successLabel != null) {
+            successLabel.setText("Profil " + profile.provider() + " verifie. Completez le telephone et le code OTP.");
+        }
     }
 
     private void handleRegister() {
@@ -294,6 +386,7 @@ public class RegisterController {
         try {
             boolean created = userDAO.ajouter(newUser);
             if (created) {
+                otpService.clear();
                 successLabel.setText("Inscription reussie. Redirection vers la connexion...");
                 errorLabel.setText("");
 

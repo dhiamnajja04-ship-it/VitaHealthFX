@@ -1,70 +1,81 @@
 package tn.esprit.workshopjdbc.Controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;  // ← IMPORT AJOUTÉ
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tn.esprit.workshopjdbc.Entities.User;
+import tn.esprit.workshopjdbc.Services.OtpVerificationService;
 import tn.esprit.workshopjdbc.Services.ServiceVitaHealth;
 import tn.esprit.workshopjdbc.Utils.CaptchaGenerator;
+import tn.esprit.workshopjdbc.Utils.NotificationManager;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
-import java.util.Random;
 
 public class ForgotPasswordController {
 
     @FXML private TextField emailField;
     @FXML private TextField captchaField;
+    @FXML private TextField otpCodeField;
     @FXML private Label captchaLabel;
     @FXML private Label messageLabel;
     @FXML private Button verifyEmailBtn;
     @FXML private Button resetPasswordBtn;
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
-    
-    // Panels pour les étapes
+
     @FXML private VBox step1Box;
     @FXML private VBox step2Box;
     @FXML private VBox step3Box;
 
     private ServiceVitaHealth service;
+    private OtpVerificationService otpService;
     private String generatedCaptcha;
-    private String verificationCode;
-    private String userEmail;
+    private String userPhone;
     private int userId;
 
     @FXML
     public void initialize() {
         service = new ServiceVitaHealth();
+        otpService = new OtpVerificationService();
         showStep1();
         generateNewCaptcha();
     }
 
     private void showStep1() {
-        if (step1Box != null) step1Box.setVisible(true);
-        if (step2Box != null) step2Box.setVisible(false);
-        if (step3Box != null) step3Box.setVisible(false);
-        if (messageLabel != null) {
-            messageLabel.setText("");
-            messageLabel.setStyle("-fx-text-fill: #333;");
-        }
+        setStepVisible(step1Box, true);
+        setStepVisible(step2Box, false);
+        setStepVisible(step3Box, false);
+        setMessage("", "#334155");
     }
 
     private void showStep2() {
-        if (step1Box != null) step1Box.setVisible(false);
-        if (step2Box != null) step2Box.setVisible(true);
-        if (step3Box != null) step3Box.setVisible(false);
+        setStepVisible(step1Box, false);
+        setStepVisible(step2Box, true);
+        setStepVisible(step3Box, false);
+        if (otpCodeField != null) {
+            otpCodeField.clear();
+            otpCodeField.requestFocus();
+        }
     }
 
     private void showStep3() {
-        if (step1Box != null) step1Box.setVisible(false);
-        if (step2Box != null) step2Box.setVisible(false);
-        if (step3Box != null) step3Box.setVisible(true);
+        setStepVisible(step1Box, false);
+        setStepVisible(step2Box, false);
+        setStepVisible(step3Box, true);
+        if (newPasswordField != null) newPasswordField.requestFocus();
+    }
+
+    private void setStepVisible(VBox box, boolean visible) {
+        if (box != null) {
+            box.setVisible(visible);
+            box.setManaged(visible);
+        }
     }
 
     private void generateNewCaptcha() {
@@ -80,63 +91,68 @@ public class ForgotPasswordController {
 
     @FXML
     private void handleVerifyEmail() {
-        String email = emailField.getText().trim();
-        String userCaptcha = captchaField.getText().trim();
+        String email = emailField.getText() == null ? "" : emailField.getText().trim();
+        String userCaptcha = captchaField.getText() == null ? "" : captchaField.getText().trim();
 
-        // 1. Vérifier CAPTCHA
+        if (email.isBlank()) {
+            setMessage("Email obligatoire.", "#ef4444");
+            return;
+        }
+
         if (!generatedCaptcha.equals(userCaptcha)) {
-            messageLabel.setText("❌ CAPTCHA incorrect ! Veuillez réessayer.");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("CAPTCHA incorrect. Veuillez reessayer.", "#ef4444");
             generateNewCaptcha();
             return;
         }
 
-        // 2. Vérifier si l'email existe
         try {
             User user = service.getUserByEmail(email);
             if (user == null) {
-                messageLabel.setText("❌ Aucun compte trouvé avec cet email !");
-                messageLabel.setStyle("-fx-text-fill: red;");
+                setMessage("Aucun compte trouve avec cet email.", "#ef4444");
+                return;
+            }
+            if (user.getPhone() == null || user.getPhone().trim().isBlank()) {
+                setMessage("Ce compte n'a pas de numero telephone. Contactez l'administrateur.", "#ef4444");
                 return;
             }
 
-            userEmail = email;
             userId = user.getId();
-            
-            // 3. Générer un code de vérification
-            verificationCode = generateVerificationCode();
-            
-            // 4. Simuler l'envoi d'email
-            sendSimulatedEmail(userEmail, verificationCode);
-            
-            messageLabel.setText("✅ Code envoyé à " + email + " (Simulation: " + verificationCode + ")");
-            messageLabel.setStyle("-fx-text-fill: green;");
-            showStep2();
+            userPhone = user.getPhone().trim();
+            OtpVerificationService.OtpResult result =
+                    otpService.sendCode(userPhone, "la reinitialisation du mot de passe");
 
+            if (!result.sent() && !result.dryRun()) {
+                setMessage(result.message(), "#ef4444");
+                NotificationManager.showToast(scene(), "OTP mot de passe", result.message(), NotificationManager.Type.ERROR);
+                return;
+            }
+
+            setMessage(result.message(), "#16a34a");
+            NotificationManager.Type type = result.dryRun()
+                    ? NotificationManager.Type.WARNING
+                    : NotificationManager.Type.SUCCESS;
+            NotificationManager.showToast(scene(), "OTP mot de passe", result.message(), type);
+            showStep2();
         } catch (SQLException e) {
-            messageLabel.setText("❌ Erreur: " + e.getMessage());
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("Erreur base de donnees: " + e.getMessage(), "#ef4444");
         } catch (Exception e) {
-            messageLabel.setText("❌ Erreur inattendue: " + e.getMessage());
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("Erreur inattendue: " + e.getMessage(), "#ef4444");
         }
     }
 
     @FXML
     private void handleVerifyCode() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Code de vérification");
-        dialog.setHeaderText("Entrez le code reçu par email");
-        dialog.setContentText("Code à 6 chiffres:");
-        
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent() && result.get().equals(verificationCode)) {
-            messageLabel.setText("✅ Code vérifié ! Créez votre nouveau mot de passe.");
-            messageLabel.setStyle("-fx-text-fill: green;");
+        String code = otpCodeField == null || otpCodeField.getText() == null
+                ? ""
+                : otpCodeField.getText().trim();
+
+        if (otpService.verify(userPhone, code)) {
+            setMessage("Code OTP verifie. Creez votre nouveau mot de passe.", "#16a34a");
+            NotificationManager.showToast(scene(), "OTP mot de passe", "Code valide.", NotificationManager.Type.SUCCESS);
             showStep3();
         } else {
-            messageLabel.setText("❌ Code incorrect ! Veuillez réessayer.");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("Code OTP incorrect ou expire.", "#ef4444");
+            NotificationManager.showToast(scene(), "OTP mot de passe", "Code incorrect ou expire.", NotificationManager.Type.ERROR);
         }
     }
 
@@ -145,76 +161,65 @@ public class ForgotPasswordController {
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // Vérifier la longueur du mot de passe
         if (newPassword == null || newPassword.length() < 4) {
-            messageLabel.setText("❌ Le mot de passe doit contenir au moins 4 caractères !");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("Le mot de passe doit contenir au moins 4 caracteres.", "#ef4444");
             return;
         }
 
-        // Vérifier la confirmation
         if (!newPassword.equals(confirmPassword)) {
-            messageLabel.setText("❌ Les mots de passe ne correspondent pas !");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("Les mots de passe ne correspondent pas.", "#ef4444");
             return;
         }
 
-        // Réinitialiser le mot de passe
         try {
             boolean success = service.resetPassword(userId, newPassword);
             if (success) {
-                messageLabel.setText("✅ Mot de passe réinitialisé avec succès !");
-                messageLabel.setStyle("-fx-text-fill: green;");
-                
-                // Rediriger vers login après 2 secondes
-                new Thread(() -> {
+                otpService.clear();
+                setMessage("Mot de passe reinitialise avec succes.", "#16a34a");
+                NotificationManager.showToast(scene(), "Mot de passe", "Mot de passe reinitialise.", NotificationManager.Type.SUCCESS);
+
+                Thread redirect = new Thread(() -> {
                     try {
-                        Thread.sleep(2000);
-                        javafx.application.Platform.runLater(() -> handleBackToLogin());
+                        Thread.sleep(1600);
+                        Platform.runLater(this::handleBackToLogin);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
                     }
-                }).start();
+                });
+                redirect.setDaemon(true);
+                redirect.start();
             } else {
-                messageLabel.setText("❌ Erreur lors de la réinitialisation !");
-                messageLabel.setStyle("-fx-text-fill: red;");
+                setMessage("Erreur lors de la reinitialisation.", "#ef4444");
             }
         } catch (SQLException e) {
-            messageLabel.setText("❌ Erreur: " + e.getMessage());
-            messageLabel.setStyle("-fx-text-fill: red;");
+            setMessage("Erreur base de donnees: " + e.getMessage(), "#ef4444");
         }
-    }
-
-    private String generateVerificationCode() {
-        Random random = new Random();
-        int code = 100000 + random.nextInt(900000);
-        return String.valueOf(code);
-    }
-
-    private void sendSimulatedEmail(String email, String code) {
-        System.out.println("📧 === SIMULATION D'ENVOI D'EMAIL ===");
-        System.out.println("   À: " + email);
-        System.out.println("   Sujet: Code de réinitialisation - VitaHealth");
-        System.out.println("   Message: Votre code de vérification est: " + code);
-        System.out.println("   Ce code est valable 15 minutes.");
-        System.out.println("====================================");
     }
 
     @FXML
     private void handleBackToLogin() {
         try {
             Stage stage = (Stage) emailField.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
+            LoginController loginController = new LoginController();
+            Scene scene = loginController.getScene();
             stage.setScene(scene);
-            stage.setTitle("VitaHealth - Connexion");
+            stage.setTitle("VitaHealthFX - Connexion");
             stage.show();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            // Fallback: fermer la fenêtre
             Stage stage = (Stage) emailField.getScene().getWindow();
             stage.close();
+        }
+    }
+
+    private Scene scene() {
+        return emailField == null ? null : emailField.getScene();
+    }
+
+    private void setMessage(String text, String color) {
+        if (messageLabel != null) {
+            messageLabel.setText(text);
+            messageLabel.setStyle("-fx-text-fill: " + color + ";");
         }
     }
 }

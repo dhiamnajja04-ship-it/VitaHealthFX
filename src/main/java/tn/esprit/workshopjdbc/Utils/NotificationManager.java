@@ -91,9 +91,16 @@ public final class NotificationManager {
     public static void styleAlert(Alert alert, String title, String message) {
         alert.setTitle(title);
         alert.setHeaderText(title);
-        alert.setContentText(message);
         DialogPane pane = alert.getDialogPane();
         pane.getStyleClass().add("app-dialog");
+        pane.setMinWidth(460);
+        pane.setPrefWidth(540);
+        Label content = new Label(message == null ? "" : message);
+        content.setWrapText(true);
+        content.getStyleClass().add("app-dialog-content");
+        content.setMaxWidth(480);
+        pane.setContent(content);
+        alert.setResizable(true);
         Scene scene = pane.getScene();
         if (scene != null) {
             ThemeManager.apply(scene);
