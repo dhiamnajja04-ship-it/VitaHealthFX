@@ -19,6 +19,13 @@ public class NouvellePreescriptionController {
     @FXML private Button validerBtn;
     @FXML private Button annulerBtn;
 
+    // ✅ Labels d'erreur (à ajouter dans le FXML)
+    @FXML private Label erreurMedicaments;
+    @FXML private Label erreurDuree;
+    @FXML private Label erreurInstructions;
+
+    private static final int INSTRUCTIONS_MIN_LENGTH = 10;
+
     private TriConsumer onValider;
     private Runnable onAnnuler;
 
@@ -32,6 +39,8 @@ public class NouvellePreescriptionController {
 
     @FXML
     public void initialize() {
+        cacherErreurs();
+
         rechercherMedicamentBtn.setOnAction(e -> rechercherMedicament());
 
         resultatsMedicaments.setOnMouseClicked(event -> {
@@ -41,22 +50,135 @@ public class NouvellePreescriptionController {
                 medicamentsArea.setText(current.isEmpty() ? selected.toString() : current + "\n" + selected);
                 resultatsMedicaments.getItems().clear();
                 rechercheMedicamentField.clear();
+                validerChampMedicaments();
             }
         });
 
-        validerBtn.setOnAction(e -> {
-            String med = medicamentsArea.getText().trim();
-            String dur = dureeField.getText().trim();
-            String ins = instructionsArea.getText().trim();
-            if (med.isEmpty() || dur.isEmpty() || ins.isEmpty()) {
-                new Alert(Alert.AlertType.WARNING, "Remplissez tous les champs.", ButtonType.OK).showAndWait();
-                return;
-            }
-            if (onValider != null) onValider.accept(med, dur, ins);
-        });
+        // ✅ Validation en temps réel
+        medicamentsArea.textProperty().addListener((obs, old, val) -> validerChampMedicaments());
+        dureeField.textProperty().addListener((obs, old, val) -> validerChampDuree());
+        instructionsArea.textProperty().addListener((obs, old, val) -> validerChampInstructions());
 
+        validerBtn.setOnAction(e -> soumettre());
         annulerBtn.setOnAction(e -> { if (onAnnuler != null) onAnnuler.run(); });
     }
+
+    // ================== VALIDATIONS ==================
+
+    private boolean validerChampMedicaments() {
+        String val = medicamentsArea.getText().trim();
+
+        // ✅ Contrôle 1 : champ obligatoire non vide
+        if (val.isEmpty()) {
+            afficherErreur(erreurMedicaments, medicamentsArea, "⚠ Ce champ est obligatoire.");
+            return false;
+        }
+        // ✅ Contrôle 3 : doit être une chaîne de caractères valide (pas que des chiffres)
+        if (val.matches("^[0-9]+$")) {
+            afficherErreur(erreurMedicaments, medicamentsArea, "⚠ Saisissez un nom de médicament valide.");
+            return false;
+        }
+        cacherErreur(erreurMedicaments, medicamentsArea);
+        return true;
+    }
+
+    private boolean validerChampDuree() {
+        String val = dureeField.getText().trim();
+
+        // ✅ Contrôle 1 : champ obligatoire non vide
+        if (val.isEmpty()) {
+            afficherErreur(erreurDuree, dureeField, "⚠ Ce champ est obligatoire.");
+            return false;
+        }
+        // ✅ Contrôle 3 : doit contenir au moins un caractère alphabétique (ex: "7 jours" et pas juste "7")
+        if (!val.matches(".*[a-zA-ZÀ-ÿ].*")) {
+            afficherErreur(erreurDuree, dureeField, "⚠ Précisez l'unité. Ex: 7 jours, 2 semaines, 1 mois");
+            return false;
+        }
+        cacherErreur(erreurDuree, dureeField);
+        return true;
+    }
+
+    private boolean validerChampInstructions() {
+        String val = instructionsArea.getText().trim();
+
+        // ✅ Contrôle 1 : champ obligatoire non vide
+        if (val.isEmpty()) {
+            afficherErreur(erreurInstructions, instructionsArea, "⚠ Ce champ est obligatoire.");
+            return false;
+        }
+        // ✅ Contrôle 2 : longueur minimale
+        if (val.length() < INSTRUCTIONS_MIN_LENGTH) {
+            afficherErreur(erreurInstructions, instructionsArea,
+                    "⚠ Trop court (min " + INSTRUCTIONS_MIN_LENGTH + " caractères, actuellement " + val.length() + ").");
+            return false;
+        }
+        // ✅ Contrôle 3 : doit contenir des lettres (pas que des chiffres/symboles)
+        if (!val.matches(".*[a-zA-ZÀ-ÿ].*")) {
+            afficherErreur(erreurInstructions, instructionsArea, "⚠ Saisissez des instructions valides.");
+            return false;
+        }
+        cacherErreur(erreurInstructions, instructionsArea);
+        return true;
+    }
+
+    private void soumettre() {
+        boolean medOk = validerChampMedicaments();
+        boolean durOk = validerChampDuree();
+        boolean insOk = validerChampInstructions();
+
+        if (!medOk || !durOk || !insOk) {
+            // ✅ Animation shake sur le bouton valider
+            animerErreur(validerBtn);
+            return;
+        }
+
+        if (onValider != null) {
+            onValider.accept(
+                    medicamentsArea.getText().trim(),
+                    dureeField.getText().trim(),
+                    instructionsArea.getText().trim()
+            );
+        }
+    }
+
+    // ================== HELPERS VISUELS ==================
+
+    private void afficherErreur(Label label, javafx.scene.Node champ, String message) {
+        if (label != null) {
+            label.setText(message);
+            label.setVisible(true);
+            label.setManaged(true);
+        }
+        champ.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2; -fx-border-radius: 6;");
+    }
+
+    private void cacherErreur(Label label, javafx.scene.Node champ) {
+        if (label != null) {
+            label.setVisible(false);
+            label.setManaged(false);
+        }
+        champ.setStyle("-fx-border-color: #dce1e7; -fx-border-width: 1; -fx-border-radius: 6;");
+    }
+
+    private void cacherErreurs() {
+        if (erreurMedicaments != null) { erreurMedicaments.setVisible(false); erreurMedicaments.setManaged(false); }
+        if (erreurDuree != null)       { erreurDuree.setVisible(false);       erreurDuree.setManaged(false); }
+        if (erreurInstructions != null){ erreurInstructions.setVisible(false); erreurInstructions.setManaged(false); }
+    }
+
+    // ✅ Animation shake si formulaire invalide
+    private void animerErreur(javafx.scene.Node node) {
+        javafx.animation.TranslateTransition tt =
+                new javafx.animation.TranslateTransition(javafx.util.Duration.millis(60), node);
+        tt.setFromX(0);
+        tt.setByX(8);
+        tt.setCycleCount(6);
+        tt.setAutoReverse(true);
+        tt.play();
+    }
+
+    // ================== RECHERCHE MÉDICAMENTS ==================
 
     private void rechercherMedicament() {
         String query = rechercheMedicamentField.getText().trim();

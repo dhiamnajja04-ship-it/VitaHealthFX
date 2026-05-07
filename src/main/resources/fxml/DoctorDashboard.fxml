@@ -81,15 +81,13 @@
                             <ComboBox fx:id="patientPrescCombo" prefWidth="250"
                                       promptText="Sélectionner un patient" />
                             <Button fx:id="refreshPrescListBtn"
-                                    style="-fx-background-color: #95a5a6; -fx-text-fill: white;
-                                           -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
-                                    text="🔄 Rafraîchir" />
+                                    text="Rafraîchir" />
                             <Button fx:id="ouvrirFormPrescriptionBtn"
                                     style="-fx-background-color: #27ae60; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"
                                     text=" Nouvelle prescription" />
                             <Button fx:id="supprimerPrescriptionBtn"
-                                    text="🗑 Supprimer" />
+                                    text="Supprimer" />
                             <Button fx:id="genererPdfBtn"
                                     text=" PDF" />
                         </HBox>
