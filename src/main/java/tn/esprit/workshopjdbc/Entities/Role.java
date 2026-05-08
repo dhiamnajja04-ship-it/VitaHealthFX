@@ -7,7 +7,8 @@ package tn.esprit.workshopjdbc.Entities;
 public final class Role {
     public static final String ADMIN   = "ADMIN";
     public static final String PATIENT = "PATIENT";
-    public static final String MEDECIN = "MEDECIN";   // was "medecin" / "DOCTOR" — unified here
+    public static final String DOCTOR = "DOCTOR";
+    public static final String MEDECIN = DOCTOR;
 
     private Role() {}
 }

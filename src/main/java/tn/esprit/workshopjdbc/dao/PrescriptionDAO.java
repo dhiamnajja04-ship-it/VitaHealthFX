@@ -1,6 +1,7 @@
 package tn.esprit.workshopjdbc.dao;
 
 import tn.esprit.workshopjdbc.Entities.Prescription;
+import tn.esprit.workshopjdbc.Entities.User;
 import com.vitahealth.config.DatabaseConnection;
 
 import java.sql.*;
@@ -10,11 +11,12 @@ import java.util.List;
 public class PrescriptionDAO {
 
     public boolean ajouter(int patientId, int medecinId, Prescription p) {
-        String sql = "INSERT INTO prescriptions (patient_id, medecin_id, medication_list, instructions, duration) VALUES (?, ?, ?, ?, ?)";
+        // Changement de medecin_id -> doctor_id ici
+        String sql = "INSERT INTO prescriptions (patient_id, doctor_id, medication_list, instructions, duration) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, patientId);
-            pstmt.setInt(2, medecinId);
+            pstmt.setInt(2, medecinId); // C'est ici que l'ID du docteur est envoyé vers doctor_id
             pstmt.setString(3, p.getMedicationList());
             pstmt.setString(4, p.getInstructions());
             pstmt.setString(5, p.getDuration());
@@ -24,6 +26,7 @@ public class PrescriptionDAO {
             }
             return true;
         } catch (SQLException e) {
+            System.err.println("Erreur dans ajouter: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -42,6 +45,7 @@ public class PrescriptionDAO {
                 p.setMedicationList(rs.getString("medication_list"));
                 p.setInstructions(rs.getString("instructions"));
                 p.setDuration(rs.getString("duration"));
+                // Vérifiez si votre colonne s'appelle created_at ou date dans la base
                 p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 list.add(p);
             }
@@ -52,8 +56,9 @@ public class PrescriptionDAO {
     }
 
     public List<Prescription> getByMedecinId(int medecinId) {
+        // Changement de medecin_id -> doctor_id dans le WHERE
         List<Prescription> list = new ArrayList<>();
-        String sql = "SELECT * FROM prescriptions WHERE medecin_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT * FROM prescriptions WHERE doctor_id = ? ORDER BY created_at DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, medecinId);
@@ -73,6 +78,30 @@ public class PrescriptionDAO {
         return list;
     }
 
+    public User getDoctorByPrescriptionId(int prescriptionId) {
+        // Changement du JOIN : p.medecin_id -> p.doctor_id
+        String sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.role FROM user u " +
+                "JOIN prescriptions p ON u.id = p.doctor_id WHERE p.id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, prescriptionId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                User doctor = new User();
+                doctor.setId(rs.getInt("id"));
+                doctor.setFirstName(rs.getString("first_name"));
+                doctor.setLastName(rs.getString("last_name"));
+                doctor.setEmail(rs.getString("email"));
+                doctor.setRole(rs.getString("role"));
+                return doctor;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Le reste (modifier, supprimer) ne change pas car ils utilisent l'ID de la prescription
     public boolean modifier(Prescription p) {
         String sql = "UPDATE prescriptions SET medication_list=?, instructions=?, duration=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getConnection();

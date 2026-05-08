@@ -38,8 +38,20 @@ public class AdminEventController {
     @FXML
     public void initialize() {
         loadData();
+
+
         searchBar.textProperty().addListener((obs, oldVal, newVal) -> {
             displayEvents(eventService.searchByTitleOrDescription(newVal));
+        });
+
+        // --- ADD THIS: Live Validation for the Title Field ---
+        titleField.textProperty().addListener((obs, old, newValue) -> {
+            if (isDuplicate(newValue)) {
+                titleField.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2px; -fx-background-radius: 8; -fx-border-radius: 8;");
+                // Optional: You could show a small hidden label here too
+            } else {
+                titleField.setStyle("-fx-border-color: #e2e8f0; -fx-border-width: 1px; -fx-background-radius: 8; -fx-border-radius: 8;");
+            }
         });
     }
 
@@ -187,13 +199,29 @@ public class AdminEventController {
         card.setStyle("-fx-background-color: #f0f9ff; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #0ea5e9; -fx-border-width: 2;");
     }
 
-    @FXML private void handleAdd() {
+    @FXML
+    private void handleAdd() {
         if (!validate()) return;
+
+        // Check if event already exists by title
+        if (isDuplicate(titleField.getText())) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Duplicate Event");
+            alert.setHeaderText("Action Cancelled");
+            alert.setContentText("An event with the title '" + titleField.getText() + "' already exists. Please use a different name.");
+            alert.showAndWait();
+            return;
+        }
+
         Event e = new Event();
         fillEventData(e);
         eventService.add(e);
         loadData();
         handleClear();
+
+        // Optional: Success message
+        Alert success = new Alert(Alert.AlertType.INFORMATION, "Workshop added successfully!");
+        success.show();
     }
 
     @FXML private void handleUpdate() {
@@ -253,5 +281,10 @@ public class AdminEventController {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.show();
+    }
+    private boolean isDuplicate(String title) {
+        List<Event> allEvents = eventService.findAll();
+        return allEvents.stream()
+                .anyMatch(event -> event.getTitle().equalsIgnoreCase(title));
     }
 }
