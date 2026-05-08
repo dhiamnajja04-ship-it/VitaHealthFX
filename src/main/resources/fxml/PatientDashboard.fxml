@@ -6,19 +6,45 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.PatientController">
+    <left>
+        <VBox prefWidth="260.0" style="-fx-background-color: #ffffff; -fx-border-color: #e4e6eb; -fx-border-width: 0 1 0 0;" spacing="5.0">
+            <padding>
+                <Insets top="20.0" left="20.0" right="20.0" bottom="20.0"/>
+            </padding>
+            
+            <!-- Logo -->
+            <Label text="🏥 VitaHealthFX" style="-fx-text-fill: #27ae60; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"/>
+            <Label text="Espace Patient" style="-fx-text-fill: #65676b; -fx-font-size: 13px; -fx-padding: 0 0 20 0;"/>
+            
+            <!-- Navigation -->
+            <Label text="MENU" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #90949c;"/>
+            <Button text="📅 Mes rendez-vous" styleClass="nav-button, active-nav" onAction="#showTab0" />
+            <Button text="🩺 Mon profil santé" styleClass="nav-button" onAction="#showTab1" />
+            <Button text="📊 Paramètres médicaux" styleClass="nav-button" onAction="#showTab2" />
+            <Button text="📋 Mes prescriptions" styleClass="nav-button" onAction="#showTab3" />
+            <Button text="🎓 Ateliers &amp; Événements" styleClass="nav-button" onAction="#showTab4" />
+            <Button text="💬 Forum Santé" styleClass="nav-button" onAction="#showTab5" />
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <HBox spacing="10.0" alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 10; -fx-background-radius: 12;">
+                <Label fx:id="userLabel" style="-fx-text-fill: #050505; -fx-font-size: 13px; -fx-font-weight: bold;" text="Patient" />
+            </HBox>
+            <Button fx:id="themeToggleBtn" onAction="#toggleTheme" styleClass="nav-button" text="🌙 Dark mode" />
+            <Button fx:id="logoutBtn" onAction="#handleLogout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 15; -fx-cursor: hand; -fx-font-size: 13px;" text="🚪 Déconnexion" />
+        </VBox>
+    </left>
+    
     <center>
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
                 <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="🏥 VitaHealthFX" />
                 <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Patient" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Patient" />
-                <Button fx:id="themeToggleBtn" onAction="#toggleTheme" styleClass="theme-toggle" text="Dark mode" />
-                <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
+                <Label fx:id="headerUserLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Patient" />
             </HBox>
 
-            <TabPane side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
-                <!-- 📅 Mes rendez-vous -->
+            <TabPane fx:id="tabPane" side="TOP" style="-fx-tab-min-height: 0; -fx-tab-max-height: 0;" styleClass="hidden-tab-headers" VBox.vgrow="ALWAYS">
                 <Tab closable="false" text="📅 Mes rendez-vous">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <HBox spacing="12.0" alignment="CENTER_LEFT">
@@ -40,7 +66,6 @@
                     </VBox>
                 </Tab>
 
-                <!-- 🩺 Mon profil santé -->
                 <Tab closable="false" text="🩺 Mon profil santé">
                     <ScrollPane fitToWidth="true">
                         <VBox spacing="20.0" style="-fx-padding: 20;">
@@ -71,6 +96,7 @@
                                 <Label style="-fx-font-weight: bold;" text="🏥 Maladies chroniques" />
                                 <TextArea fx:id="diseasesArea" prefHeight="60" promptText="Diabète, hypertension, etc." />
                             </VBox>
+
                             <HBox spacing="20.0">
                                 <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                                     <Label style="-fx-font-weight: bold;" text="👤 Contact d'urgence" />
@@ -81,6 +107,7 @@
                                     <TextField fx:id="emergencyPhoneField" promptText="Numéro de téléphone" />
                                 </VBox>
                             </HBox>
+
                             <HBox spacing="15.0">
                                 <Button fx:id="saveHealthBtn" text="💾 Enregistrer" />
                                 <Button fx:id="refreshHealthBtn" text="🔄 Actualiser" />
@@ -89,18 +116,21 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- 📊 Paramètres médicaux (avec alerte, niveau activité, tendances) -->
                 <Tab closable="false" text="📊 Paramètres médicaux">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <GridPane hgap="15.0" vgap="10.0">
                             <Label text="Poids (kg):" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                             <TextField fx:id="poidsField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
                             <Label text="Taille (m):" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                             <TextField fx:id="tailleField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
                             <Label text="Glycémie:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                             <TextField fx:id="glycemieField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
                             <Label text="Tension:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                             <TextField fx:id="tensionField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
                             <Label style="-fx-font-weight: bold;" text="IMC Calculé:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                             <HBox spacing="10" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                 <Label fx:id="imcCalculLabel" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;" text="0.0" />
@@ -110,9 +140,9 @@
 
                         <HBox spacing="15.0">
                             <Button fx:id="ajouterParametreBtn" text="Ajouter" />
+                            <Button fx:id="modifierParametreBtn" text="Modifier" />
                             <Button fx:id="supprimerParametreBtn" text="Supprimer" />
                             <Button fx:id="rafraichirParametresBtn" text="🔄 Actualiser" />
-                            <Button fx:id="showTrendsBtn" text="📈 Voir tendances" />
                         </HBox>
 
                         <TableView fx:id="parametreTable" prefHeight="350">
@@ -123,15 +153,11 @@
                                 <TableColumn fx:id="colParamImc" prefWidth="80" text="IMC" />
                                 <TableColumn fx:id="colParamGlycemie" prefWidth="100" text="Glycémie" />
                                 <TableColumn fx:id="colParamTension" prefWidth="100" text="Tension" />
-                                <TableColumn fx:id="colAlerte" prefWidth="200" text="Alerte" />
                             </columns>
                         </TableView>
-
-                        <Label fx:id="niveauActiviteLabel" style="-fx-font-size: 14px; -fx-padding: 10 0 0 0;" />
                     </VBox>
                 </Tab>
 
-                <!-- 📋 Mes prescriptions (avec bouton PDF) -->
                 <Tab closable="false" text="📋 Mes prescriptions">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <HBox spacing="15.0">
@@ -143,33 +169,34 @@
                                 <TableColumn fx:id="colMedicaments" prefWidth="250" text="Médicaments" />
                                 <TableColumn fx:id="colInstructions" prefWidth="250" text="Instructions" />
                                 <TableColumn fx:id="colDuree" prefWidth="100" text="Durée" />
-                                <TableColumn fx:id="colActionsPresc" prefWidth="100" text="Actions" />
                             </columns>
                         </TableView>
                     </VBox>
                 </Tab>
 
-                <!-- 🎓 Ateliers & Événements -->
                 <Tab closable="false" text="🎓 Ateliers &amp; Événements">
                     <VBox spacing="20.0" style="-fx-padding: 25; -fx-background-color: #f8fafc;">
-                        <HBox alignment="CENTER_LEFT" spacing="15.0">
-                            <VBox>
-                                <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Catalogue des Ateliers" />
-                                <Label style="-fx-text-fill: #64748b;" text="Inscrivez-vous aux sessions de sensibilisation santé." />
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <TextField fx:id="searchWorkshopField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Rechercher un événement..." style="-fx-background-radius: 20; -fx-padding: 0 20;" />
-                        </HBox>
-                        <Separator />
-                        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-                            <content>
-                                <FlowPane fx:id="workshopGrid" hgap="25.0" style="-fx-padding: 10;" vgap="25.0" />
-                            </content>
-                        </ScrollPane>
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                <children>
+                                    <VBox>
+                                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Catalogue des Ateliers" />
+                                        <Label style="-fx-text-fill: #64748b;" text="Inscrivez-vous aux sessions de sensibilisation santé." />
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="searchWorkshopField" prefHeight="40.0" prefWidth="350.0" promptText="🔍 Rechercher un événement..." style="-fx-background-radius: 20; -fx-padding: 0 20;" />
+                                </children>
+                            </HBox>
+                            <Separator />
+                            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                                <content>
+                                    <FlowPane fx:id="workshopGrid" hgap="25.0" style="-fx-padding: 10;" vgap="25.0" />
+                                </content>
+                            </ScrollPane>
+                        </children>
                     </VBox>
                 </Tab>
 
-                <!-- Forum Santé -->
                 <Tab closable="false" text="Forum Santé">
                     <StackPane fx:id="forumContainer" style="-fx-background-color: #f8fafc;" />
                 </Tab>

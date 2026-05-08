@@ -12,9 +12,9 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>21</javafx.version>
+        <javafx.version>21.0.4</javafx.version>
         <pdfbox.version>2.0.30</pdfbox.version>
-        <jackson.version>2.16.1</jackson.version>
+        <jackson.version>2.17.1</jackson.version>
     </properties>
 
     <dependencies>
@@ -111,6 +111,27 @@
             <artifactId>atlantafx-base</artifactId>
             <version>2.1.0</version>
         </dependency>
+
+        <!-- Apache HttpClient 5 for API calls (Groq, NewsAPI, etc.) -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+
+        <!-- Apache Commons Text for text similarity (categorization) -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.12.0</version>
+        </dependency>
+
+        <!-- Apache Commons Lang (utility) -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -118,12 +139,13 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.11</version>
+                <version>0.0.8</version>
                 <configuration>
                     <mainClass>tn.esprit.workshopjdbc.MainApp</mainClass>
                     <options>
                         <!-- Désactive l'accélération matérielle (évite les erreurs de rendu WebView) -->
                         <option>-Dprism.order=sw</option>
+                        <option>--enable-native-access=javafx.graphics</option>
                     </options>
                 </configuration>
             </plugin>
