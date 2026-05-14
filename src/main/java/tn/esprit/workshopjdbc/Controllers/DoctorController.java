@@ -22,8 +22,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -85,6 +87,8 @@ public class DoctorController {
     @FXML private TableColumn<ParaMedical, Double> colImc;
     @FXML private TableColumn<ParaMedical, String> colInterpretation;
     @FXML private StackPane forumContainer;
+    @FXML private TabPane tabPane;
+    private boolean forumLoaded = false;
 
     private UserDAO userDAO;
     private AppointmentDAO appointmentDAO;
@@ -114,6 +118,9 @@ public class DoctorController {
         setupParametreTable();
         loadDoctorAppointments();
         loadAllPatients();
+
+        // Setup forum tab
+        setupForumTab();
 
         // Actions
         if (searchPatientField != null) {
@@ -214,18 +221,6 @@ public class DoctorController {
                 setGraphic(empty ? null : selectBtn);
             }
         });
-    }
-
-    private void loadForumModule() {
-        if (forumContainer == null) return;
-
-        try {
-            Parent forumView = FXMLLoader.load(getClass().getResource("/fxml/forum/ForumView.fxml"));
-            forumContainer.getChildren().setAll(forumView);
-        } catch (Exception e) {
-            System.err.println("Could not load forum module: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     private void setupPrescriptionTable() {
@@ -424,5 +419,39 @@ public class DoctorController {
 
     private void showAlert(String title, String msg, Alert.AlertType type) {
         NotificationManager.showAlert(title, msg, type);
+    }
+
+    private void loadForumModule() {
+        if (forumContainer == null) return;
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CommunityFeed.fxml"));
+            Parent forumView = loader.load();
+            forumContainer.getChildren().setAll(forumView);
+        } catch (IOException e) {
+            System.err.println("Could not load forum module: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void setupForumTab() {
+        if (tabPane != null) {
+            tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                if (newTab != null && newTab.getText().contains("Forum") && !forumLoaded) {
+                    loadForumModule();
+                    forumLoaded = true;
+                }
+            });
+        }
+    }
+
+    public void selectTab(int index) {
+        if (tabPane == null) return;
+        if (index < 0 || index >= tabPane.getTabs().size()) return;
+        tabPane.getSelectionModel().select(index);
+        if (index == 4 && !forumLoaded) {
+            loadForumModule();
+            forumLoaded = true;
+        }
     }
 }

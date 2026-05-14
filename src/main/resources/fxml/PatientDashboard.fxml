@@ -6,18 +6,45 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.PatientController">
+    <left>
+        <VBox prefWidth="260.0" style="-fx-background-color: #ffffff; -fx-border-color: #e4e6eb; -fx-border-width: 0 1 0 0;" spacing="5.0">
+            <padding>
+                <Insets top="20.0" left="20.0" right="20.0" bottom="20.0"/>
+            </padding>
+            
+            <!-- Logo -->
+            <Label text="🏥 VitaHealthFX" style="-fx-text-fill: #27ae60; -fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"/>
+            <Label text="Espace Patient" style="-fx-text-fill: #65676b; -fx-font-size: 13px; -fx-padding: 0 0 20 0;"/>
+            
+            <!-- Navigation -->
+            <Label text="MENU" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #90949c;"/>
+            <Button text="📅 Mes rendez-vous" styleClass="nav-button, active-nav" onAction="#showTab0" />
+            <Button text="🩺 Mon profil santé" styleClass="nav-button" onAction="#showTab1" />
+            <Button text="📊 Paramètres médicaux" styleClass="nav-button" onAction="#showTab2" />
+            <Button text="📋 Mes prescriptions" styleClass="nav-button" onAction="#showTab3" />
+            <Button text="🎓 Ateliers &amp; Événements" styleClass="nav-button" onAction="#showTab4" />
+            <Button text="💬 Forum Santé" styleClass="nav-button" onAction="#showTab5" />
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <HBox spacing="10.0" alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 10; -fx-background-radius: 12;">
+                <Label fx:id="userLabel" style="-fx-text-fill: #050505; -fx-font-size: 13px; -fx-font-weight: bold;" text="Patient" />
+            </HBox>
+            <Button fx:id="themeToggleBtn" onAction="#toggleTheme" styleClass="nav-button" text="🌙 Dark mode" />
+            <Button fx:id="logoutBtn" onAction="#handleLogout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 15; -fx-cursor: hand; -fx-font-size: 13px;" text="🚪 Déconnexion" />
+        </VBox>
+    </left>
+    
     <center>
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 15 25;">
                 <Label style="-fx-text-fill: #27ae60; -fx-font-size: 22px; -fx-font-weight: bold;" text="🏥 VitaHealthFX" />
                 <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Espace Patient" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="userLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Patient" />
-                <Button fx:id="themeToggleBtn" onAction="#toggleTheme" styleClass="theme-toggle" text="Dark mode" />
-                <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
+                <Label fx:id="headerUserLabel" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;" text="Patient" />
             </HBox>
 
-            <TabPane side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="tabPane" side="TOP" style="-fx-tab-min-height: 0; -fx-tab-max-height: 0;" styleClass="hidden-tab-headers" VBox.vgrow="ALWAYS">
                 <Tab closable="false" text="📅 Mes rendez-vous">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <HBox spacing="12.0" alignment="CENTER_LEFT">

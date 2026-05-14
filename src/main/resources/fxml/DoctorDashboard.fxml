@@ -18,7 +18,7 @@
                 <Button fx:id="logoutBtn" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="🚪 Déconnexion" />
             </HBox>
 
-            <TabPane side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="tabPane" side="TOP" styleClass="modern-top-tabs" VBox.vgrow="ALWAYS">
                 <Tab text="📅 Mon Agenda" closable="false">
                     <VBox spacing="15.0" style="-fx-padding: 20;">
                         <HBox spacing="15.0">

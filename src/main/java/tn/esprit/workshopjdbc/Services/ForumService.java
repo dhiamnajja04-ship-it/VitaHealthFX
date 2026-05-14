@@ -9,6 +9,7 @@ import tn.esprit.workshopjdbc.dao.ForumCategoryDAO;
 import tn.esprit.workshopjdbc.dao.ForumCommentDAO;
 import tn.esprit.workshopjdbc.dao.ForumPostDAO;
 import tn.esprit.workshopjdbc.dao.ForumReportDAO;
+import tn.esprit.workshopjdbc.dao.ForumSchemaInitializer;
 
 import java.util.List;
 
@@ -30,8 +31,19 @@ public class ForumService {
     }
 
     public boolean createPost(User author, ForumCategory category, String title, String content, String language) {
+        return createPost(author, category, title, content, language, null, null, null);
+    }
+
+    public boolean createPost(User author, ForumCategory category, String title, String content, String language,
+                              String imageUrl, String videoUrl, String tag) {
         if (author == null || category == null || isBlank(title) || isBlank(content)) {
             return false;
+        }
+
+        // Check content moderation - reject if inappropriate
+        GroqContentModerationService.ModerationResult moderation = GroqContentModerationService.moderateContent(title + " " + content);
+        if (!moderation.isClean) {
+            throw new IllegalArgumentException("Inappropriate content detected: " + moderation.reason);
         }
 
         ForumPost post = new ForumPost();
@@ -40,7 +52,13 @@ public class ForumService {
         post.setTitle(title.trim());
         post.setContent(content.trim());
         post.setLanguage(isBlank(language) ? "fr" : language.trim().toLowerCase());
-        post.setStatus(moderationService.evaluateStatus(title, content));
+        post.setStatus("PENDING_REVIEW");
+        post.setImageUrl(isBlank(imageUrl) ? null : imageUrl.trim());
+        post.setVideoUrl(isBlank(videoUrl) ? null : videoUrl.trim());
+        
+        // Always auto-generate tag using Groq
+        post.setTag(GroqTagGenerationService.generateTag(title, content));
+        
         return postDAO.create(post);
     }
 
@@ -49,11 +67,17 @@ public class ForumService {
             return false;
         }
 
+        // Check content moderation - reject if inappropriate
+        GroqContentModerationService.ModerationResult moderation = GroqContentModerationService.moderateContent(content);
+        if (!moderation.isClean) {
+            throw new IllegalArgumentException("Inappropriate content detected: " + moderation.reason);
+        }
+
         ForumComment comment = new ForumComment();
         comment.setAuthorId(author.getId());
         comment.setPostId(post.getId());
         comment.setContent(content.trim());
-        comment.setStatus(moderationService.evaluateStatus("", content));
+        comment.setStatus("PUBLISHED");
         return commentDAO.create(comment);
     }
 
@@ -112,10 +136,83 @@ public class ForumService {
         return updated;
     }
 
+    public boolean updatePost(User author, ForumPost post, String title, String content, String imageUrl, String videoUrl, String tag) {
+        if (author == null || post == null || isBlank(title) || isBlank(content)) {
+            return false;
+        }
+        // Verify ownership - only the author can edit their post (or admin)
+        if (post.getAuthorId() != author.getId() && !"ADMIN".equalsIgnoreCase(author.getRole())) {
+            return false;
+        }
+
+        post.setTitle(title.trim());
+        post.setContent(content.trim());
+        post.setImageUrl(isBlank(imageUrl) ? null : imageUrl.trim());
+        post.setVideoUrl(isBlank(videoUrl) ? null : videoUrl.trim());
+        post.setTag(isBlank(tag) ? null : tag.trim());
+        return postDAO.update(post);
+    }
+
+    public boolean deletePostByAuthor(User author, ForumPost post) {
+        if (author == null || post == null) {
+            return false;
+        }
+        // Verify ownership - only the author can delete their post (or admin)
+        if (post.getAuthorId() != author.getId() && !"ADMIN".equalsIgnoreCase(author.getRole())) {
+            return false;
+        }
+        return postDAO.delete(post.getId());
+    }
+
+    public ForumPost getPost(int postId) {
+        return postDAO.findById(postId);
+    }
+
+    public boolean updateComment(User author, ForumComment comment, String content) {
+        if (author == null || comment == null || isBlank(content)) {
+            return false;
+        }
+        // Verify ownership - only the author can edit their comment (or admin)
+        if (comment.getAuthorId() != author.getId() && !"ADMIN".equalsIgnoreCase(author.getRole())) {
+            return false;
+        }
+
+        comment.setContent(content.trim());
+        comment.setStatus(moderationService.evaluateStatus("", content));
+        return commentDAO.update(comment);
+    }
+
+    public boolean deleteComment(User author, ForumComment comment) {
+        if (author == null || comment == null) {
+            return false;
+        }
+        // Verify ownership - only the author can delete their comment (or admin)
+        if (comment.getAuthorId() != author.getId() && !"ADMIN".equalsIgnoreCase(author.getRole())) {
+            return false;
+        }
+        return commentDAO.delete(comment.getId());
+    }
+
+    public ForumComment getComment(int commentId) {
+        return commentDAO.findById(commentId);
+    }
+
     public String translatePreview(ForumPost post, String targetLanguage) {
         if (post == null) return "";
         String language = isBlank(targetLanguage) ? "en" : targetLanguage.toLowerCase();
         return "[Traduction automatique vers " + language + " - simulation]\n\n" + post.getContent();
+    }
+
+    public boolean toggleLike(User user, ForumPost post) {
+        if (user == null || post == null) return false;
+        ForumSchemaInitializer.ensureSchema();
+        return postDAO.toggleLike(post.getId(), user.getId());
+    }
+
+    public boolean incrementShareCount(ForumPost post) {
+        if (post == null) return false;
+        ForumSchemaInitializer.ensureSchema();
+        return postDAO.incrementShareCount(post.getId());
     }
 
     private boolean isBlank(String value) {

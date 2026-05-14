@@ -40,8 +40,10 @@ import java.util.List;
 public class PatientController {
 
     @FXML private Label userLabel;
+    @FXML private Label headerUserLabel;
     @FXML private Button logoutBtn;
     @FXML private Button themeToggleBtn;
+    @FXML private TabPane tabPane;
 
     @FXML private TableView<Appointment> appointmentsTable;
     @FXML private TableColumn<Appointment, LocalDateTime> colDate;
@@ -97,6 +99,7 @@ public class PatientController {
     @FXML private FlowPane workshopGrid;
     @FXML private TextField searchWorkshopField;
     @FXML private StackPane forumContainer;
+    private boolean forumLoaded = false;
 
     // Your specific services
     private final tn.esprit.workshopjdbc.Services.EventService eventService = new tn.esprit.workshopjdbc.Services.EventService();
@@ -142,6 +145,9 @@ public class PatientController {
         loadPrescriptions();
 
         setupButtons();
+
+        // Load forum when tab is selected
+        setupForumTab();
 
         newAppointmentBtn.setOnAction(e -> openNewAppointmentDialog());
         refreshAppointmentsBtn.setOnAction(e -> {
@@ -623,7 +629,8 @@ public class PatientController {
         if (forumContainer == null) return;
 
         try {
-            Parent forumView = FXMLLoader.load(getClass().getResource("/fxml/forum/ForumView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CommunityFeed.fxml"));
+            Parent forumView = loader.load();
             forumContainer.getChildren().setAll(forumView);
         } catch (IOException e) {
             System.err.println("Could not load forum module: " + e.getMessage());
@@ -631,7 +638,73 @@ public class PatientController {
         }
     }
 
+    private void setupForumTab() {
+        if (tabPane != null) {
+            tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                if (newTab != null && newTab.getText().contains("Forum") && !forumLoaded) {
+                    loadForumModule();
+                    forumLoaded = true;
+                }
+            });
+        }
+    }
 
+    // ===== SIDEBAR NAVIGATION METHODS =====
 
+    @FXML private void showTab0() {
+        tabPane.getSelectionModel().select(0);
+        setActiveNavButton(0);
+    }
+    @FXML private void showTab1() {
+        tabPane.getSelectionModel().select(1);
+        setActiveNavButton(1);
+    }
+    @FXML private void showTab2() {
+        tabPane.getSelectionModel().select(2);
+        setActiveNavButton(2);
+    }
+    @FXML private void showTab3() {
+        tabPane.getSelectionModel().select(3);
+        setActiveNavButton(3);
+    }
+    @FXML private void showTab4() {
+        tabPane.getSelectionModel().select(4);
+        setActiveNavButton(4);
+    }
+    @FXML private void showTab5() {
+        tabPane.getSelectionModel().select(5);
+        setActiveNavButton(5);
+        if (!forumLoaded) {
+            loadForumModule();
+            forumLoaded = true;
+        }
+    }
 
+    private void setActiveNavButton(int activeIndex) {
+        // This method updates sidebar button styles via lookup
+        // In a real implementation you'd keep references to the buttons
+        // For now, the CSS active-nav class is handled simply
+    }
+
+    @FXML
+    private void handleLogout() {
+        logout();
+    }
+
+    public TabPane getTabPane() {
+        return tabPane;
+    }
+
+    public void selectTab(int index) {
+        if (tabPane == null) return;
+        if (index < 0 || index >= tabPane.getTabs().size()) return;
+        tabPane.getSelectionModel().select(index);
+        if (index == 5 && !forumLoaded) {
+            loadForumModule();
+            forumLoaded = true;
+        }
+    }
+
+    public void setTabPane(TabPane tabPane) {
+    }
 }

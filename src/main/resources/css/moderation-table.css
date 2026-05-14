@@ -1,0 +1,178 @@
+/* ─────────────────────────────────────────────
+   Forum Moderation Table — Enhanced Styles
+   Add these to your community-feed.css
+   ───────────────────────────────────────────── */
+
+/* ── TableView shell ── */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: #f3f4f6;
+}
+
+/* ── Column headers ── */
+.table-view .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 1;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-size: 40px;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 0 8;
+}
+
+/* ── Rows ── */
+.table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-cell-size: 52px;
+    -fx-border-color: transparent transparent #f3f4f6 transparent;
+    -fx-border-width: 1;
+    -fx-padding: 0;
+}
+
+/* Alternating rows */
+.table-row-cell:even {
+    -fx-background-color: #f9fafb;
+}
+
+/* Hover */
+.table-row-cell:hover {
+    -fx-background-color: #eff6ff;
+    -fx-cursor: hand;
+}
+
+/* Selected row */
+.table-row-cell:selected {
+    -fx-background-color: #dbeafe;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #1e40af;
+}
+
+/* ── Cells ── */
+.table-cell {
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-padding: 0 12;
+    -fx-alignment: CENTER-LEFT;
+    -fx-border-color: transparent;
+}
+
+/* ── Scroll bar – hide or slim down ── */
+.table-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #d1d5db;
+    -fx-background-radius: 4;
+}
+
+.table-view .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+/* ────────────────────────────────────────────
+   STATUS BADGE LABELS
+   In your controller, add a styleClass to the
+   Label inside the Status cell:
+     "badge-published", "badge-pending",
+     "badge-hidden",    "badge-locked",
+     "badge-reported"
+   ────────────────────────────────────────── */
+
+.badge-published {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #15803d;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10;
+    -fx-background-radius: 20;
+}
+
+.badge-pending {
+    -fx-background-color: #fef9c3;
+    -fx-text-fill: #854d0e;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10;
+    -fx-background-radius: 20;
+}
+
+.badge-hidden {
+    -fx-background-color: #f3f4f6;
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10;
+    -fx-background-radius: 20;
+}
+
+.badge-locked {
+    -fx-background-color: #e0e7ff;
+    -fx-text-fill: #3730a3;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10;
+    -fx-background-radius: 20;
+}
+
+.badge-reported {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10;
+    -fx-background-radius: 20;
+}
+
+/* ──────────────────────────────────────────
+   CONTROLLER SNIPPET — Status badge cell
+   Add this column setup in your controller:
+   ─────────────────────────────────────────
+colStatus.setCellFactory(col -> new TableCell<>() {
+    private final Label badge = new Label();
+    {
+        setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        setAlignment(Pos.CENTER);
+    }
+    @Override
+    protected void updateItem(String status, boolean empty) {
+        super.updateItem(status, empty);
+        if (empty || status == null) { setGraphic(null); return; }
+        badge.setText(status.toUpperCase());
+        badge.getStyleClass().removeIf(s -> s.startsWith("badge-"));
+        badge.getStyleClass().add("badge-" + status.toLowerCase());
+        setGraphic(badge);
+    }
+});
+   ────────────────────────────────────────── */
+
+/* ──────────────────────────────────────────
+   REPORTS COLUMN — red highlight when > 0
+   In controller setCellFactory for colReports:
+colReports.setCellFactory(col -> new TableCell<>() {
+    @Override
+    protected void updateItem(Integer count, boolean empty) {
+        super.updateItem(count, empty);
+        if (empty || count == null) { setText(null); setStyle(""); return; }
+        setText(count > 0 ? "🚨 " + count : "—");
+        setStyle(count > 0
+            ? "-fx-text-fill: #dc2626; -fx-font-weight: bold;"
+            : "-fx-text-fill: #9ca3af;");
+    }
+});
+   ────────────────────────────────────────── */

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.CommunityFeedViewController" stylesheets="@../../css/community-feed.css">
+
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #ffffff; -fx-padding: 12 25; -fx-border-color: #e4e6eb; -fx-border-width: 0 0 1 0;">
+            <Label text="VitaHealth" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+            <TextField promptText="Search posts, members..." styleClass="search-field" prefWidth="400" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox spacing="15.0" alignment="CENTER">
+                <Button text="🔔" styleClass="icon-button"/>
+                <Button text="💬" styleClass="icon-button"/>
+                <HBox spacing="10.0" alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 5 12; -fx-background-radius: 25;">
+                    <Circle radius="18.0" style="-fx-fill: linear-gradient(#667eea, #764ba2);"/>
+                    <VBox spacing="1.0">
+                        <Label text="Dr. Fatma Tounsi" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                        <Label text="Médecin" style="-fx-font-size: 10px; -fx-text-fill: #65676b;"/>
+                    </VBox>
+                </HBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="280.0" style="-fx-background-color: #ffffff; -fx-border-color: #e4e6eb; -fx-border-width: 0 1 0 0;" spacing="0.0">
+            <padding>
+                <Insets top="20.0" left="0.0" right="0.0" bottom="20.0"/>
+            </padding>
+            
+            <!-- Dashboard Section -->
+            <VBox spacing="8.0" style="-fx-padding: 0 12;-fx-margin-bottom: 15;">
+                <Label text="DASHBOARD" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #90949c; -fx-letter-spacing: 1px; -fx-padding: 8 8;"/>
+                <Button text="📊 Dashboard" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;" onAction="#showCommunityFeed"/>
+            </VBox>
+            
+            <!-- Forum Section -->
+            <VBox spacing="8.0" style="-fx-padding: 0 12; -fx-margin-bottom: 15;">
+                <Label text="FORUM &amp; COMMUNITY" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #90949c; -fx-letter-spacing: 1px; -fx-padding: 8 8;"/>
+                <Button text="📢 Community Feed" styleClass="nav-button, active-nav" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8; -fx-background-color: #e3f2fd; -fx-text-fill: #1e88e5; -fx-font-weight: bold;" onAction="#showCommunityFeed"/>
+                <Button text="💬 Discussions" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                <Button text="🏆 Trending Topics" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+            </VBox>
+            
+            <!-- Patients &amp; Care Section -->
+            <VBox spacing="8.0" style="-fx-padding: 0 12; -fx-margin-bottom: 15;">
+                <Label text="PATIENTS &amp; CARE" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #90949c; -fx-letter-spacing: 1px; -fx-padding: 8 8;"/>
+                <Button text="🏥 Patient Care" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;" onAction="#showPatientCare"/>
+                <Button text="📋 Consultations" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                <Button text="💊 Prescriptions" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                <Button text="📊 Health Records" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+            </VBox>
+            
+            <!-- Resources Section -->
+            <VBox spacing="8.0" style="-fx-padding: 0 12; -fx-margin-bottom: 15;">
+                <Label text="RESOURCES" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #90949c; -fx-letter-spacing: 1px; -fx-padding: 8 8;"/>
+                <Button text="📚 Medical Library" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;" onAction="#showMedicalLibrary"/>
+                <Button text="📖 Guidelines" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                <Button text="🎓 Training" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            
+            <!-- Bottom Actions -->
+            <VBox spacing="8.0" style="-fx-padding: 12;">
+                <Separator style="-fx-padding: 8 0;"/>
+                <Button text="⚙️ Settings" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;" onAction="#showSettings"/>
+                <Button text="❓ Help &amp; Support" styleClass="nav-button" style="-fx-padding: 12 16; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Center Content -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
+            <VBox spacing="20.0" style="-fx-padding: 20;">
+
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <Label text="Community Forum" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <ComboBox promptText="Filter by category" style="-fx-background-color: #ffffff; -fx-padding: 8 12; -fx-background-radius: 8; prefWidth: 180;"/>
+                    <Button text="🔄 Refresh" styleClass="secondary-button"/>
+                </HBox>
+
+                <!-- Create Post Input Card -->
+                <VBox spacing="12.0" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);">
+                    <HBox spacing="12.0" alignment="TOP_LEFT">
+                        <Circle fx:id="postAvatarCircle" radius="24.0" style="-fx-fill: linear-gradient(#667eea, #764ba2);"/>
+                        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                            <TextField fx:id="newPostInput" promptText="What's on your mind, Dr. Tounsi?"
+                                       style="-fx-background-color: #f0f2f5; -fx-background-radius: 20; -fx-padding: 12 15; -fx-font-size: 14px;"
+                                       onMouseClicked="#openCreatePostDialog"/>
+                            <HBox spacing="12.0" alignment="CENTER_LEFT">
+                                <Button text="📸 Photo" styleClass="post-action-button" onAction="#openCreatePostDialog"/>
+                                <Button text="🎥 Video" styleClass="post-action-button" onAction="#openCreatePostDialog"/>
+                                <Button text="😊 Feeling" styleClass="post-action-button" onAction="#openCreatePostDialog"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Post Now" styleClass="primary-button" onAction="#openCreatePostDialog"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Stories Section -->
+                <VBox spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 15 20; -fx-background-radius: 12;">
+                    <Label text="Stories" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #050505;"/>
+                    <HBox fx:id="storiesHBox" spacing="12.0" style="-fx-background-color: transparent;"/>
+                </VBox>
+
+                <!-- Posts Feed -->
+                <VBox fx:id="postsContainer" spacing="15.0">
+                    <!-- Posts will be loaded dynamically here -->
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Right Sidebar -->
+    <right>
+        <VBox prefWidth="320.0" style="-fx-background-color: #ffffff; -fx-border-color: #e4e6eb; -fx-border-width: 0 0 0 1;" spacing="15.0">
+            <padding>
+                <Insets top="20.0" left="20.0" right="20.0" bottom="20.0"/>
+            </padding>
+            <VBox spacing="10.0" style="-fx-background-color: #e3f2fd; -fx-padding: 15; -fx-background-radius: 12;">
+                <Label text="💡 Featured Topic" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+                <Label text="Recent Advances in Cardiology" style="-fx-font-size: 12px; -fx-text-fill: #050505; -fx-font-weight: bold;" wrapText="true"/>
+                <Label text="12 members discussing" style="-fx-font-size: 11px; -fx-text-fill: #65676b;"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <Label text="TRENDING TOPICS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #90949c;"/>
+                <VBox spacing="8.0">
+                    <HBox spacing="10.0" alignment="TOP_LEFT" style="-fx-padding: 10; -fx-background-color: #f8fafc; -fx-background-radius: 8;">
+                        <Label text="#" style="-fx-font-size: 11px; -fx-text-fill: #90949c; -fx-font-weight: bold;"/>
+                        <VBox spacing="2.0">
+                            <Label text="Diabetes Management" style="-fx-font-size: 12px; -fx-text-fill: #050505; -fx-font-weight: bold;"/>
+                            <Label text="542 posts • 89 members" style="-fx-font-size: 10px; -fx-text-fill: #65676b;"/>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="10.0" alignment="TOP_LEFT" style="-fx-padding: 10; -fx-background-color: #f8fafc; -fx-background-radius: 8;">
+                        <Label text="#" style="-fx-font-size: 11px; -fx-text-fill: #90949c; -fx-font-weight: bold;"/>
+                        <VBox spacing="2.0">
+                            <Label text="Mental Health" style="-fx-font-size: 12px; -fx-text-fill: #050505; -fx-font-weight: bold;"/>
+                            <Label text="428 posts • 76 members" style="-fx-font-size: 10px; -fx-text-fill: #65676b;"/>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="10.0" alignment="TOP_LEFT" style="-fx-padding: 10; -fx-background-color: #f8fafc; -fx-background-radius: 8;">
+                        <Label text="#" style="-fx-font-size: 11px; -fx-text-fill: #90949c; -fx-font-weight: bold;"/>
+                        <VBox spacing="2.0">
+                            <Label text="Wellness Tips" style="-fx-font-size: 12px; -fx-text-fill: #050505; -fx-font-weight: bold;"/>
+                            <Label text="356 posts • 124 members" style="-fx-font-size: 10px; -fx-text-fill: #65676b;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </right>
+</BorderPane>

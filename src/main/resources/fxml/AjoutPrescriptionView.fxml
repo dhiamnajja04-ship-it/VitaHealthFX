@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" style="-fx-background-color: #f4f6f9; -fx-padding: 24;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.workshopjdbc.Controllers.NouvellePreescriptionController">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="📋 Nouvelle Prescription" />
+    </HBox>
+    <Separator />
+
+    <!-- Recherche médicament -->
+    <VBox spacing="6">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="🔎 Rechercher un médicament" />
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <TextField fx:id="rechercheMedicamentField" promptText="ex: paracétamol, amoxicilline..." style="-fx-background-radius: 20; -fx-padding: 8 14;" HBox.hgrow="ALWAYS" />
+            <Button fx:id="rechercherMedicamentBtn" style="-fx-background-color: #2980b9; -fx-text-fill: white;                            -fx-background-radius: 20; -fx-padding: 8 18; -fx-cursor: hand;" text="🔍 Rechercher" />
+        </HBox>
+        <!-- ✅ prefHeight agrandi : 160 → 320 -->
+        <ListView fx:id="resultatsMedicaments" prefHeight="1213.0" prefWidth="478.0" style="-fx-background-radius: 8; -fx-border-radius: 8;                          -fx-border-color: #dce1e7; -fx-border-width: 1;" VBox.vgrow="ALWAYS" />
+    </VBox>
+
+    <Separator />
+
+    <!-- Médicaments sélectionnés -->
+    <VBox spacing="6">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="💊 Médicaments sélectionnés" />
+    </VBox>
+     <TextArea fx:id="medicamentsArea" prefHeight="38.0" prefWidth="478.0" promptText="Cliquez sur un résultat pour l'ajouter ici..." style="-fx-background-radius: 8; -fx-border-radius: 8;                          -fx-border-color: #dce1e7;" />
+
+    <!-- Durée -->
+    <VBox spacing="6">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="⏱ Durée du traitement" />
+        <TextField fx:id="dureeField" promptText="Ex: 7 jours, 2 semaines..." style="-fx-background-radius: 20; -fx-padding: 8 14;" />
+    </VBox>
+
+    <!-- Instructions -->
+    <VBox spacing="6">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #34495e;" text="📝 Instructions / Posologie" />
+        <TextArea fx:id="instructionsArea" prefHeight="90" promptText="Ex: 1 comprimé matin et soir pendant les repas..." style="-fx-background-radius: 8; -fx-border-radius: 8;                          -fx-border-color: #dce1e7;" />
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" />
+    <Separator />
+
+    <!-- Actions -->
+    <HBox alignment="CENTER_RIGHT" spacing="12">
+        <!-- ✅ "Annuler" remplacé par "Retour aux prescriptions" -->
+        <Button fx:id="annulerBtn" style="-fx-background-color: #7f8c8d; -fx-text-fill: white;                        -fx-background-radius: 20; -fx-padding: 9 20; -fx-cursor: hand;" text="⬅ Retour aux prescriptions" />
+        <Button fx:id="validerBtn" style="-fx-background-color: #27ae60; -fx-text-fill: white;                        -fx-background-radius: 20; -fx-padding: 9 22; -fx-cursor: hand;                        -fx-font-weight: bold;" text="✅ Valider la prescription" />
+    </HBox>
+
+</VBox>
